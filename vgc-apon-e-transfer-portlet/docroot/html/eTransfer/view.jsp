@@ -49,7 +49,7 @@ if(sapUser!=null&&eTransfer!=null && flag){
 		officeSite="vgc.apon.e.transfer.beijing.slt";
 	}else if("Beijing-ACB".equals(sapUser.getOfficeSite())){
 		officeSite="vgc.apon.e.transfer.beijing.acb";
-	}else if("Beijing-Indigo".equals(sapUser.getOfficeSite())){
+	}else if("Bejiing-Indigo".equals(sapUser.getOfficeSite())){
 		officeSite="vgc.apon.e.transfer.beijing.indigo";
 	}else if("Beijing-VTA".equals(sapUser.getOfficeSite())){
 		officeSite="vgc.apon.e.transfer.beijing.vta";
@@ -606,10 +606,7 @@ function illegalChar(validateFileName){
 			</li>
 			<li class="md01"><liferay-ui:message key="vgc.apon.e.transfer.current.staff.code"></liferay-ui:message></li>
 			<li class="md022">
-				<%
-					String readonly = Validator.isNotNull(eTransfer.getTicketNo())?"readonly=\"readonly\"":"";
-				%>
-				<input <%=readonly %> type="text" id="currentStaffCode" name="<portlet:namespace/>currentStaffCode" value="<%=eTransfer.getCurrentStaffCode()%>" required="required" maxlength="75">
+				<input type="text" id="currentStaffCode" name="<portlet:namespace/>currentStaffCode" value="<%=eTransfer.getCurrentStaffCode()%>" required="required" maxlength="75">
 				<a href='javascript:<%= renderResponse.getNamespace() + "searchSAPUser()" %>' onclick="">
 			    <img src='<%=checkImagePath%>'/></a>
 			</li>
@@ -976,7 +973,7 @@ if (selectCarLink) {
 						officeSite="vgc.apon.e.transfer.beijing.slt";
 					}else if("Beijing-ACB"==event.officeSite){
 						officeSite="vgc.apon.e.transfer.beijing.acb";
-					}else if("Beijing-Indigo"==event.officeSite){
+					}else if("Bejiing-Indigo"==event.officeSite){
 						officeSite="vgc.apon.e.transfer.beijing.indigo";
 					}else if("Beijing-VTA"==event.officeSite){
 						officeSite="vgc.apon.e.transfer.beijing.vta";

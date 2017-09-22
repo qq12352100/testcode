@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflow-definition xmlns="urn:liferay.com:liferay-workflow_6.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:liferay.com:liferay-workflow_6.2.0 http://www.liferay.com/dtd/liferay-workflow-definition_6_2_0.xsd">
+    <name>E-Closing</name>
+    <version>1</version>
+    <state>
+        <name>created</name>
+        <metadata><![CDATA[{"transitions":{"fork":{"bendpoints":[]},"submit":{"bendpoints":[]},"EC_Supervisor Complete":{"bendpoints":[]}},"xy":[10,442]}]]></metadata>
+        <initial>true</initial>
+        <transitions>
+            <transition>
+                <name>submit</name>
+                <target>fork</target>
+                <default>true</default>
+            </transition>
+        </transitions>
+    </state>
+    <state>
+        <name>approved</name>
+        <metadata><![CDATA[{"terminal":true,"xy":[1390,442]}]]></metadata>
+        <actions>
+            <action>
+                <name>approve</name>
+                <script><![CDATA[import com.liferay.portal.kernel.workflow.WorkflowStatusManagerUtil;
+
+WorkflowStatusManagerUtil.updateStatus(0, workflowContext);]]></script>
+                <script-language>groovy</script-language>
+                <execution-type>onEntry</execution-type>
+            </action>
+        </actions>
+    </state>
+    <fork>
+        <name>fork</name>
+        <metadata><![CDATA[{"transitions":{"fse/le consultant":{"bendpoints":[],"xy":[4,0]},"security complete":{"bendpoints":[],"xy":[-46,-37]},"fse/le consultant complete":{"bendpoints":[],"xy":[-47,-35]},"fleet services":{"bendpoints":[],"xy":[4,-2]},"hr department complete":{"bendpoints":[],"xy":[-46,-57]},"organization department complete":{"bendpoints":[],"xy":[-256,-387]},"hr training department complete":{"bendpoints":[],"xy":[-47,-60]},"supervisor complete":{"bendpoints":[],"xy":[-47,44]},"finance department complete":{"bendpoints":[],"xy":[-256,-328]},"it department complete":{"bendpoints":[],"xy":[-46,-48]},"administration department complete":{"bendpoints":[],"xy":[-46,32]}},"xy":[160,430]}]]></metadata>
+        <transitions>
+            <transition>
+                <name>supervisor complete</name>
+                <target>supervisor complete</target>
+                <default>true</default>
+            </transition>
+            <transition>
+                <name>administration department complete</name>
+                <target>administration department complete</target>
+                <default>true</default>
+            </transition>
+            <transition>
+                <name>fleet services</name>
+                <target>fleet services</target>
+                <default>true</default>
+            </transition>
+            <transition>
+                <name>security complete</name>
+                <target>security complete</target>
+                <default>true</default>
+            </transition>
+            <transition>
+                <name>it department complete</name>
+                <target>it department complete</target>
+                <default>true</default>
+            </transition>
+            <transition>
+                <name>finance department complete</name>
+                <target>finance department complete</target>
+                <default>true</default>
+            </transition>
+            <transition>
+                <name>hr department complete</name>
+                <target>hr department complete</target>
+                <default>true</default>
+            </transition>
+            <transition>
+                <name>hr training department complete</name>
+                <target>hr training department complete</target>
+                <default>true</default>
+            </transition>
+            <transition>
+                <name>fse/le consultant</name>
+                <target>fse/le consultant</target>
+                <default>true</default>
+            </transition>
+        </transitions>
+    </fork>
+    <join>
+        <name>join</name>
+        <metadata><![CDATA[{"transitions":{"approve":{"bendpoints":[],"xy":[-27,1]},"approved":{"bendpoints":[]}},"xy":[1210,430]}]]></metadata>
+        <transitions>
+            <transition>
+                <name>approve</name>
+                <target>approved</target>
+            </transition>
+        </transitions>
+    </join>
+    <task>
+        <name>supervisor complete</name>
+        <metadata><![CDATA[{"transitions":{"approve":{"bendpoints":[],"xy":[-125,-64]}},"xy":[662,-26]}]]></metadata>
+        <assignments>
+            <scripted-assignment>
+                <script><![CDATA[import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.model.Role;
+
+long companyId = GetterUtil.getLong((String) workflowContext.get(WorkflowConstants.CONTEXT_COMPANY_ID));
+ServiceContext serviceContext = (ServiceContext) workflowContext.get(WorkflowConstants.CONTEXT_SERVICE_CONTEXT);
+Role supervisorRole = (Role) serviceContext.getAttribute("vgcapon_eclosing_ec_supervisor");
+roles = new ArrayList<Role>();
+roles.add(supervisorRole);
+user = null;]]></script>
+                <script-language>groovy</script-language>
+            </scripted-assignment>
+        </assignments>
+        <transitions>
+            <transition>
+                <name>approve</name>
+                <target>join</target>
+                <default>true</default>
+            </transition>
+        </transitions>
+    </task>
+    <task>
+        <name>administration department complete</name>
+        <metadata><![CDATA[{"transitions":{"approve":{"bendpoints":[],"xy":[-124,-45]}},"xy":[660,78]}]]></metadata>
+        <assignments>
+            <scripted-assignment>
+                <script><![CDATA[import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.model.Role;
+
+long companyId = GetterUtil.getLong((String) workflowContext.get(WorkflowConstants.CONTEXT_COMPANY_ID));
+ServiceContext serviceContext = (ServiceContext) workflowContext.get(WorkflowConstants.CONTEXT_SERVICE_CONTEXT);
+Role[] adminRoles = (Role[]) serviceContext.getAttribute("vgcapon_eclosing_ec_administration_department");
+roles = new ArrayList<Role>();
+for(Role role : adminRoles){
+	roles.add(role);
+}
+user = null;]]></script>
+                <script-language>groovy</script-language>
+            </scripted-assignment>
+        </assignments>
+        <transitions>
+            <transition>
+                <name>approve</name>
+                <target>join</target>
+                <default>true</default>
+            </transition>
+        </transitions>
+    </task>
+    <condition>
+        <name>fleet services</name>
+        <metadata><![CDATA[{"transitions":{"Yes":{"bendpoints":[],"xy":[-8,13]},"fleet services-admin complete":{"bendpoints":[],"xy":[-8,13]},"No":{"bendpoints":[],"xy":[-7,-19]},"fleet services-fse coordination complete":{"bendpoints":[],"xy":[-7,-19]}},"xy":[480,310]}]]></metadata>
+        <script><![CDATA[import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
+
+ServiceContext serviceContext = (ServiceContext) workflowContext.get(WorkflowConstants.CONTEXT_SERVICE_CONTEXT);
+String employeeGroupId = (String)serviceContext.getAttribute("vgcapon_eclosing_employeegroupid");
+
+if(employeeGroupId.equals("6")){
+	returnValue = "No";
+}else{
+	returnValue = "Yes";
+}]]></script>
+        <script-language>groovy</script-language>
+        <transitions>
+            <transition>
+                <name>Yes</name>
+                <target>fleet services-admin complete</target>
+                <default>true</default>
+            </transition>
+            <transition>
+                <name>No</name>
+                <target>fleet services-fse coordination complete</target>
+                <default>true</default>
+            </transition>
+        </transitions>
+    </condition>
+    <task>
+        <name>fleet services-admin complete</name>
+        <metadata><![CDATA[{"transitions":{"approve":{"bendpoints":[],"xy":[-125,-31]}},"xy":[662,182]}]]></metadata>
+        <assignments>
+            <scripted-assignment>
+                <script><![CDATA[import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.model.Role;
+
+long companyId = GetterUtil.getLong((String) workflowContext.get(WorkflowConstants.CONTEXT_COMPANY_ID));
+ServiceContext serviceContext = (ServiceContext) workflowContext.get(WorkflowConstants.CONTEXT_SERVICE_CONTEXT);
+Role[] adminRoles = (Role[]) serviceContext.getAttribute("vgcapon_eclosing_ec_fleet_services_admin");
+roles = new ArrayList<Role>();
+for(Role role : adminRoles){
+	roles.add(role);
+}
+user = null;]]></script>
+                <script-language>groovy</script-language>
+            </scripted-assignment>
+        </assignments>
+        <transitions>
+            <transition>
+                <name>approve</name>
+                <target>join</target>
+                <default>true</default>
+            </transition>
+        </transitions>
+    </task>
+    <task>
+        <name>fleet services-fse coordination complete</name>
+        <metadata><![CDATA[{"transitions":{"approve":{"bendpoints":[],"xy":[-124,-5]}},"xy":[660,338]}]]></metadata>
+        <assignments>
+            <scripted-assignment>
+                <script><![CDATA[import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.model.Role;
+
+long companyId = GetterUtil.getLong((String) workflowContext.get(WorkflowConstants.CONTEXT_COMPANY_ID));
+ServiceContext serviceContext = (ServiceContext) workflowContext.get(WorkflowConstants.CONTEXT_SERVICE_CONTEXT);
+Role[] adminRoles = (Role[]) serviceContext.getAttribute("vgcapon_eclosing_ec_fleet_services_fse_coordination");
+roles = new ArrayList<Role>();
+for(Role role : adminRoles){
+	roles.add(role);
+}
+user = null;]]></script>
+                <script-language>groovy</script-language>
+            </scripted-assignment>
+        </assignments>
+        <transitions>
+            <transition>
+                <name>approve</name>
+                <target>join</target>
+                <default>true</default>
+            </transition>
+        </transitions>
+    </task>
+    <task>
+        <name>fse/le consultant complete</name>
+        <metadata><![CDATA[{"transitions":{"approve":{"bendpoints":[],"xy":[-124,29]}},"xy":[660,529]}]]></metadata>
+        <assignments>
+            <scripted-assignment>
+                <script><![CDATA[import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.model.Role;
+
+long companyId = GetterUtil.getLong((String) workflowContext.get(WorkflowConstants.CONTEXT_COMPANY_ID));
+ServiceContext serviceContext = (ServiceContext) workflowContext.get(WorkflowConstants.CONTEXT_SERVICE_CONTEXT);
+Role[] adminRoles = (Role[]) serviceContext.getAttribute("vgcapon_eclosing_ec_fse_le_consultant");
+roles = new ArrayList<Role>();
+for(Role role : adminRoles){
+	roles.add(role);
+}
+user = null;]]></script>
+                <script-language>groovy</script-language>
+            </scripted-assignment>
+        </assignments>
+        <transitions>
+            <transition>
+                <name>approve</name>
+                <target>join</target>
+                <default>true</default>
+            </transition>
+        </transitions>
+    </task>
+    <task>
+        <name>security complete</name>
+        <metadata><![CDATA[{"transitions":{"approve":{"bendpoints":[],"xy":[-124,18]}},"xy":[660,633]}]]></metadata>
+        <assignments>
+            <scripted-assignment>
+                <script><![CDATA[import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.model.Role;
+
+long companyId = GetterUtil.getLong((String) workflowContext.get(WorkflowConstants.CONTEXT_COMPANY_ID));
+ServiceContext serviceContext = (ServiceContext) workflowContext.get(WorkflowConstants.CONTEXT_SERVICE_CONTEXT);
+Role[] adminRoles = (Role[]) serviceContext.getAttribute("vgcapon_eclosing_ec_security");
+roles = new ArrayList<Role>();
+for(Role role : adminRoles){
+	roles.add(role);
+}
+user = null;]]></script>
+                <script-language>groovy</script-language>
+            </scripted-assignment>
+        </assignments>
+        <transitions>
+            <transition>
+                <name>approve</name>
+                <target>join</target>
+                <default>true</default>
+            </transition>
+        </transitions>
+    </task>
+    <task>
+        <name>it department complete</name>
+        <metadata><![CDATA[{"transitions":{"approve":{"bendpoints":[],"xy":[-124,26]}},"xy":[660,737]}]]></metadata>
+        <assignments>
+            <scripted-assignment>
+                <script><![CDATA[import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.model.Role;
+
+long companyId = GetterUtil.getLong((String) workflowContext.get(WorkflowConstants.CONTEXT_COMPANY_ID));
+ServiceContext serviceContext = (ServiceContext) workflowContext.get(WorkflowConstants.CONTEXT_SERVICE_CONTEXT);
+Role[] adminRoles = (Role[]) serviceContext.getAttribute("vgcapon_eclosing_ec_it_department");
+roles = new ArrayList<Role>();
+for(Role role : adminRoles){
+	roles.add(role);
+}
+user = null;]]></script>
+                <script-language>groovy</script-language>
+            </scripted-assignment>
+        </assignments>
+        <transitions>
+            <transition>
+                <name>approve</name>
+                <target>join</target>
+                <default>true</default>
+            </transition>
+        </transitions>
+    </task>
+    <task>
+        <name>finance department complete</name>
+        <metadata><![CDATA[{"transitions":{"approve":{"bendpoints":[],"xy":[107,-183]}},"xy":[660,1049]}]]></metadata>
+        <assignments>
+            <scripted-assignment>
+                <script><![CDATA[import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.model.Role;
+
+long companyId = GetterUtil.getLong((String) workflowContext.get(WorkflowConstants.CONTEXT_COMPANY_ID));
+ServiceContext serviceContext = (ServiceContext) workflowContext.get(WorkflowConstants.CONTEXT_SERVICE_CONTEXT);
+Role[] adminRoles = (Role[]) serviceContext.getAttribute("vgcapon_eclosing_ec_finance_department");
+roles = new ArrayList<Role>();
+for(Role role : adminRoles){
+	roles.add(role);
+}
+user = null;]]></script>
+                <script-language>groovy</script-language>
+            </scripted-assignment>
+        </assignments>
+        <transitions>
+            <transition>
+                <name>approve</name>
+                <target>join</target>
+                <default>true</default>
+            </transition>
+        </transitions>
+    </task>
+    <task>
+        <name>hr department complete</name>
+        <metadata><![CDATA[{"transitions":{"approve":{"bendpoints":[],"xy":[-124,63]}},"xy":[660,945]}]]></metadata>
+        <assignments>
+            <scripted-assignment>
+                <script><![CDATA[import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.model.Role;
+
+long companyId = GetterUtil.getLong((String) workflowContext.get(WorkflowConstants.CONTEXT_COMPANY_ID));
+ServiceContext serviceContext = (ServiceContext) workflowContext.get(WorkflowConstants.CONTEXT_SERVICE_CONTEXT);
+Role[] adminRoles = (Role[]) serviceContext.getAttribute("vgcapon_eclosing_ec_hr_department");
+roles = new ArrayList<Role>();
+for(Role role : adminRoles){
+	roles.add(role);
+}
+user = null;]]></script>
+                <script-language>groovy</script-language>
+            </scripted-assignment>
+        </assignments>
+        <transitions>
+            <transition>
+                <name>approve</name>
+                <target>join</target>
+                <default>true</default>
+            </transition>
+        </transitions>
+    </task>
+    <task>
+        <name>hr training department complete</name>
+        <metadata><![CDATA[{"transitions":{"approve":{"bendpoints":[],"xy":[-125,52]}},"xy":[662,841]}]]></metadata>
+        <assignments>
+            <scripted-assignment>
+                <script><![CDATA[import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.model.Role;
+
+long companyId = GetterUtil.getLong((String) workflowContext.get(WorkflowConstants.CONTEXT_COMPANY_ID));
+ServiceContext serviceContext = (ServiceContext) workflowContext.get(WorkflowConstants.CONTEXT_SERVICE_CONTEXT);
+Role[] adminRoles = (Role[]) serviceContext.getAttribute("vgcapon_eclosing_ec_hr_training_department");
+roles = new ArrayList<Role>();
+for(Role role : adminRoles){
+	roles.add(role);
+}
+user = null;]]></script>
+                <script-language>groovy</script-language>
+            </scripted-assignment>
+        </assignments>
+        <transitions>
+            <transition>
+                <name>approve</name>
+                <target>join</target>
+                <default>true</default>
+            </transition>
+        </transitions>
+    </task>
+    <condition>
+        <name>fse/le consultant</name>
+        <metadata><![CDATA[{"transitions":{"Yes":{"bendpoints":[]},"No":{"bendpoints":[],"xy":[-2,10]}},"xy":[480,430]}]]></metadata>
+        <script><![CDATA[import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
+
+ServiceContext serviceContext = (ServiceContext) workflowContext.get(WorkflowConstants.CONTEXT_SERVICE_CONTEXT);
+String employeeGroupId = (String)serviceContext.getAttribute("vgcapon_eclosing_employeegroupid");
+
+if(employeeGroupId.equals("4") || employeeGroupId.equals("5") || employeeGroupId.equals("6")){
+	returnValue = "Yes";
+}else{
+	returnValue = "No";
+}]]></script>
+        <script-language>groovy</script-language>
+        <transitions>
+            <transition>
+                <name>No</name>
+                <target>join</target>
+                <default>true</default>
+            </transition>
+            <transition>
+                <name>Yes</name>
+                <target>fse/le consultant complete</target>
+                <default>true</default>
+            </transition>
+        </transitions>
+    </condition>
+    <description>E-Closing</description>
+</workflow-definition>

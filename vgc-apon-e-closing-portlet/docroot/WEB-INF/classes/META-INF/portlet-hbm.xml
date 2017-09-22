@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false" auto-import="false">
+	<import class="com.e.closing.model.EClosing" />
+	<class name="com.e.closing.model.impl.EClosingImpl" table="vgcapon_EClosing">
+		<cache usage="read-write" />
+		<id name="eclosingId" type="long">
+			<generator class="assigned" />
+		</id>
+		<property name="groupId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="companyId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="userId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="userName" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="createDate" type="org.hibernate.type.TimestampType" />
+		<property name="modifiedDate" type="org.hibernate.type.TimestampType" />
+		<property name="ticketNo" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="staffCode" type="com.liferay.portal.dao.orm.hibernate.IntegerType" />
+		<property name="staffName" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="company" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="division" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="department" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="costCenter" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="functionName" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="positionCode" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="employeeGroupId" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="employeeGroupName" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="privateEmailAddress" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="startingDate" type="org.hibernate.type.TimestampType" />
+		<property name="lastWorkingDay" type="org.hibernate.type.TimestampType" />
+		<property name="finishContractDate" type="org.hibernate.type.TimestampType" />
+		<property name="seatOfficeNumber" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="permanentAddress" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="dmOption1" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="dmOption2" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="dmStatus" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="dmComments" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="adOption1" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="adOption2" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="adOption3" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="adOption4" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="adFinanceFee" type="com.liferay.portal.dao.orm.hibernate.DoubleType" />
+		<property name="adStatus" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="adComments" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="fsOption1" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="fsStatus" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="fsComments" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="flcOption1" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="flcOption2" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="flcStatus" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="flcComments" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="securityOption1" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="securityFinanceFee" type="com.liferay.portal.dao.orm.hibernate.DoubleType" />
+		<property name="securityStatus" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="securityComments" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="idOption1" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="idOption2" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="idOption3" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="idOption4" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="idOption5" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="idOption6" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="idOption7" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="idOption8" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="idOption9" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="idHrFee" type="com.liferay.portal.dao.orm.hibernate.DoubleType" />
+		<property name="idFinanceFee" type="com.liferay.portal.dao.orm.hibernate.DoubleType" />
+		<property name="idStatus" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="idComments" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="htdOption1" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="htdHrFee" type="com.liferay.portal.dao.orm.hibernate.DoubleType" />
+		<property name="htdFinanceFee" type="com.liferay.portal.dao.orm.hibernate.DoubleType" />
+		<property name="htdStatus" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="htdComments" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="hdOption1" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="hdOption2" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="hdOption2Text" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="hdOption3" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="hdOption3Money" type="com.liferay.portal.dao.orm.hibernate.DoubleType" />
+		<property name="hdOption4" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="hdOption4Money" type="com.liferay.portal.dao.orm.hibernate.DoubleType" />
+		<property name="hdStatus" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="hdComments" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="hdleaveText" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="fdOption1" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="fdOption2" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="fdOption3" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="fdOption4" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="fdOption4Text" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="fdStatus" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="fdComments" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="applicantAgent" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="approverAgent" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="processType" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="subProcessType" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="status" type="com.liferay.portal.dao.orm.hibernate.IntegerType" />
+		<property name="statusByUserId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="statusByUserName" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="statusDate" type="org.hibernate.type.TimestampType" />
+	</class>
+</hibernate-mapping>

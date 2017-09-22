@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_1_0.xsd">
+	<persistence-unit-metadata>
+		<xml-mapping-metadata-complete/>
+		<persistence-unit-defaults>
+			<access>PROPERTY</access>
+		</persistence-unit-defaults>
+	</persistence-unit-metadata>
+	<mapped-superclass class="com.e.closing.model.impl.EClosingModelImpl">
+		<attributes>
+			<id name="eclosingId" />
+			<basic name="groupId" />
+			<basic name="companyId" />
+			<basic name="userId" />
+			<basic name="userName" />
+			<basic name="createDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="modifiedDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="ticketNo" />
+			<basic name="staffCode" />
+			<basic name="staffName" />
+			<basic name="company" />
+			<basic name="division" />
+			<basic name="department" />
+			<basic name="costCenter" />
+			<basic name="functionName" />
+			<basic name="positionCode" />
+			<basic name="employeeGroupId" />
+			<basic name="employeeGroupName" />
+			<basic name="privateEmailAddress" />
+			<basic name="startingDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="lastWorkingDay">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="finishContractDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="seatOfficeNumber" />
+			<basic name="permanentAddress" />
+			<basic name="dmOption1" />
+			<basic name="dmOption2" />
+			<basic name="dmStatus" />
+			<basic name="dmComments" />
+			<basic name="adOption1" />
+			<basic name="adOption2" />
+			<basic name="adOption3" />
+			<basic name="adOption4" />
+			<basic name="adFinanceFee" />
+			<basic name="adStatus" />
+			<basic name="adComments" />
+			<basic name="fsOption1" />
+			<basic name="fsStatus" />
+			<basic name="fsComments" />
+			<basic name="flcOption1" />
+			<basic name="flcOption2" />
+			<basic name="flcStatus" />
+			<basic name="flcComments" />
+			<basic name="securityOption1" />
+			<basic name="securityFinanceFee" />
+			<basic name="securityStatus" />
+			<basic name="securityComments" />
+			<basic name="idOption1" />
+			<basic name="idOption2" />
+			<basic name="idOption3" />
+			<basic name="idOption4" />
+			<basic name="idOption5" />
+			<basic name="idOption6" />
+			<basic name="idOption7" />
+			<basic name="idOption8" />
+			<basic name="idOption9" />
+			<basic name="idHrFee" />
+			<basic name="idFinanceFee" />
+			<basic name="idStatus" />
+			<basic name="idComments" />
+			<basic name="htdOption1" />
+			<basic name="htdHrFee" />
+			<basic name="htdFinanceFee" />
+			<basic name="htdStatus" />
+			<basic name="htdComments" />
+			<basic name="hdOption1" />
+			<basic name="hdOption2" />
+			<basic name="hdOption2Text" />
+			<basic name="hdOption3" />
+			<basic name="hdOption3Money" />
+			<basic name="hdOption4" />
+			<basic name="hdOption4Money" />
+			<basic name="hdStatus" />
+			<basic name="hdComments" />
+			<basic name="hdleaveText" />
+			<basic name="fdOption1" />
+			<basic name="fdOption2" />
+			<basic name="fdOption3" />
+			<basic name="fdOption4" />
+			<basic name="fdOption4Text" />
+			<basic name="fdStatus" />
+			<basic name="fdComments" />
+			<basic name="applicantAgent" />
+			<basic name="approverAgent" />
+			<basic name="processType" />
+			<basic name="subProcessType" />
+			<basic name="status" />
+			<basic name="statusByUserId" />
+			<basic name="statusByUserName" />
+			<basic name="statusDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+			<transient name="statusByUserUuid" />
+			<transient name="userUuid" />
+		</attributes>
+	</mapped-superclass>
+	<entity class="com.e.closing.model.impl.EClosingImpl" name="EClosing">
+		<table name="vgcapon_EClosing" />
+		<attributes />
+	</entity>
+</entity-mappings>

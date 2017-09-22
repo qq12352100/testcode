@@ -2,6 +2,7 @@
 *.jar
 
 /WEB-INF/classes/
+/.settings/
 
 service.properties
 .classpath

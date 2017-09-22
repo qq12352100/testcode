@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" default-destroy-method="destroy" default-init-method="afterPropertiesSet" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+	<bean id="com.seatoffice.service.SeatOfficeLocalService" class="com.seatoffice.service.impl.SeatOfficeLocalServiceImpl" />
+	<bean id="com.seatoffice.service.SeatOfficeService" class="com.seatoffice.service.impl.SeatOfficeServiceImpl" />
+	<bean id="com.seatoffice.service.persistence.SeatOfficePersistence" class="com.seatoffice.service.persistence.SeatOfficePersistenceImpl" parent="basePersistence" />
+</beans>

@@ -1,0 +1,296 @@
+<?xml version="1.0"?>
+<workflow-definition xmlns="urn:liferay.com:liferay-workflow_6.2.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:liferay.com:liferay-workflow_6.2.0 http://www.liferay.com/dtd/liferay-workflow-definition_6_2_0.xsd">
+	<name>Seat And Office</name>
+	<description>The seat and office moving workflow content.</description>
+	<version>1</version>
+	<state>
+		<name>created</name>
+		<metadata><![CDATA[{"transitions":{"reviewer":{"bendpoints":[],"xy":[-29,9]},"review":{"bendpoints":[]}},"xy":[50,265]}]]></metadata>
+		<initial>true</initial>
+        <transitions>
+            <transition>
+                <name>reviewer</name>
+                <target>Admin Seat Management</target>
+                <default>true</default>
+            </transition>
+        </transitions>
+	</state>
+	<state>
+		<name>approved</name>
+		<metadata><![CDATA[{"terminal":true,"xy":[840,265]}]]></metadata>
+		<actions>
+			<action>
+				<name>approve</name>
+				<script>
+					<![CDATA[import com.liferay.portal.kernel.workflow.WorkflowStatusManagerUtil;
+						import com.liferay.portal.kernel.workflow.WorkflowConstants;
+						WorkflowStatusManagerUtil.updateStatus(WorkflowConstants.toStatus("approved"), workflowContext);]]>
+				</script>
+				<script-language>groovy</script-language>
+				<execution-type>onEntry</execution-type>
+			</action>
+		</actions>
+	</state>
+	<task>
+		<name>update</name>
+		<metadata><![CDATA[{"transitions":{"complete":{"bendpoints":[[263,236]]},"resubmit":{"bendpoints":[[293,447]]}},"xy":[380,481]}]]></metadata>
+		<actions>
+			<action>
+				<name>reject</name>
+				<script>
+					<![CDATA[Packages.com.liferay.portal.kernel.workflow.WorkflowStatusManagerUtil.updateStatus(Packages.com.liferay.portal.kernel.workflow.WorkflowConstants.toStatus("draft"), workflowContext);]]>
+				</script>
+				<script-language>javascript</script-language>
+				<execution-type>onAssignment</execution-type>
+			</action>
+			<notification>
+				<name>Creator Modification Notification</name>
+				<template>
+						<![CDATA[Your submission was rejected by ${userName}, please modify and resubmit.]]>
+				</template>
+				<template-language>freemarker</template-language>
+				<notification-type>user-notification</notification-type>
+				<recipients>
+					<user />
+				</recipients>
+				<execution-type>onAssignment</execution-type>
+			</notification>
+		</actions>
+		<assignments>
+			<user />
+		</assignments>
+        <transitions>
+            <transition>
+                <name>resubmit</name>
+                <target>Admin Seat Management</target>
+                <default>true</default>
+            </transition>
+        </transitions>
+	</task>
+	<task>
+		<name>supervisor reviewer</name>
+		<metadata><![CDATA[{"transitions":{"approve":{"bendpoints":[],"xy":[-55,-5]},"reject":{"bendpoints":[]}},"xy":[350,250]}]]></metadata>
+		<actions>
+			<notification>
+				<name>Review Notification</name>
+				<template>
+					<![CDATA[${userName} sent you a ${entryType} for review in the workflow.]]>
+				</template>
+				<template-language>freemarker</template-language>
+				<notification-type>user-notification</notification-type>
+				<recipients>
+					<user />
+				</recipients>
+				<execution-type>onAssignment</execution-type>
+			</notification>
+            <action>
+                <name>approve</name>
+                <script><![CDATA[import com.liferay.portal.kernel.workflow.WorkflowStatusManagerUtil;
+									import com.liferay.portal.kernel.workflow.WorkflowConstants;
+									WorkflowStatusManagerUtil.updateStatus(101, workflowContext);]]></script>
+                <script-language>groovy</script-language>
+                <execution-type>onEntry</execution-type>
+            </action>
+		</actions>
+        <assignments>
+            <scripted-assignment>
+                <script><![CDATA[
+				import com.liferay.portal.service.UserLocalServiceUtil;
+				import com.liferay.portal.kernel.util.GetterUtil;
+				import com.liferay.portal.kernel.workflow.WorkflowConstants;
+				import com.liferay.portal.service.ServiceContext;
+				import com.liferay.portal.service.RoleLocalServiceUtil;
+				import com.liferay.portal.model.Role;
+				
+				long companyId = GetterUtil.getLong((String) workflowContext.get(WorkflowConstants.CONTEXT_COMPANY_ID));
+				ServiceContext serviceContext = (ServiceContext) workflowContext.get(WorkflowConstants.CONTEXT_SERVICE_CONTEXT);
+				Role supervisorRole = (Role) serviceContext.getAttribute("vgcapon_seatOffice_supervisor");
+				user = null;
+				roles = new ArrayList<Role>();
+				roles.add(supervisorRole);
+				]]></script>
+                <script-language>groovy</script-language>
+            </scripted-assignment>
+        </assignments>
+		<transitions>
+			<transition>
+				<name>reject</name>
+				<target>update</target>
+				<default>false</default>
+			</transition>
+            <transition>
+                <name>approve</name>
+                <target>approveCondition</target>
+            </transition>
+            <transition>
+                <name>approve</name>
+                <target>PositionFgCondition</target>
+            </transition>
+		</transitions>
+	</task>
+    <task>
+        <name>Admin Seat Management</name>
+        <metadata><![CDATA[{"transitions":{"approve":{"bendpoints":[],"xy":[-24,7]},"reject":{"bendpoints":[]}},"xy":[190,250]}]]></metadata>
+        <actions>
+            <action>
+                <name>rusubmit</name>
+                <script><![CDATA[					import com.liferay.portal.kernel.workflow.WorkflowStatusManagerUtil;
+									import com.liferay.portal.kernel.workflow.WorkflowConstants;
+									WorkflowStatusManagerUtil.updateStatus(WorkflowConstants.toStatus("pending"), workflowContext);
+				]]></script>
+                <script-language>groovy</script-language>
+                <execution-type>onEntry</execution-type>
+            </action>
+        </actions>
+        <assignments>
+            <scripted-assignment>
+                <script><![CDATA[	
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.RoleLocalServiceUtil;
+import com.liferay.portal.model.Role;
+
+long companyId = GetterUtil.getLong((String) workflowContext.get(WorkflowConstants.CONTEXT_COMPANY_ID));
+ServiceContext serviceContext = (ServiceContext) workflowContext.get(WorkflowConstants.CONTEXT_SERVICE_CONTEXT);
+Role[] adminRoles = (Role[]) serviceContext.getAttribute("vgcapon_SO_Admin_Seat_Management");
+roles = new ArrayList<Role>();
+for(Role role:adminRoles) {
+	roles.add(role);
+}
+user = null;]]></script>
+                <script-language>groovy</script-language>
+            </scripted-assignment>
+        </assignments>
+        <transitions>
+            <transition>
+                <name>approve</name>
+                <target>supervisor reviewer</target>
+            </transition>
+            <transition>
+                <name>reject</name>
+                <target>update</target>
+                <default>true</default>
+            </transition>
+        </transitions>
+    </task>
+    <task>
+        <name>Head of Admin</name>
+        <metadata><![CDATA[{"transitions":{"approve":{"bendpoints":[],"xy":[-19,9]},"approved":{"bendpoints":[],"xy":[-24,6]},"reject":{"bendpoints":[]}},"xy":[520,250]}]]></metadata>
+        <actions>
+            <action>
+                <name>approve</name>
+                <script><![CDATA[/* specify task action script */
+import com.liferay.portal.kernel.workflow.WorkflowStatusManagerUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
+WorkflowStatusManagerUtil.updateStatus(102, workflowContext);]]></script>
+                <script-language>groovy</script-language>
+                <execution-type>onEntry</execution-type>
+            </action>
+        </actions>
+        <assignments>
+            <scripted-assignment>
+                <script><![CDATA[import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.RoleLocalServiceUtil;
+import com.liferay.portal.model.Role;
+
+long companyId = GetterUtil.getLong((String) workflowContext.get(WorkflowConstants.CONTEXT_COMPANY_ID));
+ServiceContext serviceContext = (ServiceContext) workflowContext.get(WorkflowConstants.CONTEXT_SERVICE_CONTEXT);
+Role[] adminRoles = (Role[]) serviceContext.getAttribute("vgcapon_SO_Head_of_Admin");
+roles = new ArrayList<Role>();
+for(Role role:adminRoles) {
+	roles.add(role);
+}
+user = null;]]></script>
+                <script-language>groovy</script-language>
+            </scripted-assignment>
+        </assignments>
+        <transitions>
+            <transition>
+                <name>reject</name>
+                <target>update</target>
+            </transition>
+            <transition>
+                <name>approve</name>
+                <target>Admin</target>
+            </transition>
+            <transition>
+                <name>approve</name>
+                <target>Admin Seat Management(review)</target>
+            </transition>
+        </transitions>
+    </task>
+    <task>
+        <name>Admin Seat Management(review)</name>
+        <metadata><![CDATA[{"transitions":{"approve":{"bendpoints":[],"xy":[-24,11]}},"xy":[680,250]}]]></metadata>
+        <actions>
+            <action>
+                <name>approve</name>
+                <script><![CDATA[/* specify task action script */
+import com.liferay.portal.kernel.workflow.WorkflowStatusManagerUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
+WorkflowStatusManagerUtil.updateStatus(103, workflowContext);]]></script>
+                <script-language>groovy</script-language>
+                <execution-type>onEntry</execution-type>
+            </action>
+        </actions>
+        <assignments>
+            <scripted-assignment>
+                <script><![CDATA[	import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.RoleLocalServiceUtil;
+import com.liferay.portal.model.Role;
+
+long companyId = GetterUtil.getLong((String) workflowContext.get(WorkflowConstants.CONTEXT_COMPANY_ID));
+ServiceContext serviceContext = (ServiceContext) workflowContext.get(WorkflowConstants.CONTEXT_SERVICE_CONTEXT);
+Role[] adminRoles = (Role[]) serviceContext.getAttribute("vgcapon_SO_Admin_Seat_Management");
+roles = new ArrayList<Role>();
+for(Role role:adminRoles) {
+	roles.add(role);
+}
+user = null;]]></script>
+                <script-language>groovy</script-language>
+            </scripted-assignment>
+        </assignments>
+        <transitions>
+            <transition>
+                <name>approve</name>
+                <target>approved</target>
+                <default>true</default>
+            </transition>
+        </transitions>
+    </task>
+    <condition>
+        <name>PositionFgCondition</name>
+        <metadata><![CDATA[{"transitions":{"yes":{"bendpoints":[]},"no":{"bendpoints":[]},"Yes":{"bendpoints":[],"xy":[1,-4]},"No":{"bendpoints":[],"xy":[12,-4]}},"xy":[522,20]}]]></metadata>
+        <script><![CDATA[import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.service.ServiceContext;
+
+ServiceContext serviceContext = (ServiceContext) workflowContext.get(WorkflowConstants.CONTEXT_SERVICE_CONTEXT);
+String positionFg = (String) serviceContext.getAttribute("vgcapon_seatOffice_positionFg");
+
+if (positionFg.contains("No")) {
+	returnValue = "No";
+}else {
+	returnValue = "Yes";
+}]]></script>
+        <script-language>groovy</script-language>
+        <transitions>
+            <transition>
+                <name>Yes</name>
+                <target>Head of Admin</target>
+            </transition>
+            <transition>
+                <name>No</name>
+                <target>Admin Seat Management(review)</target>
+            </transition>
+        </transitions>
+    </condition>
+    <name>seat and office moving</name>
+</workflow-definition>

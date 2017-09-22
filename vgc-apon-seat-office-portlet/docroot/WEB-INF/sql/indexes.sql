@@ -1,0 +1,1 @@
+create index IX_64A59EA6 on vgcapon_SeatOffice (status, userId);

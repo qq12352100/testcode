@@ -1,7 +1,7 @@
 package com.seatoffice.util;
 
 public enum OfficeSiteEnum {
-	SLT("Beijing-SLT", "01"), ACB("Beijing-ACB", "02"), INDIGO("Bejiing-Indigo", "03"), VTA("Beijing-VTA", "04"),
+	SLT("Beijing-SLT", "01"), ACB("Beijing-ACB", "02"), INDIGO("Beijing-Indigo", "03"), VTA("Beijing-VTA", "04"),
 	HLP("Beijing-HLP", "05"), CITY("Beijing-Audi City", "06"), TCB("Beijing-Audi TCB", "07"), ATA("Beijing-Audi ATA", "08"),
 	DEALER("Beijing-Audi Dealer No.1", "09"), NA("N/A", "10"),EMPTY("","0");
 	

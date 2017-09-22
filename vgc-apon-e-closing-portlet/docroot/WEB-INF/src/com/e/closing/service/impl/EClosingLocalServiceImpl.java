@@ -620,7 +620,7 @@ public class EClosingLocalServiceImpl extends EClosingLocalServiceBaseImpl {
 			subject = "E-Closing Application-#staffName#-#ticketNo#- Cabinet Key & Office Key Copy Fee";
 		}
 		else if (emailId.equals("8")) {
-			subject = "VGC Closing Guide";
+			subject = "VCIC Closing Guide";
 		}
 		return subject;
 	}

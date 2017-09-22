@@ -6,12 +6,12 @@ rm -rf vgc-apon-e-transfer-portlet/docroot/WEB-INF/classes
 rm -rf vgc-apon-seat-office-portlet/docroot/WEB-INF/classes
 sleep 1s
 git add .
-sleep 1s
-git commit -m '$1'
+sleep 3s
+git commit -m "$1"
 sleep 1s
 git push origin master
-sleep 1s
+sleep 3s
 echo "remove all file!"
 rm -rf vgc-apon*
-sleep 3s
+sleep 1s
 echo "ok!"

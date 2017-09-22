@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 6.2.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_6_2_0.dtd">
+<service-builder package-path="com.e.onboarding">
+	<author>sanguine</author>
+	<namespace>vgcapon</namespace>
+
+	<entity name="Distribution" local-service="true" remote-service="true">
+
+		<!-- PK fields -->
+
+		<column name="distributionId" type="long" primary="true" />
+
+		<!-- Group instance -->
+
+		<column name="groupId" type="long" />
+
+		<!-- Audit fields -->
+
+		<column name="companyId" type="long" />
+		<column name="userId" type="long" />
+		<column name="userName" type="String" />
+		<column name="createDate" type="Date" />
+		<column name="modifiedDate" type="Date" />
+
+		<!-- Other fields -->
+
+		<column name="emailAddress" type="String" />
+		<column name="name" type="String" />
+		<column name="comments" type="String" />
+		<column name="type" type="String"/>
+		
+		<!-- Order -->
+
+		<!-- Finder methods -->
+		<finder return-type="Collection" name="Type">
+			<finder-column name="type"></finder-column>
+		</finder>
+		
+		<finder return-type="Distribution" name="emailAddress">
+			<finder-column name="emailAddress"></finder-column>
+		</finder>
+	</entity>
+	
+	<entity name="EOnBoarding" local-service="true" remote-service="true">
+
+		<!-- PK fields -->
+
+		<column name="eOnBoardingId" type="long" primary="true" />
+        <column name="ticketNo" type="String"/>
+        <column name="processType" type="String"></column>
+        <column name="subType" type="String"></column>
+
+		<!-- Group instance -->
+
+		<column name="groupId" type="long" />
+
+		<!-- Audit fields -->
+
+		<column name="companyId" type="long" />
+		<column name="userId" type="long" />
+		<column name="userName" type="String" />
+		<column name="createDate" type="Date" />
+		<column name="modifiedDate" type="Date" />
+		<column name="submittedDate" type="Date" />
+		<column name="modifiedUserId" type="long"/>
+		<column name="modifiedUserName" type="String"/>
+
+        <!-- workflow -->
+	     <column name="status" type="int" />
+		<column name="statusByUserId" type="long" />
+		<column name="statusByUserName" type="String" />
+		<column name="statusDate" type="Date" />
+		<!-- Other fields -->
+
+		<column name="staffCode" type="String" />
+		<column name="lastName" type="String" />
+		<column name="firstName" type="String" />
+		<column name="name" type="String" />
+		<column name="gender" type="String" />
+		<column name="birthday" type="Date" />
+		<column name="photoPath" type="String" />
+		
+		<column name="contractType" type="String" />
+		<column name="workLocation" type="String" />
+		<column name="division" type="String" />
+		<column name="officeSite" type="String" />
+		<column name="department" type="String" />
+		<column name="startingDate" type="Date" />
+        <column name="positionCode" type="String" />
+		<column name="serviceLength" type="String" />
+
+		<column name="functionName" type="String" />
+		<column name="reportTo" type="String" />		
+		<column name="reportToStaffName" type="String" />
+		<column name="title" type="String" />		
+		<column name="costCenter" type="String" />		
+		
+        <column name="itRelatedHardware" type="boolean" />		
+		<column name="companyCar" type="boolean" />
+		<column name="replacement" type="boolean" />
+		
+		<column name="nameOfReplacedPerson" type="String" />
+		<column name="contactInfo" type="String" />
+        <column name="comments" type="String" />
+        
+        <column name="isApplicantAgent" type="boolean"></column>
+        <column name="isApproverAgent" type="boolean"></column>  
+        
+        <column name="adminEntitlement" type="String" />     
+        <column name="adminSeatNo" type="String" />         
+		<column name="adminTasks" type="String" />
+		<column name="adminStatus" type="String" />
+        <column name="adminComments" type="String" />
+        
+        <column name="securityTasks" type="String" />
+		<column name="securityStatus" type="String" />
+        <column name="securityComments" type="String" />
+  
+        
+        <column name="itpTasks" type="String" />
+		<column name="itpStatus" type="String" />
+        <column name="iptComments" type="String" />
+        
+        <column name="financeTasks" type="String" />
+		<column name="financeStatus" type="String" />
+        <column name="financeComments" type="String" />
+        
+		<!-- Order -->
+		
+		<!-- Finder methods -->
+		<finder name="S_U" return-type="Collection">
+			<finder-column name="status" />
+			<finder-column name="userId" />
+		</finder>
+	</entity>	
+</service-builder>

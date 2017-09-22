@@ -274,10 +274,10 @@ public interface EClosingLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
-	public void saveOrUpdateAuditTrailLog(long companyId, long groupId,
-		long eClosingId, long operationUserId, java.lang.String operationUser,
-		java.lang.String action, java.lang.String operationComment,
-		boolean isDelegation)
+	public void saveOrUpdateAuditTrailLog(java.lang.String workflowRoleName,
+		long companyId, long groupId, long eClosingId, long operationUserId,
+		java.lang.String operationUser, java.lang.String action,
+		java.lang.String operationComment, boolean isDelegation)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 

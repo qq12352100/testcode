@@ -1,3 +1,7 @@
 *.class
 *.jar
+
 /WEB-INF/classes/
+
+service.properties
+.classpath

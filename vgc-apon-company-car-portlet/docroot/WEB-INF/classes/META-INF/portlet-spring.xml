@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" default-destroy-method="destroy" default-init-method="afterPropertiesSet" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+	<bean id="com.company.car.service.CompanyCarManagementLocalService" class="com.company.car.service.impl.CompanyCarManagementLocalServiceImpl" />
+	<bean id="com.company.car.service.CompanyCarManagementService" class="com.company.car.service.impl.CompanyCarManagementServiceImpl" />
+	<bean id="com.company.car.service.persistence.CompanyCarManagementPersistence" class="com.company.car.service.persistence.CompanyCarManagementPersistenceImpl" parent="basePersistence" />
+	<bean id="com.company.car.service.FirstCompanyCarLocalService" class="com.company.car.service.impl.FirstCompanyCarLocalServiceImpl" />
+	<bean id="com.company.car.service.FirstCompanyCarService" class="com.company.car.service.impl.FirstCompanyCarServiceImpl" />
+	<bean id="com.company.car.service.persistence.FirstCompanyCarPersistence" class="com.company.car.service.persistence.FirstCompanyCarPersistenceImpl" parent="basePersistence" />
+	<bean id="com.company.car.service.SecondCompanyCarLocalService" class="com.company.car.service.impl.SecondCompanyCarLocalServiceImpl" />
+	<bean id="com.company.car.service.SecondCompanyCarService" class="com.company.car.service.impl.SecondCompanyCarServiceImpl" />
+	<bean id="com.company.car.service.persistence.SecondCompanyCarPersistence" class="com.company.car.service.persistence.SecondCompanyCarPersistenceImpl" parent="basePersistence" />
+</beans>

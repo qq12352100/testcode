@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+
+<model-hints>
+	<model name="com.company.car.model.CompanyCarManagement">
+		<field name="companyCarManagementId" type="long" />
+		<field name="createDate" type="Date" />
+		<field name="modifiedDate" type="Date" />
+		<field name="carNo" type="String" />
+		<field name="carType" type="String" />
+		<field name="contractType" type="String" />
+		<field name="gradeType" type="String" />
+		<field name="grade" type="String" />
+		<field name="carBrand" type="String" />
+		<field name="carModel" type="String" />
+		<field name="carCategory" type="String" />
+	</model>
+	<model name="com.company.car.model.FirstCompanyCar">
+		<field name="firstCompanyCarId" type="long" />
+		<field name="ticketNo" type="String" />
+		<field name="groupId" type="long" />
+		<field name="userId" type="long" />
+		<field name="userName" type="String" />
+		<field name="createDate" type="Date" />
+		<field name="modifiedDate" type="Date" />
+		<field name="submittedDate" type="Date" />
+		<field name="companyId" type="long" />
+		<field name="name" type="String" />
+		<field name="staffCode" type="long" />
+		<field name="division" type="String" />
+		<field name="department" type="String" />
+		<field name="status" type="int" />
+		<field name="statusByUserId" type="long" />
+		<field name="statusByUserName" type="String" />
+		<field name="companyName" type="String" />
+		<field name="statusDate" type="Date" />
+		<field name="contactNo" type="String" />
+		<field name="workingLocation" type="String" />
+		<field name="officeSite" type="String" />
+		<field name="currentCarModel" type="String" />
+		<field name="currentCarColor" type="String" />
+		<field name="currentPlateNumber" type="String" />
+		<field name="acquiringDate" type="Date" />
+		<field name="expectedCarModel" type="String" />
+		<field name="expectedCarColor" type="String" />
+		<field name="expectedLastPlateNumber" type="String" />
+		<field name="positionCostCenterId" type="String" />
+		<field name="employeeGroupId" type="String" />
+		<field name="contractEndDate" type="Date" />
+		<field name="mobilePhone" type="String" />
+		<field name="officePhone" type="String" />
+		<field name="email" type="String" />
+		<field name="isApplicantAgent" type="boolean" />
+		<field name="isApproverAgent" type="boolean" />
+		<field name="drivingLicenseInformation" type="int" />
+		<field name="estimatedObtainingDate" type="Date" />
+		<field name="comments" type="String">
+			<hint name="max-length">512</hint>
+		</field>
+		<field name="childrenNumber" type="int" />
+		<field name="processType" type="String" />
+		<field name="subType" type="String" />
+	</model>
+	<model name="com.company.car.model.SecondCompanyCar">
+		<field name="secondCompanyCarId" type="long" />
+		<field name="ticketNo" type="String" />
+		<field name="groupId" type="long" />
+		<field name="userId" type="long" />
+		<field name="userName" type="String" />
+		<field name="createDate" type="Date" />
+		<field name="modifiedDate" type="Date" />
+		<field name="submittedDate" type="Date" />
+		<field name="companyId" type="long" />
+		<field name="name" type="String" />
+		<field name="staffCode" type="long" />
+		<field name="division" type="String" />
+		<field name="department" type="String" />
+		<field name="status" type="int" />
+		<field name="statusByUserId" type="long" />
+		<field name="statusByUserName" type="String" />
+		<field name="companyName" type="String" />
+		<field name="statusDate" type="Date" />
+		<field name="contactNo" type="String" />
+		<field name="workingLocation" type="String" />
+		<field name="officeSite" type="String" />
+		<field name="currentCarModel" type="String" />
+		<field name="currentCarColor" type="String" />
+		<field name="currentPlateNumber" type="String" />
+		<field name="acquiringDate" type="Date" />
+		<field name="expectedCarModel" type="String" />
+		<field name="expectedCarColor" type="String" />
+		<field name="expectedLastPlateNumber" type="String" />
+		<field name="positionCostCenterId" type="String" />
+		<field name="employeeGroupId" type="String" />
+		<field name="contractEndDate" type="Date" />
+		<field name="mobilePhone" type="String" />
+		<field name="officePhone" type="String" />
+		<field name="email" type="String" />
+		<field name="isApplicantAgent" type="boolean" />
+		<field name="isApproverAgent" type="boolean" />
+		<field name="drivingLicenseInformation" type="int" />
+		<field name="estimatedObtainingDate" type="Date" />
+		<field name="comments" type="String">
+			<hint name="max-length">512</hint>
+		</field>
+		<field name="processType" type="String" />
+		<field name="subType" type="String" />
+	</model>
+</model-hints>

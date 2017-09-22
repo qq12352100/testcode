@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false" auto-import="false">
+	<import class="com.company.car.model.CompanyCarManagement" />
+	<import class="com.company.car.model.FirstCompanyCar" />
+	<class name="com.company.car.model.impl.CompanyCarManagementImpl" table="vgcapon_CompanyCarManagement">
+		<cache usage="read-write" />
+		<id name="companyCarManagementId" type="long">
+			<generator class="assigned" />
+		</id>
+		<property name="createDate" type="org.hibernate.type.TimestampType" />
+		<property name="modifiedDate" type="org.hibernate.type.TimestampType" />
+		<property name="carNo" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="carType" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="contarctType" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="gradeType" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="grade" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="carBrand" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="carModel" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="carCategory" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+	</class>
+	<class name="com.company.car.model.impl.FirstCompanyCarImpl" table="vgcapon_FirstCompanyCar">
+		<cache usage="read-write" />
+		<id name="firstCompanyCarId" type="long">
+			<generator class="assigned" />
+		</id>
+		<property name="ticketNo" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="groupId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="userId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="userName" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="createDate" type="org.hibernate.type.TimestampType" />
+		<property name="modifiedDate" type="org.hibernate.type.TimestampType" />
+		<property name="companyId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="name" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="staffCode" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="divisionDepartment" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="status" type="com.liferay.portal.dao.orm.hibernate.IntegerType" />
+		<property name="statusByUserId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="statusByUserName" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="companyName" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="statusDate" type="org.hibernate.type.TimestampType" />
+		<property name="contactNo" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="workingLocation" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="officeSite" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="currentCarModel" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="currentCarColor" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="currentPlateNumber" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="acquiringDate" type="org.hibernate.type.TimestampType" />
+		<property name="expectedCarModel" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="expectedCarColor" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="expectedLastPlateNumber" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="positionCostCenterId" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="employeeGroupId" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="contractEndDate" type="org.hibernate.type.TimestampType" />
+		<property name="mobilePhone" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="officePhone" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="email" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="isOnBehalfOf" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="isHasCondition" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="comments" type="com.liferay.portal.dao.orm.hibernate.StringType" />
+		<property name="familyMemberInChina" type="com.liferay.portal.dao.orm.hibernate.IntegerType" />
+	</class>
+</hibernate-mapping>

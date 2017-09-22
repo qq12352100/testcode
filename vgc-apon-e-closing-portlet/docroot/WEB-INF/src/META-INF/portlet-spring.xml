@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" default-destroy-method="destroy" default-init-method="afterPropertiesSet" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
-	<bean id="com.e.closing.service.EClosingLocalService" class="com.e.closing.service.impl.EClosingLocalServiceImpl" />
-	<bean id="com.e.closing.service.EClosingService" class="com.e.closing.service.impl.EClosingServiceImpl" />
-	<bean id="com.e.closing.service.persistence.EClosingPersistence" class="com.e.closing.service.persistence.EClosingPersistenceImpl" parent="basePersistence" />
-	<bean id="com.e.closing.service.persistence.EClosingFinder" class="com.e.closing.service.persistence.EClosingFinderImpl" parent="basePersistence" />
-</beans>

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 6.2.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_6_2_0.dtd">
+<service-builder package-path="com.company.car">
+	<namespace>vgcapon</namespace>
+
+	<entity name="CompanyCarManagement" local-service="true" remote-service="true">
+
+		<!-- PK fields -->
+
+		<column name="companyCarManagementId" type="long" primary="true" />
+
+		<!-- Audit fields -->
+
+		<column name="createDate" type="Date" />
+		<column name="modifiedDate" type="Date" />
+
+		<!-- Other fields -->
+		<column name="carNo" type="String" />	
+		<column name="carType" type="String" />
+		<column name="contractType" type="String" />
+		<column name="gradeType" type="String" />
+		<column name="grade" type="String" />
+		<column name="carBrand" type="String" />
+		<column name="carModel" type="String" />
+		<column name="carCategory" type="String" />
+
+		<!-- Order -->
+
+		<order by="asc">
+			<order-column name="carCategory" />
+		</order>
+
+		<finder name="carNo" return-type="CompanyCarManagement">
+			<finder-column name="carNo" />
+		</finder>
+
+		<finder name="C_C_C_C" return-type="Collection">
+			<finder-column name="carType" />
+			<finder-column name="contractType" />
+			<finder-column name="carBrand" />
+			<finder-column name="carCategory" />
+		</finder>
+	</entity>
+	<entity name="FirstCompanyCar" local-service="true" remote-service="true">
+				<!-- PK fields -->
+
+		<column name="firstCompanyCarId" type="long" primary="true" />
+        <column name="ticketNo" type="String"></column>
+
+		<!-- Group instance -->
+
+		<column name="groupId" type="long" />
+
+		<!-- Audit fields -->
+
+		<column name="userId" type="long" />
+		<column name="userName" type="String" />
+		<column name="createDate" type="Date" />
+		<column name="modifiedDate" type="Date" />
+		<column name="submittedDate" type="Date" />
+		<column name="companyId" type="long" />
+
+		<!-- Other fields -->
+
+		<column name="name" type="String" />
+		<column name="staffCode" type="long" />
+		<column name="division" type="String" />
+		<column name="department" type="String" />
+
+		<!-- Workflow -->
+		<column name="status" type="int" />
+		<column name="statusByUserId" type="long" />
+		<column name="statusByUserName" type="String" />
+		<column name="companyName" type="String" />
+		<column name="statusDate" type="Date" />
+        <column name="contactNo" type="String"></column>
+        <column name="workingLocation" type="String"></column>
+        <column name="officeSite" type="String"></column>
+        <column name="currentCarModel" type="String"></column>
+        <column name="currentCarColor" type="String"></column>
+        <column name="currentPlateNumber" type="String"></column>
+        <column name="acquiringDate" type="Date"></column>
+        <column name="expectedCarModel" type="String"></column>
+        <column name="expectedCarColor" type="String"></column>
+        <column name="expectedLastPlateNumber" type="String"></column>
+		<column name="positionCostCenterId" type="String"></column>
+		<column name="employeeGroupId" type="String"></column>
+		<column name="contractEndDate" type="Date" />
+        <column name="mobilePhone" type="String"></column>
+        <column name="officePhone" type="String"></column>
+        <column name="email" type="String"></column>
+        <column name="isApplicantAgent" type="boolean"></column>
+        <column name="isApproverAgent" type="boolean"></column>        
+        <column name="drivingLicenseInformation" type="int"></column>
+        <column name="estimatedObtainingDate" type="Date"></column>
+        <column name="comments" type="String"></column>
+        <column name="childrenNumber" type="int"></column>
+        <column name="processType" type="String"></column>
+        <column name="subType" type="String"></column>
+		
+		<finder name="S_U" return-type="Collection">
+			<finder-column name="status" />
+			<finder-column name="userId" />
+		</finder>
+	</entity>
+	
+	<entity name="SecondCompanyCar" local-service="true" remote-service="true">
+				<!-- PK fields -->
+
+		<column name="secondCompanyCarId" type="long" primary="true" />
+        <column name="ticketNo" type="String"></column>
+
+		<!-- Group instance -->
+
+		<column name="groupId" type="long" />
+
+		<!-- Audit fields -->
+
+		<column name="userId" type="long" />
+		<column name="userName" type="String" />
+		<column name="createDate" type="Date" />
+		<column name="modifiedDate" type="Date" />
+		<column name="submittedDate" type="Date" />
+		<column name="companyId" type="long" />
+
+		<!-- Other fields -->
+
+		<column name="name" type="String" />
+		<column name="staffCode" type="long" />
+		<column name="division" type="String" />
+		<column name="department" type="String" />
+
+		<!-- Workflow -->
+		<column name="status" type="int" />
+		<column name="statusByUserId" type="long" />
+		<column name="statusByUserName" type="String" />
+		<column name="companyName" type="String" />
+		<column name="statusDate" type="Date" />
+        <column name="contactNo" type="String"></column>
+        <column name="workingLocation" type="String"></column>
+        <column name="officeSite" type="String"></column>
+        <column name="currentCarModel" type="String"></column>
+        <column name="currentCarColor" type="String"></column>
+        <column name="currentPlateNumber" type="String"></column>
+        <column name="acquiringDate" type="Date"></column>
+        <column name="expectedCarModel" type="String"></column>
+        <column name="expectedCarColor" type="String"></column>
+        <column name="expectedLastPlateNumber" type="String"></column>
+		<column name="positionCostCenterId" type="String"></column>
+		<column name="employeeGroupId" type="String"></column>
+		<column name="contractEndDate" type="Date" />
+        <column name="mobilePhone" type="String"></column>
+        <column name="officePhone" type="String"></column>
+        <column name="email" type="String"></column>
+        <column name="isApplicantAgent" type="boolean"></column>
+        <column name="isApproverAgent" type="boolean"></column> 
+        <column name="drivingLicenseInformation" type="int"></column>
+        <column name="estimatedObtainingDate" type="Date"></column>
+        <column name="comments" type="String"></column>
+        <column name="processType" type="String"></column>
+        <column name="subType" type="String"></column>
+
+		<finder name="S_U" return-type="Collection">
+			<finder-column name="status" />
+			<finder-column name="userId" />
+		</finder>
+	</entity>
+</service-builder>

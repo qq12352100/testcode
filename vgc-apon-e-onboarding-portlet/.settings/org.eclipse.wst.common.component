@@ -1,8 +1,18 @@
-<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+<?xml version="1.0" encoding="UTF-8"?>
+<project-modules id="moduleCoreId" project-version="1.5.0">
     <wb-module deploy-name="vgc-apon-e-onboarding-portlet">
         <wb-resource deploy-path="/" source-path="/docroot" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/docroot/WEB-INF/src"/>
         <dependent-module archiveName="vgc-apon-sap-apondata-handler-portlet-service.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/vgc-apon-sap-apondata-handler-portlet/docroot/WEB-INF/lib/vgc-apon-sap-apondata-handler-portlet-service.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="vgc-apon-audit-trail-log-portlet-service.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/vgc-apon-audit-trail-log-portlet/docroot/WEB-INF/lib/vgc-apon-audit-trail-log-portlet-service.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="vgc-apon-file-management-portlet-service.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/vgc-apon-file-management-portlet/docroot/WEB-INF/lib/vgc-apon-file-management-portlet-service.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="vgc-apon-global-management-portlet-service.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/vgc-apon-global-management-portlet/docroot/WEB-INF/lib/vgc-apon-global-management-portlet-service.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="vgc-apon-audit-trail-log-portlet-service.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/vgc-apon-audit-trail-log-portlet/docroot/WEB-INF/lib/vgc-apon-audit-trail-log-portlet-service.jar">

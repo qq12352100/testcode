@@ -137,9 +137,8 @@ public class EClosingLocalServiceClp implements EClosingLocalService {
 		_methodName24 = "saveOrUpdateAuditTrailLog";
 
 		_methodParameterTypes24 = new String[] {
-				"java.lang.String", "long", "long", "long", "long",
-				"java.lang.String", "java.lang.String", "java.lang.String",
-				"boolean"
+				"long", "long", "long", "long", "java.lang.String",
+				"java.lang.String", "java.lang.String", "boolean"
 			};
 
 		_methodName25 = "sendMail";
@@ -918,19 +917,17 @@ public class EClosingLocalServiceClp implements EClosingLocalService {
 	}
 
 	@Override
-	public void saveOrUpdateAuditTrailLog(java.lang.String workflowRoleName,
-		long companyId, long groupId, long eClosingId, long operationUserId,
-		java.lang.String operationUser, java.lang.String action,
-		java.lang.String operationComment, boolean isDelegation)
+	public void saveOrUpdateAuditTrailLog(long companyId, long groupId,
+		long eClosingId, long operationUserId, java.lang.String operationUser,
+		java.lang.String action, java.lang.String operationComment,
+		boolean isDelegation)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			_invokableLocalService.invokeMethod(_methodName24,
 				_methodParameterTypes24,
 				new Object[] {
-					ClpSerializer.translateInput(workflowRoleName),
-					
-				companyId,
+					companyId,
 					
 				groupId,
 					

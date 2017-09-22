@@ -323,15 +323,15 @@ public class EClosingLocalServiceWrapper implements EClosingLocalService,
 	}
 
 	@Override
-	public void saveOrUpdateAuditTrailLog(java.lang.String workflowRoleName,
-		long companyId, long groupId, long eClosingId, long operationUserId,
-		java.lang.String operationUser, java.lang.String action,
-		java.lang.String operationComment, boolean isDelegation)
+	public void saveOrUpdateAuditTrailLog(long companyId, long groupId,
+		long eClosingId, long operationUserId, java.lang.String operationUser,
+		java.lang.String action, java.lang.String operationComment,
+		boolean isDelegation)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_eClosingLocalService.saveOrUpdateAuditTrailLog(workflowRoleName,
-			companyId, groupId, eClosingId, operationUserId, operationUser,
-			action, operationComment, isDelegation);
+		_eClosingLocalService.saveOrUpdateAuditTrailLog(companyId, groupId,
+			eClosingId, operationUserId, operationUser, action,
+			operationComment, isDelegation);
 	}
 
 	@Override

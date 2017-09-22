@@ -221,7 +221,7 @@ public class EClosingLocalServiceImpl extends EClosingLocalServiceBaseImpl {
 			AssetEntry assetEntry = AssetEntryLocalServiceUtil.updateEntry(eClosing.getUserId(), eClosing.getGroupId(), eClosing.getCreateDate(), eClosing.getModifiedDate(), EClosing.class.getName(), eClosing.getEclosingId(), String.valueOf(eClosing.getCompanyId()), 0, serviceContext.getAssetCategoryIds(), serviceContext.getAssetTagNames(), true, null, null, null, ContentTypes.TEXT_HTML, eClosing.getTicketNo(), null, null, null, null, 0, 0, null, false);
 			AssetLinkLocalServiceUtil.updateLinks(eClosing.getUserId(), assetEntry.getEntryId(), serviceContext.getAssetLinkEntryIds(), AssetLinkConstants.TYPE_RELATED);
 			WorkflowHandlerRegistryUtil.startWorkflowInstance(eClosing.getCompanyId(), eClosing.getUserId(), EClosing.class.getName(), eClosing.getEclosingId(), eClosing, serviceContext);
-			this.saveOrUpdateAuditTrailLog(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), eClosing.getEclosingId(), operationUserId, operationUser, ActionConstants.SUBMIT, "", eClosing.getApplicantAgent());
+			this.saveOrUpdateAuditTrailLog(null,serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), eClosing.getEclosingId(), operationUserId, operationUser, ActionConstants.SUBMIT, "", eClosing.getApplicantAgent());
 		}else if (action.equals("2")) {
 			WorkflowInstanceLink workflowInstanceLink = WorkflowInstanceLinkLocalServiceUtil.fetchWorkflowInstanceLink(eClosing.getCompanyId(), 0, EClosing.class.getName(), eClosing.getEclosingId());
 			int workflowTaskCount = WorkflowTaskManagerUtil.getWorkflowTaskCount(eClosing.getCompanyId(), false);
@@ -232,12 +232,12 @@ public class EClosingLocalServiceImpl extends EClosingLocalServiceBaseImpl {
 					this.updateStatus(createUserId, eClosing.getEclosingId(), WorkflowConstants.STATUS_PENDING, serviceContext);
 				}
 			}
-			this.saveOrUpdateAuditTrailLog(serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), eClosing.getEclosingId(), operationUserId, operationUser, ActionConstants.SUBMIT, "", eClosing.getApplicantAgent());
+			this.saveOrUpdateAuditTrailLog(null,serviceContext.getCompanyId(), serviceContext.getScopeGroupId(), eClosing.getEclosingId(), operationUserId, operationUser, ActionConstants.SUBMIT, "", eClosing.getApplicantAgent());
 		}
 		return eClosing;
 	}
 	
-	public void saveOrUpdateAuditTrailLog(long companyId, long groupId, long eClosingId, long operationUserId, String operationUser, String action, String operationComment, boolean isDelegation) throws SystemException, PortalException {
+	public void saveOrUpdateAuditTrailLog(String workflowRoleName,long companyId, long groupId, long eClosingId, long operationUserId, String operationUser, String action, String operationComment, boolean isDelegation) throws SystemException, PortalException {
 		Date date = new Date();
 		List<String> toAddressesList = new ArrayList<String>();
 		List<String> ccAddressesList = new ArrayList<String>();
@@ -301,13 +301,15 @@ public class EClosingLocalServiceImpl extends EClosingLocalServiceBaseImpl {
 						}
 					}
 					if ((isSupervisor || roleNameList.contains(roleName)) && auditTrailLog.getOperationStatus().equals(ActionConstants.STATUS_PENDING_TO_APPROVE)) {
-						auditTrailLog.setOperationStatus(ActionConstants.STATUS_COMPLETED);
-						auditTrailLog.setOperationUserId(operationUserId);
-						auditTrailLog.setOperationUser(operationUser);
-						auditTrailLog.setOperationTime(date);
-						auditTrailLog.setOperationComment(operationComment);
-						AuditTrailLogLocalServiceUtil.updateAuditTrailLog(auditTrailLog);
-						break;
+						if(roleName.replace("EC_", "").equalsIgnoreCase(workflowRoleName)){
+							auditTrailLog.setOperationStatus(ActionConstants.STATUS_COMPLETED);
+							auditTrailLog.setOperationUserId(operationUserId);
+							auditTrailLog.setOperationUser(operationUser);
+							auditTrailLog.setOperationTime(date);
+							auditTrailLog.setOperationComment(operationComment);
+							AuditTrailLogLocalServiceUtil.updateAuditTrailLog(auditTrailLog);
+							break;
+						}
 					}
 				}
 				for (int i = 0, n = auditTrailLogList.size(); i < n; i++) {
@@ -706,38 +708,38 @@ public class EClosingLocalServiceImpl extends EClosingLocalServiceBaseImpl {
 			mailbodyBuffer.append("<p>Dear Colleague,</p>");
 			mailbodyBuffer.append("<p>In order to help you complete your closing process more efficiently, we would like to suggest you to conduct handover by the following steps:</p>");
 			mailbodyBuffer.append("<p>1. Handover of Company Property - Administration Department</p>");
-			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp;• Return lunch card</p>");
-			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp;• Return key of locker/cabinet</p>");
-			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp;• Return office key (if any)</p>");
-			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp;• Return name plate of mailbox and work station</p>");
+			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp; Return lunch card</p>");
+			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp; Return key of locker/cabinet</p>");
+			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp; Return office key (if any)</p>");
+			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp; Return name plate of mailbox and work station</p>");
 			mailbodyBuffer.append("<p>2. Handover of Company Property - Fleet Services</p>");
-			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp;• Return company car (if any)</p>");
+			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp; Return company car (if any)</p>");
 			mailbodyBuffer.append("<p>3. Return work permit booklet to FSE/LE Consultant and settlement of home leave budget account (only applicable to FSE/LE)</p>");
 			mailbodyBuffer.append("<p>4. Payment Clearance - HR Training Department</p>");
-			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp;• Settle training fee account (applicable to LE/LC)</p>");
+			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp; Settle training fee account (applicable to LE/LC)</p>");
 			mailbodyBuffer.append("<p>5. Payment Clearance - HR C&B</p>");
-			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp;• Unused annual leave</p>");
-			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp;• Social insurance</p>");
-			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp;• Payment of private calls (fix)</p>");
-			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp;• Payment of private calls (mobile)</p>");
+			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp; Unused annual leave</p>");
+			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp; Social insurance</p>");
+			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp; Payment of private calls (fix)</p>");
+			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp; Payment of private calls (mobile)</p>");
 			mailbodyBuffer.append("<p>6. Payment Clearance - Finance Department</p>");
-			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp;• Settlement of business travel cash advance(s)</p>");
-			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp;• Settlement of company credit card account</p>");
-			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp;• Others (if any)</p>");
+			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp; Settlement of business travel cash advance(s)</p>");
+			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp; Settlement of company credit card account</p>");
+			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp; Others (if any)</p>");
 			mailbodyBuffer.append("<p>7. Handover of Company Property - IT Department</p>");
-			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp;• IT workplace equipment (laptop/monitor/docking station etc.)</p>");
-			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp;• Close email and intranet account</p>");
-			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp;• Close SAP account (if any)</p>");
-			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp;• Close other system accounts (if any)</p>");
-			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp;• Archive and delete shared folder</p>");
-			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp;• Change name display and voice mail on telephone</p>");
-			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp;• Return company SIM card (if any)</p>");
-			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp;• Return mobile phone (if any)</p>");
+			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp; IT workplace equipment (laptop/monitor/docking station etc.)</p>");
+			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp; Close email and intranet account</p>");
+			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp; Close SAP account (if any)</p>");
+			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp; Close other system accounts (if any)</p>");
+			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp; Archive and delete shared folder</p>");
+			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp; Change name display and voice mail on telephone</p>");
+			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp; Return company SIM card (if any)</p>");
+			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp; Return mobile phone (if any)</p>");
 			mailbodyBuffer.append("<p>8. Handover of Company Property - Security Department</p>");
-			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp;• Return door card</p>"); 
+			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp; Return door card</p>"); 
 			mailbodyBuffer.append("<p>9. Work Handover with Department</p>");
-			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp;• Work handover to successor (if applicable)</p>");
-			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp;• Handover / Finalize K-SRM tasks (if applicable)</p>");
+			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp; Work handover to successor (if applicable)</p>");
+			mailbodyBuffer.append("<p>&nbsp;&nbsp;&nbsp;&nbsp; Handover / Finalize K-SRM tasks (if applicable)</p>");
 		    mailbodyBuffer.append("<p>&nbsp;&nbsp;</p>");
 		    mailbodyBuffer.append("<p>Attention please:</p>"); 
 		    mailbodyBuffer.append("<p>After HR Consultant submits E-Closing application for you, all relevant "

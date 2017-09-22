@@ -137,8 +137,9 @@ public class EClosingLocalServiceClpInvoker {
 		_methodName47 = "saveOrUpdateAuditTrailLog";
 
 		_methodParameterTypes47 = new String[] {
-				"long", "long", "long", "long", "java.lang.String",
-				"java.lang.String", "java.lang.String", "boolean"
+				"java.lang.String", "long", "long", "long", "long",
+				"java.lang.String", "java.lang.String", "java.lang.String",
+				"boolean"
 			};
 
 		_methodName48 = "sendMail";
@@ -330,13 +331,14 @@ public class EClosingLocalServiceClpInvoker {
 
 		if (_methodName47.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes47, parameterTypes)) {
-			EClosingLocalServiceUtil.saveOrUpdateAuditTrailLog(((Long)arguments[0]).longValue(),
+			EClosingLocalServiceUtil.saveOrUpdateAuditTrailLog((java.lang.String)arguments[0],
 				((Long)arguments[1]).longValue(),
 				((Long)arguments[2]).longValue(),
 				((Long)arguments[3]).longValue(),
-				(java.lang.String)arguments[4], (java.lang.String)arguments[5],
-				(java.lang.String)arguments[6],
-				((Boolean)arguments[7]).booleanValue());
+				((Long)arguments[4]).longValue(),
+				(java.lang.String)arguments[5], (java.lang.String)arguments[6],
+				(java.lang.String)arguments[7],
+				((Boolean)arguments[8]).booleanValue());
 
 			return null;
 		}

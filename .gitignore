@@ -1,8 +1,8 @@
 *.class
 *.jar
+org.eclipse.*
 
 /WEB-INF/classes/
-/.settings/
 
 service.properties
 .classpath

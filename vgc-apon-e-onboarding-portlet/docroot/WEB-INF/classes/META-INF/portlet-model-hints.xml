@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+
+<model-hints>
+	<model name="com.e.onboarding.model.Distribution">
+		<field name="distributionId" type="long" />
+		<field name="groupId" type="long" />
+		<field name="companyId" type="long" />
+		<field name="userId" type="long" />
+		<field name="userName" type="String" />
+		<field name="createDate" type="Date" />
+		<field name="modifiedDate" type="Date" />
+		<field name="emailAddress" type="String" />
+		<field name="name" type="String" />
+		<field name="comments" type="String">
+			<hint name="max-length">250</hint>
+		</field>
+		<field name="type" type="String" />
+	</model>
+	<model name="com.e.onboarding.model.EOnBoarding">
+		<field name="eOnBoardingId" type="long" />
+		<field name="ticketNo" type="String" />
+		<field name="processType" type="String" />
+		<field name="subType" type="String" />
+		<field name="groupId" type="long" />
+		<field name="companyId" type="long" />
+		<field name="userId" type="long" />
+		<field name="userName" type="String" />
+		<field name="createDate" type="Date" />
+		<field name="modifiedDate" type="Date" />
+		<field name="submittedDate" type="Date" />
+		<field name="modifiedUserId" type="long" />
+		<field name="modifiedUserName" type="String" />
+		<field name="status" type="int" />
+		<field name="statusByUserId" type="long" />
+		<field name="statusByUserName" type="String" />
+		<field name="statusDate" type="Date" />
+		<field name="staffCode" type="String" />
+		<field name="lastName" type="String" />
+		<field name="firstName" type="String" />
+		<field name="name" type="String" />
+		<field name="gender" type="String" />
+		<field name="birthday" type="Date" />
+		<field name="photoPath" type="String">
+			<hint name="max-length">250</hint>
+		</field>
+		<field name="contractType" type="String" />
+		<field name="workLocation" type="String" />
+		<field name="division" type="String" />
+		<field name="officeSite" type="String" />
+		<field name="department" type="String" />
+		<field name="startingDate" type="Date" />
+		<field name="positionCode" type="String" />
+		<field name="serviceLength" type="String" />
+		<field name="functionName" type="String" />
+		<field name="reportTo" type="String" />
+		<field name="reportToStaffName" type="String" />
+		<field name="title" type="String" />
+		<field name="costCenter" type="String" />
+		<field name="itRelatedHardware" type="boolean" />
+		<field name="companyCar" type="boolean" />
+		<field name="replacement" type="boolean" />
+		<field name="nameOfReplacedPerson" type="String" />
+		<field name="contactInfo" type="String">
+			<hint name="max-length">250</hint>
+		</field>
+		<field name="comments" type="String">
+			<hint name="max-length">250</hint>
+		</field>
+		<field name="isApplicantAgent" type="boolean" />
+		<field name="isApproverAgent" type="boolean" />
+		<field name="adminEntitlement" type="String" />
+		<field name="adminSeatNo" type="String" />
+		<field name="adminTasks" type="String">
+			<hint name="max-length">250</hint>
+		</field>
+		<field name="adminStatus" type="String" />
+		<field name="adminComments" type="String">
+			<hint name="max-length">250</hint>
+		</field>
+		<field name="securityTasks" type="String">
+			<hint name="max-length">250</hint>
+		</field>
+		<field name="securityStatus" type="String" />
+		<field name="securityComments" type="String">
+			<hint name="max-length">250</hint>
+		</field>
+		<field name="itpTasks" type="String">
+			<hint name="max-length">250</hint>
+		</field>
+		<field name="itpStatus" type="String" />
+		<field name="iptComments" type="String">
+			<hint name="max-length">250</hint>
+		</field>
+		<field name="financeTasks" type="String">
+			<hint name="max-length">250</hint>
+		</field>
+		<field name="financeStatus" type="String" />
+		<field name="financeComments" type="String">
+			<hint name="max-length">250</hint>
+		</field>
+	</model>
+</model-hints>

@@ -1,0 +1,1 @@
+create index IX_8B007415 on vgcapon_EClosing (status, userId);

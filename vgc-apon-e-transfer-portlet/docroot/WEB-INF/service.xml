@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 6.2.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_6_2_0.dtd">
+<service-builder package-path="com.e.transfer">
+	<author>EZEYIFE</author>
+	<namespace>vgcapon</namespace>
+
+	<entity name="ETransfer" local-service="true" remote-service="true">
+
+		<!-- PK fields -->
+		<column name="eTransferId" type="long" primary="true" />
+
+		<!-- Group instance -->
+		<column name="groupId" type="long" />
+
+		<!-- Audit fields -->
+		<column name="userId" type="long" />
+		<column name="userName" type="String" />
+		<column name="createDate" type="Date" />
+		<column name="modifiedDate" type="Date" />
+		<column name="companyId" type="long" />
+
+		<!-- Personal Information -->
+		<column name="ticketNo" type="String"/>
+		<column name="staffName" type="String" />
+		<column name="currentStaffCode" type="String" />
+		<column name="contractType" type="String" />
+		<column name="newStaffCode" type="String" />
+		<column name="PassedLL" type="int" />
+		<column name="AttendedSLT" type="int" />
+		
+		<!-- Current Status -->
+		<column name="currentCompany" type="String" />
+		<column name="currentDivision"  type="String"/>
+		<column name="currentDepartment"  type="String"/>
+		<column name="currentFunctionName"  type="String"/>
+		<column name="currentCostCenter"  type="String"/>
+		<column name="currentReportingTo"  type="String"/>
+		<column name="otherAgreementIfAny" type="String" />
+		<column name="currentOfficeSite"  type="String"/>
+		<column name="currentPositionCode"  type="String"/>
+		
+		<!-- New Status -->
+		<column name="receivingStaffCode"  type="String"/>
+		<column name="receivingCompany"  type="String"/>
+		<column name="receivingDivision"  type="String"/>
+		<column name="receivingDepartment"  type="String"/>
+		<column name="newFunctionName"  type="String"/>
+		<column name="newCostCenter"  type="String"/>
+		<column name="newReportingTo"  type="String"/>
+		<column name="effectiveDate" type="Date" />
+		<column name="newOfficeSite"  type="String"/>
+		
+		<!-- Confirmed by Orga -->
+		<column name="sapPositionCode"  type="String"/>
+		<column name="replacement"  type="String"/>
+		<column name="functionGrade"  type="String"/>
+		<column name="budgetTypeOfPosition" type="int" />
+		<column name="chinaSixty" type="int" />
+		<column name="targetPDSupervisor" type="int" />
+
+		<!-- Common Parts -->
+		<column name="processType" type="String" />
+		<column name="subProcessType" type="String" />
+		
+		<column name="submittedDate" type="Date" />
+		<column name="comments"  type="String"/>
+
+		<!-- Workflow -->
+		<column name="status" type="int" />
+		<column name="statusByUserId" type="long" />
+		<column name="statusByUserName" type="String" />
+		<column name="statusDate" type="Date" />
+
+		<!-- Order -->
+		<order by="asc">
+			<order-column name="eTransferId" />
+		</order>
+
+		<finder name="S_U" return-type="Collection">
+			<finder-column name="status" />
+			<finder-column name="userId" />
+		</finder>
+		
+	</entity>
+</service-builder>

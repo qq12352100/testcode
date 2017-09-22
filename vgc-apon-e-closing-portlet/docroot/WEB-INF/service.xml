@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 6.2.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_6_2_0.dtd">
+<service-builder package-path="com.e.closing">
+	<author>t.a.jiang</author>
+	<namespace>vgcapon</namespace>
+    <entity name="EClosing" local-service="true" remote-service="true" cache-enabled="true">
+
+    	<!-- PK fields -->
+
+    	<column name="eclosingId" type="long" primary="true" />
+
+    	<!-- Group instance -->
+
+    	<column name="groupId" type="long" />
+
+    	<!-- Audit fields -->
+
+    	<column name="companyId" type="long" />
+    	<column name="userId" type="long" />
+    	<column name="userName" type="String" />
+    	<column name="createDate" type="Date" />
+    	<column name="modifiedDate" type="Date" />
+
+    	<!-- Business fields -->
+
+		<column name="ticketNo" type="String"/>
+		<column name="staffCode" type="int" />
+    	<column name="staffName" type="String" />
+        <column name="company" type="String" />
+        <column name="division" type="String" />
+        <column name="department" type="String" />
+        <column name="costCenter" type="String" />
+        <column name="functionName" type="String" />
+        <column name="positionCode" type="String" />
+        <column name="employeeGroupId" type="String" />
+        <column name="employeeGroupName" type="String" />
+        <column name="privateEmailAddress" type="String" />
+        <column name="startingDate" type="Date" />
+        <column name="lastWorkingDay" type="Date" />
+        <column name="finishContractDate" type="Date" />
+        <column name="seatOfficeNumber" type="String" />
+        <column name="permanentAddress" type="String" />
+
+		<!-- Work handover to successor -->
+		<column name="dmOption1" type="boolean" />
+		<!-- Handover / Finance K-SRM tasks -->
+		<column name="dmOption2" type="boolean" />
+		<column name="dmStatus" type="String" />
+		<column name="dmComments" type="String" />
+
+		<!-- Return lunch card -->
+		<column name="adOption1" type="boolean" />
+		<!-- Return key of locker/cabinet -->
+		<column name="adOption2" type="boolean" />
+		<!-- Return office key(if any) -->
+		<column name="adOption3" type="boolean" />
+		<!-- Return name plate of mailbox and work station -->
+		<column name="adOption4" type="boolean" />
+		<column name="adFinanceFee" type="double" />
+		<column name="adStatus" type="String" />
+		<column name="adComments" type="String" />
+
+		<!-- Return company car (if any) -->
+		<column name="fsOption1" type="boolean" />
+		<column name="fsStatus" type="String" />
+		<column name="fsComments" type="String" />
+
+		<!-- Return work permit booklet to FSE/LE Consultant (only applicable to FSE/LE) -->
+		<column name="flcOption1" type="boolean" />
+		<!-- Settlement of home leave budget account (only applicable to FSE/LE) -->
+		<column name="flcOption2" type="boolean" />
+		<column name="flcStatus" type="String" />
+		<column name="flcComments" type="String" />
+
+		<!-- Return door card -->
+		<column name="securityOption1" type="boolean" />
+		<column name="securityFinanceFee" type="double" />
+		<column name="securityStatus" type="String" />
+		<column name="securityComments" type="String" />
+
+		<!-- IT Workplace equipment(laptop/monitor/docking atation etc.) -->
+		<column name="idOption1" type="boolean" />
+		<!-- Other company assets(e.g.BlackBerry) -->
+		<column name="idOption2" type="boolean" />
+		<!-- Close email and intranet accout -->
+		<column name="idOption3" type="boolean" />
+		<!-- Close SAP account(if any) -->
+		<column name="idOption4" type="boolean" />
+		<!-- Close other system accouts(if any) -->
+		<column name="idOption5" type="boolean" />
+		<!-- Archive and delete shared folder -->
+		<column name="idOption6" type="boolean" />
+		<!-- Change name display and voice mail on telephone -->
+		<column name="idOption7" type="boolean" />
+		<!-- Return company SIM card(if any) -->
+		<column name="idOption8" type="boolean" />
+		<!-- Return mobile phone(if any) -->
+		<column name="idOption9" type="boolean" />
+		<!-- IT Equipment Fee(HR C&B Related): -->
+		<column name="idHrFee" type="double" />
+		<!-- IT Equipment Fee(Finance Related): -->
+		<column name="idFinanceFee" type="double" />
+		<column name="idStatus" type="String" />
+		<column name="idComments" type="String" />
+
+		<!-- Settlement training fee account(applicable to LE/LC) -->
+		<column name="htdOption1" type="boolean" />
+		<!-- Training Fee(HR C&B Related): -->
+		<column name="htdHrFee" type="double" />
+		<!-- Training Fee(Finance Related): -->
+		<column name="htdFinanceFee" type="double" />
+		<column name="htdStatus" type="String" />
+		<column name="htdComments" type="String" />
+
+		<!-- Unused annual leave -->
+		<column name="hdOption1" type="boolean" />
+		<!-- Social insurance paid until: -->
+		<column name="hdOption2" type="boolean" />
+		<column name="hdOption2Text" type="String" />
+		<!-- Payment of private calls(fix) -->
+		<column name="hdOption3" type="boolean" />
+		<column name="hdOption3Money" type="double" />
+		<!-- Payment of private calls(mobile) -->
+		<column name="hdOption4" type="boolean" />
+		<column name="hdOption4Money" type="double" />
+		<column name="hdStatus" type="String" />
+		<column name="hdComments" type="String" />
+		<column name="hdleaveText" type="String" />
+
+		<!-- Settlement of business travel cash advance(s) -->
+		<column name="fdOption1" type="boolean" />
+		<!-- Settlement of company credit card account -->
+		<column name="fdOption2" type="boolean" />
+		<!-- Settlement of school/kindergarden deposit -->
+		<column name="fdOption3" type="boolean" />
+		<!-- Others(if any) -->
+		<column name="fdOption4" type="boolean" />
+		<column name="fdOption4Text" type="String" />
+		<column name="fdStatus" type="String" />
+		<column name="fdComments" type="String" />
+
+        <column name="applicantAgent" type="boolean" />
+        <column name="approverAgent" type="boolean" />
+
+		<!-- Common Parts -->
+
+		<column name="processType" type="String" />
+		<column name="subProcessType" type="String" />
+
+		<!-- Workflow -->
+
+		<column name="status" type="int" />
+		<column name="statusByUserId" type="long" />
+		<column name="statusByUserName" type="String" />
+		<column name="statusDate" type="Date" />
+
+    	<!-- Order -->
+
+    	<order by="asc">
+    		<order-column name="eclosingId"></order-column>
+    	</order>
+
+    	<!-- Finder methods -->
+
+    	<finder name="S_U" return-type="Collection">
+			<finder-column name="status" />
+			<finder-column name="userId" />
+		</finder>
+    </entity>
+</service-builder>

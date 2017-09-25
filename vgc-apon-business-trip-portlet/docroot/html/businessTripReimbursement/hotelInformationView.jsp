@@ -1,4 +1,6 @@
-
+   <%
+     boolean overBudget = false;
+   %>
 	<liferay-ui:search-container delta='<%=Integer.valueOf(PropsUtil.get("vgc.apon.invalid.delta")) %>'>
 		
 		<liferay-ui:search-container-results results="<%=BtHotelInfoLocalServiceUtil.findByB_T(businessTripReimbursementId, tripType, searchContainer.getStart(),searchContainer.getEnd()) %>"
@@ -6,6 +8,12 @@
 		</liferay-ui:search-container-results>
 	
 		<liferay-ui:search-container-row className="com.business.trip.model.BtHotelInfo" keyProperty="btHotelInfoId" modelVar="btHotelInfo" escapedModel="<%=true%>">
+			<%
+			    if(btHotelInfo.getIsOverBudget()==1){
+			    	overBudget = true;
+			    }
+			%>
+			
 			<liferay-ui:search-container-column-text name="vgc-apon-business-trip-application-hotel-city"
 				property="city"/>
 			<liferay-ui:search-container-column-text name="vgc-apon-business-trip-application-hotel-city-type" 
@@ -46,18 +54,36 @@
 			</liferay-ui:search-container-column-text>
 			<liferay-ui:search-container-column-text name="vgc-apon-business-trip-application-hotel-others-please-specify" 
 				property="othersSpecify"/>
-			<liferay-ui:search-container-column-text name="vgc-apon-delete">
+<%-- 			<liferay-ui:search-container-column-text name="vgc-apon-delete">
 				<liferay-ui:icon label="<%= true %>" message="" method="get" id="<%=String.valueOf(btHotelInfo.getBtHotelInfoId()) %>"					
 					url='<%="javascript:" + renderResponse.getNamespace()+ "deleteBtHotelInfo("+btHotelInfo.getBtHotelInfoId()+");"%>' src="<%=trashImage%>" />
-			</liferay-ui:search-container-column-text>	
+			</liferay-ui:search-container-column-text>	 --%>
 		</liferay-ui:search-container-row>
 			
 		<liferay-ui:search-iterator paginate="false" />
 	</liferay-ui:search-container>
 
 <aui:button-row>
-	<aui:button value="vgc.apon.button.add"
-		 onClick='<%= renderResponse.getNamespace() + "openAddPageHotel();" %>'/>
+        <%
+	   	 if (businessTripApplication ==null && businessTripReimbursement != null){
+			  businessTripApplication = BusinessTripApplicationLocalServiceUtil.fetchBusinessTripApplicationByTicketNo(businessTripReimbursement.getBussinessTirpTicketNo());
+		 }
+		if(businessTripApplication != null && businessTripApplication.getStatus()==0&&overBudget){
+			String url = themeDisplay.getURLPortal();
+			url = url.indexOf("9080") != -1 || url.indexOf("8080") != -1 ? "" : url.substring(url.lastIndexOf('/'));
+			
+			businessTripApplicationPageUrl=url+"/web/vcic/my-applications?p_p_id=mysubmissionslist_WAR_vgcaponmysubmissionsportlet"+
+		"&_mysubmissionslist_WAR_vgcaponmysubmissionsportlet_tabs2=completed"+
+		"&_mysubmissionslist_WAR_vgcaponmysubmissionsportlet_pkId="+businessTripApplication.getBusinessTripApplicationId()+
+		"&_mysubmissionslist_WAR_vgcaponmysubmissionsportlet_operationType=ReimbursementToViewApplication"+
+		"&_mysubmissionslist_WAR_vgcaponmysubmissionsportlet_mvcPath=/html/mysubmissionslist/details/business_trip_application_details.jsp";
+			System.out.println("businessTripApplicationPageUrl="+businessTripApplicationPageUrl);
+		%>
+		<a href="<%=businessTripApplicationPageUrl%>" target="_blank"> <liferay-ui:message key="vgc-apon-business-trip-reimbursement-view-business-trip-application" /></a><br />
+		<br />
+		<%
+			}
+		%>
 </aui:button-row>
 	
 <aui:script>

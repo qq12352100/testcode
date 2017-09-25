@@ -23,6 +23,9 @@ else {
 	eLeave = ELeaveLocalServiceUtil.createELeave(eLeaveId);
 }
 String transitionName = ParamUtil.getString(renderRequest, "transitionName", "");
+
+System.out.println("**********************transitionName***********="+transitionName);
+
 String isClickAgent = ParamUtil.getString(renderRequest, "isClickAgent","");
 long sCode = themeDisplay.getUser().getFacebookId();
 Date now = new Date();
@@ -113,7 +116,7 @@ boolean isUpdateFile=false;
 if(leaveInfos!=null&&leaveInfos.size()>0){
 	for(ELeaveInfo eLeaveInfo:leaveInfos){
 		String typeOfLeaveId=eLeaveInfo.getTypeOfLeaveId();
-		if((("0120".equals(typeOfLeaveId)||"0121".equals(typeOfLeaveId)) && Double.valueOf(eLeaveInfo.getAbsenceDays())>=2)||"0140".equals(typeOfLeaveId)||
+		if((("0120".equals(typeOfLeaveId)||"0121".equals(typeOfLeaveId)) && Double.valueOf(eLeaveInfo.getAbsenceDays())>=2)||"0130".equals(typeOfLeaveId)||"0140".equals(typeOfLeaveId)||
 			"0300".equals(typeOfLeaveId)||"0301".equals(typeOfLeaveId)||"0800".equals(typeOfLeaveId)){
 			isUpdateFile=true;
 			break;
@@ -518,6 +521,9 @@ function validateFileTypeAndSize(type) {
 			var typeOfLeaveTxt=typeOfLeave.options[typeOfLeave.selectedIndex].text;
 			if(("Sick Leave"==typeOfLeaveTxt||"Sick Leave (GE)"==typeOfLeaveTxt)&&totalNum>=2){
 				alert("Please upload your Medial Certificate for this application.");
+				flag = false;
+			}else if("Overtime Leave"==typeOfLeaveTxt){
+				alert("Please upload your Overtime Claim Form for this application.");
 				flag = false;
 			}else if("Marriage Leave"==typeOfLeaveTxt){
 				alert("Please upload your Marriage Certificate scan for this application.");
@@ -1094,16 +1100,6 @@ function <portlet:namespace />applicantAgentClick(obj) {
 <aui:script use="liferay-search-container">	
 AUI().use('aui-io-request', function(A){
 	document.getElementById("checkELeaveInfo").onclick = function(){
-		var myselect=document.getElementById('typeOfLeave');
-		var index=myselect.selectedIndex ;  
-		var selectedText=myselect.options[index].text;
-		if(selectedText.indexOf("Home office-Case group")<=-1){
-			if(!validateDate()){
-				return false;
-			}
-		}
-	
-		
 		setParam();
 	}
 	
@@ -1139,7 +1135,7 @@ AUI().use('aui-io-request', function(A){
 							document.getElementById('totalLeaveEntitlement').value=responseData.totalLeaveEntitlement;								
 							document.getElementById('totalDuration').value=responseData.duration;
 							
-							if("0100"==responseData.typeOfLeaveId||"0120"==responseData.typeOfLeaveId||"0121"==responseData.typeOfLeaveId||"0124"==responseData.typeOfLeaveId||"0130"==responseData.typeOfLeaveId){
+							if("0100"==responseData.typeOfLeaveId||"0120"==responseData.typeOfLeaveId||"0121"==responseData.typeOfLeaveId||"0124"==responseData.typeOfLeaveId){
 								document.getElementById('remainingLeaveDaysBefore').value=responseData.leaveDaysBefor;
 								document.getElementById('remainingLeaveDaysAfter').value=responseData.leaveDaysAfter;
 								
@@ -1157,7 +1153,7 @@ AUI().use('aui-io-request', function(A){
 								document.getElementById('remainingLeaveDaysAfter').value="";
 							}	
 							if(typeOfLeaveId=='0122' || typeOfLeaveId=='0140' || typeOfLeaveId=='0300' || typeOfLeaveId=='0301'
-									|| typeOfLeaveId=='0400' || typeOfLeaveId=='0200' 
+									|| typeOfLeaveId=='0400' || typeOfLeaveId=='0200' || typeOfLeaveId=='0130'
 									|| typeOfLeaveId=='0800' || typeOfLeaveId=='0900' || typeOfLeaveId=='0123') {
 								document.getElementById('totalLeaveEntitlement').value= "";
 							}							

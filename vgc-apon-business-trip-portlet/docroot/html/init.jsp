@@ -63,6 +63,7 @@ page import="java.util.Map" %><%@
 page import="java.util.HashMap" %><%@
 page import="java.util.List" %><%@
 page import="java.text.SimpleDateFormat" %>
+<%@page import="java.util.Map.Entry"%>
 
 <%@ page import="javax.portlet.PortletURL" %>
 <%@page import="com.liferay.counter.service.CounterLocalServiceUtil"%>
@@ -129,6 +130,7 @@ page import="java.text.SimpleDateFormat" %>
 <script src="<%= HtmlUtil.escape(PortalUtil.getStaticResourceURL(request, themeDisplay.getPathThemeJavaScript() + "/vgcapon-validation.js")) %>" type="text/javascript"></script>
 <script src="<%= HtmlUtil.escape(PortalUtil.getStaticResourceURL(request, themeDisplay.getPathThemeJavaScript() + "/My97DatePicker/WdatePicker.js")) %>" type="text/javascript"></script>
 <script src="<%= HtmlUtil.escape(PortalUtil.getStaticResourceURL(request, themeDisplay.getPathThemeJavaScript() + "/jquery.form.min.js")) %>" type="text/javascript"></script>
+
 <%
 String currentURL = PortalUtil.getCurrentURL(request);
 

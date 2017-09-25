@@ -50,9 +50,6 @@ import com.business.trip.util.BTApplicationUtil;
 import com.business.trip.util.BusinessTripConstants;
 import com.business.trip.util.PdfReaderUtil;
 import com.business.trip.util.TravelExpenseUtil;
-import com.delegation.model.ApplicantDelegation;
-import com.delegation.service.ApplicantDelegationLocalServiceUtil;
-import com.delegation.service.ApproverDelegationLocalServiceUtil;
 import com.file.management.model.FileManagement;
 import com.file.management.service.FileManagementLocalServiceUtil;
 import com.global.management.service.GlobalToolLocalServiceUtil;
@@ -88,8 +85,7 @@ import com.vgc.apon.service.SAPUserLocalServiceUtil;
  * Portlet implementation class BusinessTripReimbursementPortlet
  */
 public class BusinessTripReimbursementPortlet extends MVCPortlet {
-	private static Log log = LogFactoryUtil
-			.getLog(BusinessTripReimbursementPortlet.class);
+	private static Log log = LogFactoryUtil.getLog(BusinessTripReimbursementPortlet.class);
 	private static String RMB = "RMB";
 	private static String EUR = "EUR";
 
@@ -98,7 +94,7 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 			RenderResponse renderResponse) throws IOException, PortletException {
 		String bussinessTirpTicketNo = ParamUtil.getString(renderRequest,
 				"bussinessTirpTicketNo2");
-		String cmd2 = ParamUtil.getString(renderRequest, "cmd2");
+		String cmd2 = ParamUtil.getString(renderRequest, "cmd2");   
 		double totalCostRmb = ParamUtil.getDouble(renderRequest,
 				"totalCostRmb", 0d);
 		double totalCostEur = ParamUtil.getDouble(renderRequest,
@@ -126,6 +122,8 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 		double flightTaxes = ParamUtil.getDouble(renderRequest, "flightTaxes",
 				0d);
 		String search = ParamUtil.getString(renderRequest, "search");
+		System.out.println("****************doView************search="+search);
+		BusinessTripApplication businessTripApplication = null;
 		try {
 			if (!"".equals(bussinessTirpTicketNo)) {
 				if ("Yes".equals(search)) {
@@ -136,13 +134,24 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 						renderRequest.setAttribute("errorMessage",
 								map.get("message"));
 					} else {
-						BusinessTripApplication businessTripApplication = (BusinessTripApplication) map
+						 businessTripApplication = (BusinessTripApplication) map
 								.get("businessTripApplication");
 						renderRequest.setAttribute("businessTripApplication",
 								businessTripApplication);
+						if(businessTripApplication != null){
+							SAPUser sapUser = SAPUserLocalServiceUtil.getSapUserByStaffCode(String.valueOf(businessTripApplication.getStaffCode()));
+							if(sapUser !=null){
+								renderRequest.setAttribute("tempApproverId",sapUser.getSupervisorFgId());
+								renderRequest.setAttribute("tempApproverName",sapUser.getSupervisorFgName());
+								renderRequest.setAttribute("tempEvpName",sapUser.getDivisionManagerName());
+								renderRequest.setAttribute("tempEvpId",sapUser.getDivisionManagerId());
+								System.out.println("******************doview***********tempEvpId="+String.valueOf(sapUser.getDivisionManagerId()));
+							}
+						}
+						renderRequest.setAttribute("selectBT","Y");
 					}
 				} else {
-					BusinessTripApplication businessTripApplication = BusinessTripApplicationLocalServiceUtil
+					 businessTripApplication = BusinessTripApplicationLocalServiceUtil
 							.getBusinessTripApplicationByTicketNo(bussinessTirpTicketNo);
 					renderRequest.setAttribute("businessTripApplication",
 							businessTripApplication);
@@ -201,8 +210,6 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 		String cmd = ParamUtil.getString(uploadPortletRequest, Constants.CMD);
 		long businessTripReimbursementId = ParamUtil.getLong(
 				uploadPortletRequest, "businessTripReimbursementId");
-		Boolean isApplicantAgent = ParamUtil.getBoolean(uploadPortletRequest,
-				"isApplicantAgent", false);
 		boolean isPaybyRmb = ParamUtil.getBoolean(uploadPortletRequest,
 				"isPaybyRmb",false);
 		String bussinessTirpTicketNo = ParamUtil.getString(
@@ -239,10 +246,13 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 				"flightTaxes");
 		double flightTransactionFee = ParamUtil.getDouble(uploadPortletRequest,
 				"flightTransactionFee");
+		
 		long approverId = ParamUtil.getLong(uploadPortletRequest, "approverId");
 		String approverName = ParamUtil.getString(uploadPortletRequest,
 				"approverName");
 		System.out.println("**********************approve name**************="+approverName);
+	
+				
 		BusinessTripApplication businessTripApplication = BusinessTripApplicationLocalServiceUtil
 				.getBusinessTripApplicationByTicketNo(bussinessTirpTicketNo);
 		String remark = ParamUtil.getString(uploadPortletRequest, "remark");
@@ -309,26 +319,41 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 		businessTripReimbursement.setOfficeSite(businessTripApplication
 				.getOfficeSite());
 		long staffCode = businessTripApplication.getStaffCode();
-		if(staffCode!=0){
-			SAPUser sapUser = SAPUserLocalServiceUtil.getSapUserByStaffCode(String.valueOf(staffCode));
-			
-			Long tmpApproverId = Long.valueOf(Validator.isNotNull(sapUser.getSupervisorFgId())?sapUser.getSupervisorFgId():"0");
-			System.out.println("**********************approve tmpApproverId**************tmpApproverId="+tmpApproverId);
-			if( approverId >0 && approverId !=tmpApproverId ){
-				System.out.println("**********************approve tmpApproverId**************approverId="+approverId);
-				businessTripReimbursement.setApproverId(approverId);
-				businessTripReimbursement.setApproverName(approverName);
-			}else{
-				businessTripReimbursement.setApproverId(tmpApproverId);
-				System.out.println("**********************approve tmpApproverId**************sapUser.getSupervisorFgName()="+sapUser.getSupervisorFgName());
-				businessTripReimbursement.setApproverName(sapUser.getSupervisorFgName());
-			}
+		/**
+		 * if the current user is applicant agent
+		 */
+		if(themeDisplay.getUser().getFacebookId() != staffCode){
+			businessTripReimbursement.setIsApplicantAgent(true);
+		}else{
+			businessTripReimbursement.setIsApplicantAgent(false);
 		}
 		
-	/*	businessTripReimbursement.setApproverId(businessTripApplication
-				.getApproverId());
-		businessTripReimbursement.setApproverName(businessTripApplication
-				.getApproverName());*/
+		// add select evp 		
+	    long evpId = ParamUtil.getLong(uploadPortletRequest, "evpId",0);
+	    String evpName = ParamUtil.getString(uploadPortletRequest, "evpName");
+	    System.out.println("================submit+++++++++++++++evpid1="+evpId+"/"+evpName);
+				
+		if(staffCode!=0){
+			SAPUser sapUser = SAPUserLocalServiceUtil.getSapUserByStaffCode(String.valueOf(staffCode));
+			if( approverId ==0 && sapUser!=null){
+				approverId = Long.valueOf(Validator.isNotNull(sapUser.getSupervisorFgId())?sapUser.getSupervisorFgId():"0");
+				approverName = sapUser.getSupervisorFgName();
+						
+			}
+			if( evpId==0 && sapUser!=null){
+				evpId = Long.valueOf(Validator.isNotNull(sapUser.getDivisionManagerId())?sapUser.getDivisionManagerId():"0");
+				evpName = sapUser.getDivisionManagerName();
+			}
+		
+		}
+		  System.out.println("================submit+++++++++++++++evpid2="+evpId+"/"+evpName);
+			
+		businessTripReimbursement.setEvpId(evpId);
+		businessTripReimbursement.setEvpName(evpName);
+		
+	    businessTripReimbursement.setApproverId(approverId);
+		businessTripReimbursement.setApproverName(approverName);
+		
 		businessTripReimbursement.setIsCrossDepartment(businessTripApplication
 				.getIsCrossDepartment());
 		businessTripReimbursement.setTargetDepartmentId(businessTripApplication
@@ -392,15 +417,12 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 			BusinessTripReimbursement oldBusinessTripReimbursement=compareList.get(size-1);
 			if(oldBusinessTripReimbursement.getSapStatus()==1){
 				int sapStatus=BTApplicationUtil.compareBusinessTripReimbursement(businessTripReimbursement,oldBusinessTripReimbursement);
-				businessTripReimbursement.setSapStatus(sapStatus);  //å¯¹æ¯”
+				businessTripReimbursement.setSapStatus(sapStatus);  
 			}
 			
-			//businessTripReimbursement.setSapStatus(0);  //å¯¹æ¯”
+			//businessTripReimbursement.setSapStatus(0);  
 		}
-		
-		System.out.println("In Add New"+isApplicantAgent);
-		
-		businessTripReimbursement.setIsApplicantAgent(isApplicantAgent);
+
 		this.saveTheUploadAttachment(uploadPortletRequest, response,
 				businessTripReimbursementId);
 		ServiceContext serviceContext = ServiceContextFactory
@@ -554,14 +576,12 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 		double costListForeignTotalRmb = ParamUtil.getDouble(
 				uploadPortletRequest, "costListForeignTotalRmb", 0d);
 		
-		//add in 2017/1/6
-		boolean isApplicantAgent = ParamUtil.getBoolean(actionRequest,
-				"isApplicantAgent", false);
-		//end in 2017/1/6
 		//add in 2017/01/23
 		String tempApproverId = ParamUtil.getString(actionRequest, "tempApproverId","");
 		String tempApproverName = ParamUtil.getString(actionRequest, "tempApproverName","");
 		//end in 2017/01/23
+		String tempEvpId = ParamUtil.getString(actionRequest, "tempEvpId","");
+		String tempEvpName = ParamUtil.getString(actionRequest, "tempEvpName","");
 		
 		boolean tempIsGetRMB = ParamUtil.getBoolean(actionRequest,"tempIsGetRMB");
 		
@@ -593,7 +613,7 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 		if (fileName != null && !fileType.equals("pdf")) {
 			actionResponse.setRenderParameter("importError", "false");
 		} else if (fileName != null) {
-			int sapStatus = 0;
+		//	int sapStatus = 0;
 			InputStream inputStream = uploadPortletRequest
 					.getFileAsStream("pdfImport");
 			String tripType = PropsUtil
@@ -631,16 +651,14 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 									.replace(",", ""));
 					taxes = fareDetails.get("taxes") == null ? 0d : Double
 							.valueOf(fareDetails.get("taxes").replace(",", ""));
-					BusinessTripReimbursement oldBusinessTripReimbursement = businessTripReimbursement;
+					//BusinessTripReimbursement oldBusinessTripReimbursement = businessTripReimbursement;
 					businessTripReimbursement.setFlightTotal(total);
 					businessTripReimbursement.setFlightAirFare(airFare);
 					businessTripReimbursement.setFlightCurrency(curency);
 					businessTripReimbursement.setFlightTaxes(taxes);
 					businessTripReimbursement
 							.setFlightTransactionFee(transactionFee);
-					List<BtFlightTrainInfo> oldBtFlightTrainInfos = BtFlightTrainInfoLocalServiceUtil
-							.findByB_T(businessTripReimbursementId, tripType,
-									-1, -1);
+					//List<BtFlightTrainInfo> oldBtFlightTrainInfos = BtFlightTrainInfoLocalServiceUtil.findByB_T(businessTripReimbursementId, tripType,-1, -1);
 					BtFlightTrainInfoLocalServiceUtil
 							.deleteBtFlightTrainInfoByB_T(
 									businessTripReimbursementId, tripType);
@@ -713,9 +731,10 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 		actionResponse.setRenderParameter("businessTripReimbursementId",
 				String.valueOf(businessTripReimbursementId));
 		
-		actionResponse.setRenderParameter("isApplicantAgent",String.valueOf(isApplicantAgent));
 		actionResponse.setRenderParameter("tempApproverId",String.valueOf(tempApproverId));
 		actionResponse.setRenderParameter("tempApproverName",String.valueOf(tempApproverName));
+		actionResponse.setRenderParameter("tempEvpId",String.valueOf(tempEvpId ));
+		actionResponse.setRenderParameter("tempEvpName",String.valueOf(tempEvpName ));
 		actionResponse.setRenderParameter("tempIsGetRMB",String.valueOf(tempIsGetRMB));
 		
 		}
@@ -925,10 +944,6 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 				"personalID");
 		String mvcPath = ParamUtil.getString(actionRequest,
 				"mvcPath");		
-		//add in 2017/1/6
-		boolean isApplicantAgent = ParamUtil.getBoolean(actionRequest,
-				"isApplicantAgent", false);
-		//end in 2017/1/6
 		
 		actionResponse.setRenderParameter("eventName", eventName);
 		actionResponse.setRenderParameter("ticketNo", ticketNo);
@@ -936,9 +951,7 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 		actionResponse.setRenderParameter("staffCode", staffCode);
 		actionResponse.setRenderParameter("personalID", personalID);
 		actionResponse.setRenderParameter("mvcPath", mvcPath);
-		
-		System.out.println("in searchBusinessTripApplication"+isApplicantAgent);
-		actionResponse.setRenderParameter("isApplicantAgent",String.valueOf(isApplicantAgent));
+
 	}
 	
 	public void addDetailInfo(ActionRequest actionRequest,
@@ -975,14 +988,16 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 		double flightTaxes = ParamUtil.getDouble(actionRequest, "flightTaxes");
 		double flightTransactionFee = ParamUtil.getDouble(actionRequest,"flightTransactionFee");
 		
-		//add in 2017/1/6
+/*		//add in 2017/1/6
 		boolean isApplicantAgent = ParamUtil.getBoolean(actionRequest,
 				"isApplicantAgent", false);
 		System.out.println("In Add Detail"+isApplicantAgent);
 		//end in 2017/1/6
-		//add in 2017/01/23
+*/		//add in 2017/01/23
 		String tempApproverId = ParamUtil.getString(actionRequest, "tempApproverId","");
 		String tempApproverName = ParamUtil.getString(actionRequest, "tempApproverName","");
+		String tempEvpId = ParamUtil.getString(actionRequest, "tempEvpId","");
+		String tempEvpName = ParamUtil.getString(actionRequest, "tempEvpName","");
 		//end in 2017/01/23
 		boolean tempIsGetRMB = ParamUtil.getBoolean(actionRequest,"tempIsGetRMB");
 		System.out.println("In Add Detail tempApproverId"+tempApproverId);
@@ -1414,9 +1429,11 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 		actionResponse.setRenderParameter("bussinessTirpTicketNo2",bussinessTirpTicketNo);
 		actionResponse.setRenderParameter("businessTripReimbursementId",String.valueOf(businessTripReimbursementId));
 		
-		actionResponse.setRenderParameter("isApplicantAgent",String.valueOf(isApplicantAgent));
+/*		actionResponse.setRenderParameter("isApplicantAgent",String.valueOf(isApplicantAgent));*/
 		actionResponse.setRenderParameter("tempApproverId",String.valueOf(tempApproverId));
 		actionResponse.setRenderParameter("tempApproverName",String.valueOf(tempApproverName));
+		actionResponse.setRenderParameter("tempEvpId",String.valueOf(tempEvpId ));
+		actionResponse.setRenderParameter("tempEvpName",String.valueOf(tempEvpName ));
 		actionResponse.setRenderParameter("tempIsGetRMB",String.valueOf(tempIsGetRMB));
 	}
 
@@ -1434,6 +1451,7 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 		String cmd2 = ParamUtil.getString(actionRequest, "cmd2");
 		long businessTripReimbursementId = ParamUtil.getLong(actionRequest,
 				"businessTripReimbursementId", 0);
+		System.out.println("****************deleteDetailInfo:businessTripReimbursementId="+businessTripReimbursementId);
 		long pkId = ParamUtil.getLong(actionRequest, "pkId", 0);
 		String tripType = PropsUtil
 				.get("vgc.apon.business.trip.reimbursement.type");
@@ -1472,81 +1490,94 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 				"flightTransactionFee");
 		//
 		
-		//add in 2017/1/6
+/*		//add in 2017/1/6
 		boolean isApplicantAgent = ParamUtil.getBoolean(actionRequest,
 				"isApplicantAgent", false);
-		System.out.println("In Del Detail"+isApplicantAgent);
+		System.out.println("In Del Detail"+isApplicantAgent);*/
 		//end in 2017/1/6
 		//add in 2017/01/23
 		String tempApproverId = ParamUtil.getString(actionRequest, "tempApproverId","");
 		String tempApproverName = ParamUtil.getString(actionRequest, "tempApproverName","");
+		String tempEvpId = ParamUtil.getString(actionRequest, "tempEvpId","");
+        String tempEvpName = ParamUtil.getString(actionRequest, "tempEvpName","");
 		//end in 2017/01/23
 		boolean tempIsGetRMB = ParamUtil.getBoolean(actionRequest,"tempIsGetRMB");
 		
 		if(token==tokenInSession){
-		if ("train".equals(tabs2)) {
-			BtTrainInfoLocalServiceUtil.deleteBtTrainInfo(pkId);
-		} else if ("hotelInformation".equals(tabs2)) {
-			BtHotelInfo btHotelInfo = BtHotelInfoLocalServiceUtil
-					.fetchBtHotelInfo(pkId);
-			hotelTotalCostRmb = BTApplicationUtil.deleteCalculate(
-					hotelTotalCostRmb, RMB, btHotelInfo.getPrice(),
-					btHotelInfo.getCurrency());
-			hotelTotalCostEur = BTApplicationUtil.deleteCalculate(
-					hotelTotalCostEur, EUR, btHotelInfo.getPrice(),
-					btHotelInfo.getCurrency());
-			BtHotelInfoLocalServiceUtil.deleteBtHotelInfo(pkId);
-			hotelTotalCostRmb = BtHotelInfoLocalServiceUtil.findCountByB_T(
-					businessTripReimbursementId, tripType) == 0 ? 0
-					: hotelTotalCostRmb;
-			hotelTotalCostEur = BtHotelInfoLocalServiceUtil.findCountByB_T(
-					businessTripReimbursementId, tripType) == 0 ? 0
-					: hotelTotalCostEur;
-		} else if ("carRental".equals(tabs2)) {
-			BtCarRentalInfo btCarRentalInfo = BtCarRentalInfoLocalServiceUtil
-					.fetchBtCarRentalInfo(pkId);
-			carRentalTotalCostRmb = BTApplicationUtil.deleteCalculate(
-					carRentalTotalCostRmb, RMB, btCarRentalInfo.getPrice(),
-					btCarRentalInfo.getCurrency());
-			carRentalTotalCostEur = BTApplicationUtil.deleteCalculate(
-					carRentalTotalCostEur, EUR, btCarRentalInfo.getPrice(),
-					btCarRentalInfo.getCurrency());
-			BtCarRentalInfoLocalServiceUtil.deleteBtCarRentalInfo(pkId);
-			carRentalTotalCostRmb = BtCarRentalInfoLocalServiceUtil
-					.findCountByB_T(businessTripReimbursementId, tripType) == 0 ? 0
-					: carRentalTotalCostRmb;
-			carRentalTotalCostEur = BtCarRentalInfoLocalServiceUtil
-					.findCountByB_T(businessTripReimbursementId, tripType) == 0 ? 0
-					: carRentalTotalCostEur;
-		} else if ("travelExpense".equals(tabs2)) {
-			BtTravelExpense travelExpense = BtTravelExpenseLocalServiceUtil
-					.fetchBtTravelExpense(pkId);
-			totalTravelExpenseRmb = BTApplicationUtil.deleteCalculate(
-					totalTravelExpenseRmb, RMB, travelExpense.getAllowance(),
-					travelExpense.getCurrency());
-			totalTravelExpenseEur = BTApplicationUtil.deleteCalculate(
-					totalTravelExpenseEur, EUR, travelExpense.getAllowance(),
-					travelExpense.getCurrency());
-			BtTravelExpenseLocalServiceUtil.deleteBtTravelExpense(pkId);
-		} else if ("costList".equals(tabs2)) {
-			BtCostList btCostList = BtCostListLocalServiceUtil
-					.fetchBtCostList(pkId);
-			if (btCostList.getInvoiceCurrency().equals(RMB)) {
-				costListInlandTotalRmb = BTApplicationUtil.deleteCalculate(
-						costListInlandTotalRmb, RMB,
-						btCostList.getInvoiceAmount(),
-						btCostList.getInvoiceCurrency());
-			} else if (btCostList.getInvoiceCurrency().equals(EUR)) {
-				costListForeignTotalEur = BTApplicationUtil.deleteCalculate(
-						costListForeignTotalEur, EUR,
-						btCostList.getInvoiceAmount(),
-						btCostList.getInvoiceCurrency());
+			if ("train".equals(tabs2)) {
+				BtTrainInfoLocalServiceUtil.deleteBtTrainInfo(pkId);
+			} else if ("hotelInformation".equals(tabs2)) {
+				BtHotelInfo btHotelInfo = BtHotelInfoLocalServiceUtil
+						.fetchBtHotelInfo(pkId);
+				hotelTotalCostRmb = BTApplicationUtil.deleteCalculate(
+						hotelTotalCostRmb, RMB, btHotelInfo.getPrice(),
+						btHotelInfo.getCurrency());
+				hotelTotalCostEur = BTApplicationUtil.deleteCalculate(
+						hotelTotalCostEur, EUR, btHotelInfo.getPrice(),
+						btHotelInfo.getCurrency());
+				BtHotelInfoLocalServiceUtil.deleteBtHotelInfo(pkId);
+				hotelTotalCostRmb = BtHotelInfoLocalServiceUtil.findCountByB_T(
+						businessTripReimbursementId, tripType) == 0 ? 0
+						: hotelTotalCostRmb;
+				hotelTotalCostEur = BtHotelInfoLocalServiceUtil.findCountByB_T(
+						businessTripReimbursementId, tripType) == 0 ? 0
+						: hotelTotalCostEur;
+			} else if ("carRental".equals(tabs2)) {
+				BtCarRentalInfo btCarRentalInfo = BtCarRentalInfoLocalServiceUtil
+						.fetchBtCarRentalInfo(pkId);
+				carRentalTotalCostRmb = BTApplicationUtil.deleteCalculate(
+						carRentalTotalCostRmb, RMB, btCarRentalInfo.getPrice(),
+						btCarRentalInfo.getCurrency());
+				carRentalTotalCostEur = BTApplicationUtil.deleteCalculate(
+						carRentalTotalCostEur, EUR, btCarRentalInfo.getPrice(),
+						btCarRentalInfo.getCurrency());
+				BtCarRentalInfoLocalServiceUtil.deleteBtCarRentalInfo(pkId);
+				carRentalTotalCostRmb = BtCarRentalInfoLocalServiceUtil
+						.findCountByB_T(businessTripReimbursementId, tripType) == 0 ? 0
+						: carRentalTotalCostRmb;
+				carRentalTotalCostEur = BtCarRentalInfoLocalServiceUtil
+						.findCountByB_T(businessTripReimbursementId, tripType) == 0 ? 0
+						: carRentalTotalCostEur;
+			} else if ("travelExpense".equals(tabs2)) {
+				BtTravelExpense travelExpense = BtTravelExpenseLocalServiceUtil
+						.fetchBtTravelExpense(pkId);
+				totalTravelExpenseRmb = BTApplicationUtil.deleteCalculate(
+						totalTravelExpenseRmb, RMB, travelExpense.getAllowance(),
+						travelExpense.getCurrency());
+				totalTravelExpenseEur = BTApplicationUtil.deleteCalculate(
+						totalTravelExpenseEur, EUR, travelExpense.getAllowance(),
+						travelExpense.getCurrency());
+				BtTravelExpenseLocalServiceUtil.deleteBtTravelExpense(pkId);
+			}else if ("deleteAllTravelExpense".equals(tabs2)) {
+				totalTravelExpenseRmb = 0;
+				totalTravelExpenseEur = 0;
+				BtTravelExpenseLocalServiceUtil.deleteBtTravelExpenseByB_T(businessTripReimbursementId, tripType);
+				tabs2 = "travelExpense";
+			} else if ("costList".equals(tabs2)) {
+				BtCostList btCostList = BtCostListLocalServiceUtil
+						.fetchBtCostList(pkId);
+				if (btCostList.getInvoiceCurrency().equals(RMB)) {
+					costListInlandTotalRmb = BTApplicationUtil.deleteCalculate(
+							costListInlandTotalRmb, RMB,
+							btCostList.getInvoiceAmount(),
+							btCostList.getInvoiceCurrency());
+				} else if (btCostList.getInvoiceCurrency().equals(EUR)) {
+					costListForeignTotalEur = BTApplicationUtil.deleteCalculate(
+							costListForeignTotalEur, EUR,
+							btCostList.getInvoiceAmount(),
+							btCostList.getInvoiceCurrency());
+				}
+				costListForeignTotalRmb = BTApplicationUtil.addCalculate(0, RMB,
+						costListForeignTotalEur, EUR);
+				BtCostListLocalServiceUtil.deleteBtCostList(pkId);
+			} else if ("deleteAllCostList".equals(tabs2)) {
+				costListInlandTotalRmb =0;
+				costListForeignTotalEur = 0;
+				costListForeignTotalRmb = 0;
+				tabs2 = "costList";
+				BtCostListLocalServiceUtil.deleteCostListByBRPKId(businessTripReimbursementId);
 			}
-			costListForeignTotalRmb = BTApplicationUtil.addCalculate(0, RMB,
-					costListForeignTotalEur, EUR);
-			BtCostListLocalServiceUtil.deleteBtCostList(pkId);
-		}
-		}
+	    }
 		totalCostRmb = BTApplicationUtil.addCalculate(hotelTotalCostRmb, RMB,
 				carRentalTotalCostRmb, RMB);
 		totalCostEur = BTApplicationUtil.addCalculate(hotelTotalCostEur, EUR,
@@ -1563,6 +1594,8 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 			businessTripReimbursement.setCostListForeignTotalEur(costListForeignTotalEur);
 			businessTripReimbursement.setOrgTotalCostRmb(costListInlandTotalRmb);
 			businessTripReimbursement.setOrgTotalCostEur(costListForeignTotalEur);
+			businessTripReimbursement.setTotalTravelExpenseEur(totalTravelExpenseEur);
+			businessTripReimbursement.setTotalTravelExpenseRmb(totalTravelExpenseRmb);
 			BusinessTripReimbursementLocalServiceUtil.updateBusinessTripReimbursement(businessTripReimbursement);
 		}
 		//Add in 2017/01/03
@@ -1614,9 +1647,11 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 				String.valueOf(businessTripReimbursementId));
 		// actionResponse.setRenderParameter("mvcPath","/html/businessTripReimbursement/view.jsp");
 		
-		actionResponse.setRenderParameter("isApplicantAgent",String.valueOf(isApplicantAgent));
+	/*	actionResponse.setRenderParameter("isApplicantAgent",String.valueOf(isApplicantAgent));*/
 		actionResponse.setRenderParameter("tempApproverId",String.valueOf(tempApproverId));
 		actionResponse.setRenderParameter("tempApproverName",String.valueOf(tempApproverName));
+		actionResponse.setRenderParameter("tempEvpId",String.valueOf(tempEvpId));
+		actionResponse.setRenderParameter("tempEvpName",String.valueOf(tempEvpName));
 		actionResponse.setRenderParameter("tempIsGetRMB",String.valueOf(tempIsGetRMB));
 	}
 	// Get the applicant agent staffcode
@@ -1625,11 +1660,11 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 			PortletException, SystemException, PortalException {
 		String bussinessTirpTicketNo = ParamUtil.getString(actionRequest,
 				"bussinessTirpTicketNo2");
-		boolean isApplicantAgent = ParamUtil.getBoolean(actionRequest,
-				"isApplicantAgent", false);
+		Long applicantAgentUserId = ParamUtil.getLong(actionRequest, "applicantAgentPerson");
+		
 		//add in 2017/01/23
-		String tempApproverId = ParamUtil.getString(actionRequest, "tempApproverId","");
-		String tempApproverName = ParamUtil.getString(actionRequest, "tempApproverName","");
+/*		String tempApproverId = ParamUtil.getString(actionRequest, "tempApproverId","");
+		String tempApproverName = ParamUtil.getString(actionRequest, "tempApproverName","");*/
 		//end in 2017/01/23
 		boolean tempIsGetRMB = ParamUtil.getBoolean(actionRequest,"tempIsGetRMB");
 		
@@ -1637,62 +1672,38 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 				.getAttribute(WebKeys.THEME_DISPLAY);
 		User user = themeDisplay.getUser();
 		long staffCode = user.getFacebookId();
-		if (isApplicantAgent) {
-			ApplicantDelegation applicantDelegation = ApplicantDelegationLocalServiceUtil
-					.fetchByP_S(ApproverDelegationLocalServiceUtil
-							.getProcessOfBusinessTripReimbursement(), String
-							.valueOf(staffCode));
-			staffCode = UserLocalServiceUtil.fetchUserById(
-					applicantDelegation.getUserId()).getFacebookId();
+		
+		if(!applicantAgentUserId.equals(user.getUserId())){
+			staffCode = UserLocalServiceUtil.fetchUserById(applicantAgentUserId).getFacebookId();
 		}
-		long businessTripReimbursementId = ParamUtil.getLong(actionRequest,
-				"businessTripReimbursementId");
-		actionResponse.setRenderParameter("staffCode",
-				String.valueOf(staffCode));
-		actionResponse.setRenderParameter("bussinessTirpTicketNo2",
-				bussinessTirpTicketNo);
-		actionResponse.setRenderParameter("isApplicantAgent",
-				String.valueOf(isApplicantAgent));
+		long businessTripReimbursementId = ParamUtil.getLong(actionRequest,"businessTripReimbursementId");
+		actionResponse.setRenderParameter("staffCode",String.valueOf(staffCode));
+		actionResponse.setRenderParameter("bussinessTirpTicketNo2",bussinessTirpTicketNo);
 		actionResponse.setRenderParameter("businessTripReimbursementId",
 				String.valueOf(businessTripReimbursementId));
-		
-		actionResponse.setRenderParameter("tempApproverId",String.valueOf(tempApproverId));
-		actionResponse.setRenderParameter("tempApproverName",String.valueOf(tempApproverName));
 		actionResponse.setRenderParameter("tempIsGetRMB",String.valueOf(tempIsGetRMB));
-		// actionResponse.setRenderParameter("mvcPath","/html/businessTripReimbursement/view.jsp");
 	}
 
+	/**
+	 * select Bussiness trip
+	 * 
+	 * @param actionRequest
+	 * @param actionResponse
+	 * @throws IOException
+	 * @throws SystemException
+	 * @throws PortalException
+	 */
 	public void searchBussinessTirpTicketNo(ActionRequest actionRequest,
 			ActionResponse actionResponse) throws IOException, SystemException,
 			PortalException {
-		String bussinessTirpTicketNo = ParamUtil.getString(actionRequest,
-				"bussinessTirpTicketNo2");
-		
-		//add in 2017/1/6
-		boolean isApplicantAgent = ParamUtil.getBoolean(actionRequest,
-				"isApplicantAgent", false);
-		//end in 2017/1/6
-		//add in 2017/01/23
-//		String tempApproverId = ParamUtil.getString(actionRequest, "tempApproverId","");
-//		String tempApproverName = ParamUtil.getString(actionRequest, "tempApproverName","");
-		//end in 2017/01/23
-		
-		long businessTripReimbursementId = ParamUtil.getLong(actionRequest,
-				"businessTripReimbursementId2", 0);
+		String bussinessTirpTicketNo = ParamUtil.getString(actionRequest,"bussinessTirpTicketNo2");
+		long businessTripReimbursementId = ParamUtil.getLong(actionRequest,"businessTripReimbursementId2", 0);
 		businessTripReimbursementId = BusinessTripReimbursementLocalServiceUtil
 				.fetchBusinessTripReimbursement(businessTripReimbursementId) == null ? 0
 				: businessTripReimbursementId;
-		actionResponse.setRenderParameter("bussinessTirpTicketNo2",
-				bussinessTirpTicketNo);
-		actionResponse.setRenderParameter("businessTripReimbursementId",
-				String.valueOf(businessTripReimbursementId));
+		actionResponse.setRenderParameter("bussinessTirpTicketNo2",bussinessTirpTicketNo);
+		actionResponse.setRenderParameter("businessTripReimbursementId",String.valueOf(businessTripReimbursementId));
 		actionResponse.setRenderParameter("search", "Yes");
-		
-		System.out.println("in searchBussinessTirpTicketNo"+isApplicantAgent);
-		actionResponse.setRenderParameter("isApplicantAgent",String.valueOf(isApplicantAgent));
-//		actionResponse.setRenderParameter("tempApproverId",String.valueOf(tempApproverId));
-//		actionResponse.setRenderParameter("tempApproverName",String.valueOf(tempApproverName));
-		// actionResponse.setRenderParameter("mvcPath","/html/businessTripReimbursement/view.jsp");
 	}
 	
 	private void addorUpdateTrain(long pkId,ActionRequest actionRequest,long businessTripReimbursementId,String tripType,SimpleDateFormat sdf) throws SystemException{

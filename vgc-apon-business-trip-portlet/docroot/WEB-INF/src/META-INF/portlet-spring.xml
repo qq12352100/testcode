@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" default-destroy-method="destroy" default-init-method="afterPropertiesSet" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+	<bean id="com.business.trip.service.BtCarRentalInfoLocalService" class="com.business.trip.service.impl.BtCarRentalInfoLocalServiceImpl" />
+	<bean id="com.business.trip.service.persistence.BtCarRentalInfoPersistence" class="com.business.trip.service.persistence.BtCarRentalInfoPersistenceImpl" parent="basePersistence" />
+	<bean id="com.business.trip.service.BtCostListLocalService" class="com.business.trip.service.impl.BtCostListLocalServiceImpl" />
+	<bean id="com.business.trip.service.persistence.BtCostListPersistence" class="com.business.trip.service.persistence.BtCostListPersistenceImpl" parent="basePersistence" />
+	<bean id="com.business.trip.service.BtEntertainmentDetailLocalService" class="com.business.trip.service.impl.BtEntertainmentDetailLocalServiceImpl" />
+	<bean id="com.business.trip.service.persistence.BtEntertainmentDetailPersistence" class="com.business.trip.service.persistence.BtEntertainmentDetailPersistenceImpl" parent="basePersistence" />
+	<bean id="com.business.trip.service.BtExchangeRateLocalService" class="com.business.trip.service.impl.BtExchangeRateLocalServiceImpl" />
+	<bean id="com.business.trip.service.persistence.BtExchangeRatePersistence" class="com.business.trip.service.persistence.BtExchangeRatePersistenceImpl" parent="basePersistence" />
+	<bean id="com.business.trip.service.BtExchangeSAPRateLocalService" class="com.business.trip.service.impl.BtExchangeSAPRateLocalServiceImpl" />
+	<bean id="com.business.trip.service.persistence.BtExchangeSAPRatePersistence" class="com.business.trip.service.persistence.BtExchangeSAPRatePersistenceImpl" parent="basePersistence" />
+	<bean id="com.business.trip.service.BtFlightTrainInfoLocalService" class="com.business.trip.service.impl.BtFlightTrainInfoLocalServiceImpl" />
+	<bean id="com.business.trip.service.persistence.BtFlightTrainInfoPersistence" class="com.business.trip.service.persistence.BtFlightTrainInfoPersistenceImpl" parent="basePersistence" />
+	<bean id="com.business.trip.service.BtHotelInfoLocalService" class="com.business.trip.service.impl.BtHotelInfoLocalServiceImpl" />
+	<bean id="com.business.trip.service.persistence.BtHotelInfoPersistence" class="com.business.trip.service.persistence.BtHotelInfoPersistenceImpl" parent="basePersistence" />
+	<bean id="com.business.trip.service.BtReimbursementSAPInfoLocalService" class="com.business.trip.service.impl.BtReimbursementSAPInfoLocalServiceImpl" />
+	<bean id="com.business.trip.service.persistence.BtReimbursementSAPInfoPersistence" class="com.business.trip.service.persistence.BtReimbursementSAPInfoPersistenceImpl" parent="basePersistence" />
+	<bean id="com.business.trip.service.BtTrainInfoLocalService" class="com.business.trip.service.impl.BtTrainInfoLocalServiceImpl" />
+	<bean id="com.business.trip.service.persistence.BtTrainInfoPersistence" class="com.business.trip.service.persistence.BtTrainInfoPersistenceImpl" parent="basePersistence" />
+	<bean id="com.business.trip.service.BtTravelExpenseLocalService" class="com.business.trip.service.impl.BtTravelExpenseLocalServiceImpl" />
+	<bean id="com.business.trip.service.persistence.BtTravelExpensePersistence" class="com.business.trip.service.persistence.BtTravelExpensePersistenceImpl" parent="basePersistence" />
+	<bean id="com.business.trip.service.BusinessTripApplicationLocalService" class="com.business.trip.service.impl.BusinessTripApplicationLocalServiceImpl" />
+	<bean id="com.business.trip.service.persistence.BusinessTripApplicationPersistence" class="com.business.trip.service.persistence.BusinessTripApplicationPersistenceImpl" parent="basePersistence" />
+	<bean id="com.business.trip.service.BusinessTripReimbursementLocalService" class="com.business.trip.service.impl.BusinessTripReimbursementLocalServiceImpl" />
+	<bean id="com.business.trip.service.persistence.BusinessTripReimbursementPersistence" class="com.business.trip.service.persistence.BusinessTripReimbursementPersistenceImpl" parent="basePersistence" />
+	<bean id="com.business.trip.service.RateCityLocalService" class="com.business.trip.service.impl.RateCityLocalServiceImpl" />
+	<bean id="com.business.trip.service.persistence.RateCityPersistence" class="com.business.trip.service.persistence.RateCityPersistenceImpl" parent="basePersistence" />
+</beans>

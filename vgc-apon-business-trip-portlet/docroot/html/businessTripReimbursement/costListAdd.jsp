@@ -1,7 +1,6 @@
 
 <%@page import="java.text.NumberFormat"%>
 <%@include file="/html/init.jsp"%>
-<%@page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 
 <%
 	String eventName = ParamUtil.getString(request, "eventName", liferayPortletResponse.getNamespace() + "AddBusinessTripReimbursement");
@@ -45,7 +44,7 @@
 		    	    <li class="nd02"><liferay-ui:message key="vgc-apon-business-trip-reimbursement-cost-list-gross-amount"/></li>
 		    	    <%-- <li class="nd02 hideli"><liferay-ui:message key="vgc-apon-business-trip-reimbursement-cost-list-tax-rate"/></li> --%>
 		    	    <li class="nd02 hideli"><liferay-ui:message key="vgc-apon-business-trip-reimbursement-cost-list-net-amount"/></li>
-		    	    <li class="nd02 hideli"><liferay-ui:message key="vgc-apon-business-trip-reimbursement-cost-list-tax-amount"/></li>
+		    	    <li class="nd02 hideli" title="Notes: If VAT special invoice, please input Tax Amount, if VAT general invoice, please input '0' as VAT Tax Amount. Gross Amount equals Net Amount plus Tax Amount."><liferay-ui:message key="vgc-apon-business-trip-reimbursement-cost-list-tax-amount"/></li>
 		    	    
 		    	</ul>
 		    	<ul id="infoul">
@@ -86,7 +85,7 @@
 		    	        <input type="text" name="<portlet:namespace/>netAmount" id="netAmount" value="<%=isNew?"":btCostList.getNetAmount() %>"  onblur="checkFloat(this)"  onkeyup="this.value=this.value.replace(/[^0-9.]/g,'')" required="required" maxlength="75"/>
 		    	    </li>
 		    	      <li class="nd02 hideli">
-		    	        <input type="text" name="<portlet:namespace/>taxAmount" id="taxAmount"  value="<%=isNew?"":btCostList.getTaxAmount() %>"  onblur="checkFloat(this)"  onkeyup="this.value=this.value.replace(/[^0-9.]/g,'')" required="required" maxlength="75"/>
+		    	        <input type="text" name="<portlet:namespace/>taxAmount" id="taxAmount"  value="<%=isNew?"":btCostList.getTaxAmount() %>"  onblur="checkFloat(this)"  onkeyup="this.value=this.value.replace(/[^0-9.]/g,'')" required="required" maxlength="75" title="Notes: If VAT special invoice, please input Tax Amount, if VAT general invoice, please input '0' as VAT Tax Amount. Gross Amount equals Net Amount plus Tax Amount."/>
 		    	    </li>
 		    	</ul>
 		    </div>
@@ -99,7 +98,7 @@
 		    	</ul>
 		    	<ul>
 		    	  <li class="nd02">
-		    	    	  <select name="<portlet:namespace/>invoiceCurrency" id="invoiceCurrency" <%=isNew?"":"disabled='disabled'"%> onchange="selectCurrencyAsTripType()">
+		    	    	  <select  name="<portlet:namespace/>invoiceCurrency" id="invoiceCurrency" <%=isNew?"":"disabled='disabled'"%> onchange="selectCurrencyAsTripType()">
 						<%
 							String invoiceCurrency =btCostList.getInvoiceCurrency()==null?"":btCostList.getInvoiceCurrency();					
 							for (String curInvoiceCurrency : new String[]{"RMB","EUR"}) {
@@ -164,12 +163,7 @@
 				<%
 		}
 		%>
-		<div style="padding:4px;">
-			Notes:
-			  <li>For both VAT special invoice AND VAT general invoice, please input '0' as VAT Tax Amount, and input Gross amount as Net Amount.</li>
-			  <li>增值税专用发票 & 增值税普通发票，都请在Tax Amount填写 ’0’，在 Net Amount 填写含税总金额</li>
-			  <li>Fur beide 'VAT Special Invoice' und 'VAT General Invoice', bitte geben '0' (NULL) als VAT Steuer Summe,und geben Brutto Summe als Netto Summe.</li>
-			</div>
+		<div style="padding:4px;">Notes: If VAT special invoice, please input Tax Amount, if VAT general invoice, please input '0' as <b>VAT Tax Amount</b>. Gross Amount equals Net Amount plus Tax Amount.</div>
 	</aui:fieldset>
 </aui:form>
 
@@ -272,14 +266,12 @@
 		var netAmount=document.getElementById("netAmount");
 		var taxAmount=document.getElementById("taxAmount");
 		var grossAmount=document.getElementById("invoiceAmount");
-		grossAmount.value="";
 		/* var taxRate=document.getElementById("taxRate"); */
 		if(costListItem=="Accommodation-Domestic"){
 			$("#titleul li:gt(2)").show();
 			$("#infoul li:gt(2)").show();
 			/* taxRate.disabled=false; */
 			netAmount.disabled=false;
-			
 			taxAmount.disabled=false;
 			paymentCurrency.disabled=false;
 			paymentCurrency.value="RMB";
@@ -318,8 +310,6 @@
 			/* taxRate.disabled=true; */
 			netAmount.disabled=true;
 			taxAmount.disabled=true;
-			netAmount.value="";
-			taxAmount.value="";
 			grossAmount.disabled=false;
 		}
 		/* selectTaxRate(); */

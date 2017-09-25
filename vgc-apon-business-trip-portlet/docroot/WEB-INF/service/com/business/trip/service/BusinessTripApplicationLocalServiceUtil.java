@@ -290,6 +290,15 @@ public class BusinessTripApplicationLocalServiceUtil {
 			serviceContext);
 	}
 
+	/**
+	* @param businessTripApplication
+	* @return isCanReselectTripType
+	*/
+	public static boolean preValidate(
+		com.business.trip.model.BusinessTripApplication businessTripApplication) {
+		return getService().preValidate(businessTripApplication);
+	}
+
 	public static com.business.trip.model.BusinessTripApplication submitBusinessTripApplication(
 		com.business.trip.model.BusinessTripApplication businessTripApplication,
 		com.liferay.portal.service.ServiceContext serviceContext)

@@ -318,4 +318,14 @@ public interface BtTravelExpenseLocalService extends BaseLocalService,
 		java.lang.String departure, java.lang.String arrival, double rateOfDma,
 		boolean isHasBreakfast, boolean isHasLunch, boolean isHasDinner)
 		throws java.text.ParseException;
+
+	/**
+	* To corrected the history data  cost list netAmountRMB value
+	*
+	* @param businessTripReimbursementId
+	* @throws SystemException
+	*/
+	public void correctAmountRmbDAOfHistoryData(
+		long businessTripReimbursementId)
+		throws com.liferay.portal.kernel.exception.SystemException;
 }

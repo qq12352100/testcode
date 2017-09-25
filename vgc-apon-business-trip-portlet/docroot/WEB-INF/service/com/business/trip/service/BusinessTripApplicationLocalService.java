@@ -260,6 +260,13 @@ public interface BusinessTripApplicationLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
+	/**
+	* @param businessTripApplication
+	* @return isCanReselectTripType
+	*/
+	public boolean preValidate(
+		com.business.trip.model.BusinessTripApplication businessTripApplication);
+
 	public com.business.trip.model.BusinessTripApplication submitBusinessTripApplication(
 		com.business.trip.model.BusinessTripApplication businessTripApplication,
 		com.liferay.portal.service.ServiceContext serviceContext)

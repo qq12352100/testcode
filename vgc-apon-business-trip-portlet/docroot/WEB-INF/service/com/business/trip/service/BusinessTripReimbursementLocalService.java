@@ -254,6 +254,10 @@ public interface BusinessTripReimbursementLocalService extends BaseLocalService,
 		java.lang.String[] parameterTypes, java.lang.Object[] arguments)
 		throws java.lang.Throwable;
 
+	public java.util.List<java.lang.Object[]> reimbursementTravelForReport(
+		java.lang.String travelType, java.lang.String ticketNo, int status,
+		java.lang.String periodStart, java.lang.String periodEnd);
+
 	public com.business.trip.model.BusinessTripReimbursement saveOrUpdateBusinessTripReimbursement(
 		com.business.trip.model.BusinessTripReimbursement businessTripReimbursement,
 		com.liferay.portal.service.ServiceContext serviceContext)
@@ -276,6 +280,18 @@ public interface BusinessTripReimbursementLocalService extends BaseLocalService,
 		boolean autoNewAterAccountReject)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Get Total Payment Amount
+	*
+	* @param businessTripReimbursement
+	* @return
+	* @throws SystemException
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.lang.Double[] getTotalPaymentAmount(
+		com.business.trip.model.BusinessTripReimbursement businessTripReimbursement)
+		throws com.liferay.portal.kernel.exception.SystemException;
 
 	public void paymentCompletedSendEmailtoApplicant(
 		com.business.trip.model.BusinessTripReimbursement businessTripReimbursement)

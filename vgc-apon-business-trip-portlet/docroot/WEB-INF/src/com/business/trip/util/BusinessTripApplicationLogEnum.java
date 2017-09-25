@@ -3,7 +3,7 @@ package com.business.trip.util;
 public enum BusinessTripApplicationLogEnum {
 	APPLICANT(1, "Applicant"), 
 	SUPERVISOR(101, "Supervisor"), 
-	DEPARTMENT_LEAD(102, "Cross Department Head"),
+	DEPARTMENT_LEAD(102, "Department Lead"),
 	EVP(103, "EVP"),
 	APP(104, "Applicant"), 
 	HEAD_OF_CONTROLLING(105, "Head of Controlling"),

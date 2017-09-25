@@ -846,6 +846,35 @@ public interface BusinessTripReimbursementModel extends BaseModel<BusinessTripRe
 	public void setIsPaybyRmb(boolean isPaybyRmb);
 
 	/**
+	 * Returns the evp ID of this business trip reimbursement.
+	 *
+	 * @return the evp ID of this business trip reimbursement
+	 */
+	public long getEvpId();
+
+	/**
+	 * Sets the evp ID of this business trip reimbursement.
+	 *
+	 * @param evpId the evp ID of this business trip reimbursement
+	 */
+	public void setEvpId(long evpId);
+
+	/**
+	 * Returns the evp name of this business trip reimbursement.
+	 *
+	 * @return the evp name of this business trip reimbursement
+	 */
+	@AutoEscape
+	public String getEvpName();
+
+	/**
+	 * Sets the evp name of this business trip reimbursement.
+	 *
+	 * @param evpName the evp name of this business trip reimbursement
+	 */
+	public void setEvpName(String evpName);
+
+	/**
 	 * Returns the status of this business trip reimbursement.
 	 *
 	 * @return the status of this business trip reimbursement

@@ -18,7 +18,6 @@ import com.business.trip.NoSuchRateCityException;
 import com.business.trip.model.RateCity;
 import com.business.trip.model.impl.RateCityImpl;
 import com.business.trip.model.impl.RateCityModelImpl;
-import com.business.trip.service.persistence.RateCityPersistence;
 
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;

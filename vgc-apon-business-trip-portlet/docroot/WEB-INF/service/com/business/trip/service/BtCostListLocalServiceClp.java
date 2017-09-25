@@ -139,27 +139,43 @@ public class BtCostListLocalServiceClp implements BtCostListLocalService {
 				"long", "java.lang.String", "java.util.List"
 			};
 
-		_methodName24 = "findSumNetAmountRmbByCurrency";
+		_methodName24 = "findSumInvoiceAmountByCurrency";
 
-		_methodParameterTypes24 = new String[] {
+		_methodParameterTypes24 = new String[] { "long", "java.lang.String" };
+
+		_methodName25 = "findEURPayByRMBByCurrency";
+
+		_methodParameterTypes25 = new String[] { "long" };
+
+		_methodName26 = "findSumNetAmountRmbByCurrency";
+
+		_methodParameterTypes26 = new String[] {
 				"long", "java.lang.String", "java.util.List"
 			};
 
-		_methodName25 = "findSumTaxByCurrency";
-
-		_methodParameterTypes25 = new String[] {
-				"long", "java.lang.String", "java.util.List"
-			};
-
-		_methodName26 = "isEntertainmentCondition";
-
-		_methodParameterTypes26 = new String[] { "long", "int" };
-
-		_methodName27 = "addCalculate";
+		_methodName27 = "findSumTaxByCurrency";
 
 		_methodParameterTypes27 = new String[] {
+				"long", "java.lang.String", "java.util.List"
+			};
+
+		_methodName28 = "isEntertainmentCondition";
+
+		_methodParameterTypes28 = new String[] { "long", "int" };
+
+		_methodName29 = "addCalculate";
+
+		_methodParameterTypes29 = new String[] {
 				"double", "java.lang.String", "double", "java.lang.String"
 			};
+
+		_methodName30 = "correctAmountRmbCostListOfHistoryData";
+
+		_methodParameterTypes30 = new String[] { "long" };
+
+		_methodName31 = "deleteCostListByBRPKId";
+
+		_methodParameterTypes31 = new String[] { "long" };
 	}
 
 	@Override
@@ -876,6 +892,68 @@ public class BtCostListLocalServiceClp implements BtCostListLocalService {
 	}
 
 	@Override
+	public java.lang.Double findSumInvoiceAmountByCurrency(
+		long businessTripPkId, java.lang.String paymentCurrency)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName24,
+					_methodParameterTypes24,
+					new Object[] {
+						businessTripPkId,
+						
+					ClpSerializer.translateInput(paymentCurrency)
+					});
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return (java.lang.Double)ClpSerializer.translateOutput(returnObj);
+	}
+
+	@Override
+	public java.lang.Double findEURPayByRMBByCurrency(long businessTripPkId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		Object returnObj = null;
+
+		try {
+			returnObj = _invokableLocalService.invokeMethod(_methodName25,
+					_methodParameterTypes25, new Object[] { businessTripPkId });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+
+		return (java.lang.Double)ClpSerializer.translateOutput(returnObj);
+	}
+
+	@Override
 	public java.lang.Double findSumNetAmountRmbByCurrency(
 		long businessTripPkId, java.lang.String paymentCurrency,
 		java.util.List<java.lang.String> items)
@@ -883,8 +961,8 @@ public class BtCostListLocalServiceClp implements BtCostListLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName24,
-					_methodParameterTypes24,
+			returnObj = _invokableLocalService.invokeMethod(_methodName26,
+					_methodParameterTypes26,
 					new Object[] {
 						businessTripPkId,
 						
@@ -919,8 +997,8 @@ public class BtCostListLocalServiceClp implements BtCostListLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName25,
-					_methodParameterTypes25,
+			returnObj = _invokableLocalService.invokeMethod(_methodName27,
+					_methodParameterTypes27,
 					new Object[] {
 						businessTripPkId,
 						
@@ -954,8 +1032,8 @@ public class BtCostListLocalServiceClp implements BtCostListLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName26,
-					_methodParameterTypes26,
+			returnObj = _invokableLocalService.invokeMethod(_methodName28,
+					_methodParameterTypes28,
 					new Object[] { businessTripPkId, type });
 		}
 		catch (Throwable t) {
@@ -984,8 +1062,8 @@ public class BtCostListLocalServiceClp implements BtCostListLocalService {
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName27,
-					_methodParameterTypes27,
+			returnObj = _invokableLocalService.invokeMethod(_methodName29,
+					_methodParameterTypes29,
 					new Object[] {
 						oldTotal,
 						
@@ -1013,6 +1091,57 @@ public class BtCostListLocalServiceClp implements BtCostListLocalService {
 		}
 
 		return ((Double)returnObj).doubleValue();
+	}
+
+	@Override
+	public void correctAmountRmbCostListOfHistoryData(
+		long businessTripReimbursementId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		try {
+			_invokableLocalService.invokeMethod(_methodName30,
+				_methodParameterTypes30,
+				new Object[] { businessTripReimbursementId });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
+	}
+
+	@Override
+	public void deleteCostListByBRPKId(long businessTripReimbursementId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		try {
+			_invokableLocalService.invokeMethod(_methodName31,
+				_methodParameterTypes31,
+				new Object[] { businessTripReimbursementId });
+		}
+		catch (Throwable t) {
+			t = ClpSerializer.translateThrowable(t);
+
+			if (t instanceof com.liferay.portal.kernel.exception.SystemException) {
+				throw (com.liferay.portal.kernel.exception.SystemException)t;
+			}
+
+			if (t instanceof RuntimeException) {
+				throw (RuntimeException)t;
+			}
+			else {
+				throw new RuntimeException(t.getClass().getName() +
+					" is not a valid exception");
+			}
+		}
 	}
 
 	private InvokableLocalService _invokableLocalService;
@@ -1070,4 +1199,12 @@ public class BtCostListLocalServiceClp implements BtCostListLocalService {
 	private String[] _methodParameterTypes26;
 	private String _methodName27;
 	private String[] _methodParameterTypes27;
+	private String _methodName28;
+	private String[] _methodParameterTypes28;
+	private String _methodName29;
+	private String[] _methodParameterTypes29;
+	private String _methodName30;
+	private String[] _methodParameterTypes30;
+	private String _methodName31;
+	private String[] _methodParameterTypes31;
 }

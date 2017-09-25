@@ -18,7 +18,6 @@ import com.business.trip.NoSuchBtEntertainmentDetailException;
 import com.business.trip.model.BtEntertainmentDetail;
 import com.business.trip.model.impl.BtEntertainmentDetailImpl;
 import com.business.trip.model.impl.BtEntertainmentDetailModelImpl;
-import com.business.trip.service.persistence.BtEntertainmentDetailPersistence;
 
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;

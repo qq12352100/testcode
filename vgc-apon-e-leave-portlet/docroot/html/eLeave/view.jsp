@@ -23,6 +23,9 @@ else {
 	eLeave = ELeaveLocalServiceUtil.createELeave(eLeaveId);
 }
 String transitionName = ParamUtil.getString(renderRequest, "transitionName", "");
+
+System.out.println("**********************transitionName***********="+transitionName);
+
 String isClickAgent = ParamUtil.getString(renderRequest, "isClickAgent","");
 long sCode = themeDisplay.getUser().getFacebookId();
 Date now = new Date();

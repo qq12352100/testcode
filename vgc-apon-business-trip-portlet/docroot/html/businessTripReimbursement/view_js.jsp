@@ -8,6 +8,9 @@ System.out.println("supportFileType111:"+request.getParameter("supportFileType")
 String supportFileSize =  ParamUtil.getString(request,"supportFileSize");
 String importFileType =  ParamUtil.getString(request,"importFileType");
 String importError =  ParamUtil.getString(request,"importError");
+String tempIsGetRMB = ParamUtil.getString(request, "tempIsGetRMB");
+String mustCheckedGetRmb = ParamUtil.getString(request, "mustCheckedGetRmb");
+
 System.out.println("importError:"+importError);
 
 //String myApplicationsPlid = request.getParameter("myApplicationsPlid");
@@ -40,7 +43,7 @@ if(Validator.isNotNull(businessTripApplicationid)){
 <aui:script>
 	//When submit the form, there will be a workflow to enabled
 	function <portlet:namespace />submitBusinessTripReimbursement() {
-		if(!validateFileTypeAndSize()) {
+		if(!validateFileTypeAndSize()||!validateGetRmb()||!validateEVP()) {
 			return false;
 		} 	
 		<portlet:namespace />setFileInfo();
@@ -48,6 +51,34 @@ if(Validator.isNotNull(businessTripApplicationid)){
 		submitForm(document.<portlet:namespace />fm);	
 	}
 	
+ 		//validate the get Rmb
+ 	function validateGetRmb() {
+ 			var mustCheckedGetRmb = '<%=mustCheckedGetRmb%>';
+ 		 	if(mustCheckedGetRmb=='Y'){
+ 		 		var isPaybyRmb= document.getElementById('isPaybyRmb');	 		
+	 			if (isPaybyRmb.checked==false) {
+	 			    var msg = '<liferay-ui:message key="vgc-apon-business-trip-reimbursement-getrmb-selectd" />';
+	 				alert(msg);
+	 				document.getElementsByName('<portlet:namespace/>isPaybyRmb').focus();
+	 				return false;
+	 			}
+ 		 	}
+ 		 	return true;
+ 	}
+	
+		//validate the get Rmb
+ 	function validateEVP(){
+		var selectObj = document.getElementById("evpId");
+		var evpId = selectObj.value; 
+		if (evpId=="-1") {
+		    var msg = '<liferay-ui:message key="vgc-apon-business-trip-reimbursement-evp-selectd" />';
+			alert(msg);
+			document.getElementsByName('<portlet:namespace/>evpId').focus();
+			return false;
+		}
+ 		return true;
+ 	}
+		
 	function <portlet:namespace />openBtApplicationDetail() {
 		var downloadUrl = '<%=openBusinessTripApplicationURL %>';		
 		window.location.href = downloadUrl;
@@ -261,7 +292,6 @@ if(Validator.isNotNull(businessTripApplicationid)){
 	
 	//When the employee is on behalf of the applicant,display the query button
 	function <portlet:namespace />applicantAgentClick(obj) {
-		document.<portlet:namespace />applicantAgentForm.<portlet:namespace />isApplicantAgent.value = obj.checked;
 		submitForm(document.<portlet:namespace />applicantAgentForm);
 	}
 	
@@ -269,6 +299,14 @@ if(Validator.isNotNull(businessTripApplicationid)){
 	function <portlet:namespace/>update(updateUrl,tabs2) {
 		var w = 1200;
 		var h = 300;
+		var radionum = document.getElementsByName("<portlet:namespace />tripType");
+        var  travelTypeVal=-1;
+        for(var i=0;i<radionum.length;i++){
+                  if(radionum[i].checked){
+                           travelTypeVal = radionum[i].value
+                  } }
+        updateUrl=updateUrl+'&<portlet:namespace />travelTypeVal='+travelTypeVal;
+		
 		if(tabs2=='hotelInformation'||tabs2=='travelExpense') {
 			w = 1200;
 			h = 550;
@@ -420,6 +458,7 @@ if(Validator.isNotNull(businessTripApplicationid)){
 		submitForm(document.<portlet:namespace/>importFm);
 	}
 	
+	
 	window.onload=function(){
 		var tohere=document.getElementById("tohere").value;
 		if(tohere!=""){
@@ -434,7 +473,43 @@ if(Validator.isNotNull(businessTripApplicationid)){
 			}else{
 				alert("import flight PDF Error!");
 			}	
-		}
+		}	
+		
+		var mustCheckedGetRmb = '<%=mustCheckedGetRmb%>';
+	 	if(mustCheckedGetRmb=='Y'){
+	 		document.getElementById('isPaybyRmb').checked=true;
+	 		changeRMBAmountDisplay("true");
+	 	}else{
+			changeRMBAmountDisplay("<%=tempIsGetRMB%>");
+	 	}
+	}
+	
+	function changeApprover(obj){
+		var selectObj = document.getElementById("approverId");
+		var approverId = selectObj.value;
+        var approverName =  selectObj.options[selectObj.selectedIndex].text;
+        document.getElementById("approverName").value =approverName;
+		document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />tempApproverId.value = approverId;
+		document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />tempApproverName.value =approverName;
+		document.<portlet:namespace />importFm.<portlet:namespace />tempApproverId.value =  approverId;
+		document.<portlet:namespace />importFm.<portlet:namespace />tempApproverName.value =approverName;
+		document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />tempApproverId.value = approverId;
+		document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />tempApproverName.value =approverName;
+	}
+	
+	
+	function changeEvpApprover(obj){
+		var selectObj = document.getElementById("evpId");
+		var evpId = selectObj.value;
+        var evpName =  selectObj.options[selectObj.selectedIndex].text;
+        document.getElementById("evpName").value=evpName;
+        
+  	    document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />tempEvpId.value = evpId;
+		document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />tempEvpName.value =evpName;
+		document.<portlet:namespace />importFm.<portlet:namespace />tempEvpId.value =evpId;
+		document.<portlet:namespace />importFm.<portlet:namespace />tempEvpName.value =evpName;
+		document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />tempEvpId.value = evpId;
+		document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />tempEvpName.value =evpName;
 	}
 	
 	function changeGetRMB(obj){
@@ -443,55 +518,43 @@ if(Validator.isNotNull(businessTripApplicationid)){
 		document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />tempIsGetRMB.value = obj.checked;
 		document.<portlet:namespace />importFm.<portlet:namespace />tempIsGetRMB.value = obj.checked;
 		document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />tempIsGetRMB.value = obj.checked;
+		//document.<portlet:namespace />btCostListsSearchContainer.<portlet:namespace />col-vgc-apon-business-trip-reimbursement-cost-list-rmb-amount.style.display = "none";
+		//$("#<portlet:namespace/>btCostListsSearchContainerSearchContainer table tbody tr td::nth-child(7)").hide();  
+		changeRMBAmountDisplay(obj.checked+"");
+	
 	}
-
-	function changeApplicantAgent(obj){
-		console.log(obj.checked);
-		//document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />isApplicantAgent.value = document.<portlet:namespace />fm.<portlet:namespace />isApplicantAgent.checked;
-		document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />isApplicantAgent.value = obj.checked;
-		document.<portlet:namespace />importFm.<portlet:namespace />isApplicantAgent.value = obj.checked;
-		document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />isApplicantAgent.value = obj.checked;
-		document.<portlet:namespace />searchBussinessTirpTicketNo.<portlet:namespace />isApplicantAgent.value = obj.checked;
+	
+	function changeRMBAmountDisplay(checked){
+		if(checked=="true"){
+			$("#<portlet:namespace />btCostListsSearchContainer_col-vgc-apon-business-trip-reimbursement-cost-list-rmb-amount").show();
+			$("#<portlet:namespace />btCostListsSearchContainerSearchContainer table tbody tr ").find("td[class='table-cell special']").each(function(i){ 
+				$(this).show();
+			});
+			$("#<portlet:namespace />btTravelExpensesSearchContainer_col-vgc-apon-business-trip-reimbursement-travel-expense-dally-rmb").show();
+			$("#<portlet:namespace />btTravelExpensesSearchContainerSearchContainer table tbody tr ").find("td[class='table-cell special']").each(function(i){ 
+				$(this).show();
+			});	
+			
+			$("#<portlet:namespace />totalRMBAmountOfCost").show(); 
+			$("#<portlet:namespace />totalRMBAmountOfEURTravelExpense").show(); 
+			
+		}else{
+		   $("#<portlet:namespace />btCostListsSearchContainer_col-vgc-apon-business-trip-reimbursement-cost-list-rmb-amount").hide();
+			$("#<portlet:namespace />btCostListsSearchContainerSearchContainer table tbody tr ").find("td[class='table-cell special']").each(function(i){ 
+				$(this).hide();
+			});
+			
+			$("#<portlet:namespace />btTravelExpensesSearchContainer_col-vgc-apon-business-trip-reimbursement-travel-expense-dally-rmb").hide();
+			$("#<portlet:namespace />btTravelExpensesSearchContainerSearchContainer table tbody tr ").find("td[class='table-cell special']").each(function(i){ 
+				$(this).hide();
+			});	
+			$("#<portlet:namespace />totalRMBAmountOfCost").hide();
+			$("#<portlet:namespace />totalRMBAmountOfEURTravelExpense").hide(); 
+		}
 	}
 </aui:script>
 
 <aui:script use="liferay-search-container">
-var selectApproverLink = A.one('#selectApprover');
-if (selectApproverLink) {
-          selectApproverLink.on(
-                   'click',
-                   function(event) {
-                             Liferay.Util.selectEntity(
-                                      {
-                                                dialog: {
-                                                          constrain: true,
-                                                          modal: true
-                                                },
-                                                id: '<portlet:namespace />selectApprover',
-                                                title: '<liferay-ui:message key="vgc-apon-business-trip-application-select-approver-title" />',
-                                                uri:'<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcPath" value="/html/businessTripReimbursement/select_approver.jsp" /></portlet:renderURL>'
-                                      },
-                                      function(event) {
-                                    	 
-                                                document.getElementById("approverId").value=event.approverId;
-                                                document.getElementById("approverName").value=event.approverName;
-                                                
-                                        		document.<portlet:namespace />applicantAgentForm.<portlet:namespace />tempApproverId.value = event.approverId;
-                                        		document.<portlet:namespace />applicantAgentForm.<portlet:namespace />tempApproverName.value = event.approverName;
-                                        		document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />tempApproverId.value = event.approverId;
-                                        		document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />tempApproverName.value = event.approverName;
-                                        		document.<portlet:namespace />importFm.<portlet:namespace />tempApproverId.value = event.approverId;
-                                        		document.<portlet:namespace />importFm.<portlet:namespace />tempApproverName.value = event.approverName;
-                                        		document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />tempApproverId.value = event.approverId;
-                                        		document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />tempApproverName.value = event.approverName;
-                                        		/* document.<portlet:namespace />searchBussinessTirpTicketNo.<portlet:namespace />tempApproverId.value = event.approverId;
-                                        		document.<portlet:namespace />searchBussinessTirpTicketNo.<portlet:namespace />tempApproverName.value = event.approverName; */
-                                      }
-                             );
-                   }
-          );
-}
-
 var searchBussinessTirpTicketNoLink = A.one('#<portlet:namespace />searchBussinessTirpTicketNo');
 if (searchBussinessTirpTicketNoLink) {
 	searchBussinessTirpTicketNoLink.on(
@@ -566,7 +629,7 @@ function CheckTripType(val) {
 	var hotelandcar = document.getElementById("hotelandcar");
 	var car = document.getElementById("car");
 	if (navs.length > 0) {
-		var ali = navs[navs.length - 3];
+		var ali = navs[navs.length - 1];
 		if (val == 0) {
 			if (ali.className == "tab active") {
 				navs[0].getElementsByTagName('a')[0].click();

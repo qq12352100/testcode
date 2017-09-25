@@ -126,39 +126,55 @@ public class BtCostListLocalServiceClpInvoker {
 
 		_methodParameterTypes88 = new String[] { "long", "java.lang.String" };
 
-		_methodName89 = "findSumByCurrency";
-
-		_methodParameterTypes89 = new String[] {
-				"long", "java.lang.String", "java.util.List"
-			};
-
-		_methodName90 = "findSumEntertainmentByCurrency";
+		_methodName90 = "findSumByCurrency";
 
 		_methodParameterTypes90 = new String[] {
 				"long", "java.lang.String", "java.util.List"
 			};
 
-		_methodName91 = "findSumNetAmountRmbByCurrency";
+		_methodName91 = "findSumEntertainmentByCurrency";
 
 		_methodParameterTypes91 = new String[] {
 				"long", "java.lang.String", "java.util.List"
 			};
 
-		_methodName92 = "findSumTaxByCurrency";
+		_methodName92 = "findSumInvoiceAmountByCurrency";
 
-		_methodParameterTypes92 = new String[] {
+		_methodParameterTypes92 = new String[] { "long", "java.lang.String" };
+
+		_methodName93 = "findEURPayByRMBByCurrency";
+
+		_methodParameterTypes93 = new String[] { "long" };
+
+		_methodName94 = "findSumNetAmountRmbByCurrency";
+
+		_methodParameterTypes94 = new String[] {
 				"long", "java.lang.String", "java.util.List"
 			};
 
-		_methodName93 = "isEntertainmentCondition";
+		_methodName95 = "findSumTaxByCurrency";
 
-		_methodParameterTypes93 = new String[] { "long", "int" };
+		_methodParameterTypes95 = new String[] {
+				"long", "java.lang.String", "java.util.List"
+			};
 
-		_methodName94 = "addCalculate";
+		_methodName96 = "isEntertainmentCondition";
 
-		_methodParameterTypes94 = new String[] {
+		_methodParameterTypes96 = new String[] { "long", "int" };
+
+		_methodName97 = "addCalculate";
+
+		_methodParameterTypes97 = new String[] {
 				"double", "java.lang.String", "double", "java.lang.String"
 			};
+
+		_methodName98 = "correctAmountRmbCostListOfHistoryData";
+
+		_methodParameterTypes98 = new String[] { "long" };
+
+		_methodName99 = "deleteCostListByBRPKId";
+
+		_methodParameterTypes99 = new String[] { "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -280,46 +296,71 @@ public class BtCostListLocalServiceClpInvoker {
 				(java.lang.String)arguments[1]);
 		}
 
-		if (_methodName89.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes89, parameterTypes)) {
-			return BtCostListLocalServiceUtil.findSumByCurrency(((Long)arguments[0]).longValue(),
-				(java.lang.String)arguments[1],
-				(java.util.List<java.lang.String>)arguments[2]);
-		}
-
 		if (_methodName90.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes90, parameterTypes)) {
-			return BtCostListLocalServiceUtil.findSumEntertainmentByCurrency(((Long)arguments[0]).longValue(),
+			return BtCostListLocalServiceUtil.findSumByCurrency(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1],
 				(java.util.List<java.lang.String>)arguments[2]);
 		}
 
 		if (_methodName91.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes91, parameterTypes)) {
-			return BtCostListLocalServiceUtil.findSumNetAmountRmbByCurrency(((Long)arguments[0]).longValue(),
+			return BtCostListLocalServiceUtil.findSumEntertainmentByCurrency(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1],
 				(java.util.List<java.lang.String>)arguments[2]);
 		}
 
 		if (_methodName92.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes92, parameterTypes)) {
+			return BtCostListLocalServiceUtil.findSumInvoiceAmountByCurrency(((Long)arguments[0]).longValue(),
+				(java.lang.String)arguments[1]);
+		}
+
+		if (_methodName93.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes93, parameterTypes)) {
+			return BtCostListLocalServiceUtil.findEURPayByRMBByCurrency(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName94.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes94, parameterTypes)) {
+			return BtCostListLocalServiceUtil.findSumNetAmountRmbByCurrency(((Long)arguments[0]).longValue(),
+				(java.lang.String)arguments[1],
+				(java.util.List<java.lang.String>)arguments[2]);
+		}
+
+		if (_methodName95.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes95, parameterTypes)) {
 			return BtCostListLocalServiceUtil.findSumTaxByCurrency(((Long)arguments[0]).longValue(),
 				(java.lang.String)arguments[1],
 				(java.util.List<java.lang.String>)arguments[2]);
 		}
 
-		if (_methodName93.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes93, parameterTypes)) {
+		if (_methodName96.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes96, parameterTypes)) {
 			return BtCostListLocalServiceUtil.isEntertainmentCondition(((Long)arguments[0]).longValue(),
 				((Integer)arguments[1]).intValue());
 		}
 
-		if (_methodName94.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes94, parameterTypes)) {
+		if (_methodName97.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes97, parameterTypes)) {
 			return BtCostListLocalServiceUtil.addCalculate(((Double)arguments[0]).doubleValue(),
 				(java.lang.String)arguments[1],
 				((Double)arguments[2]).doubleValue(),
 				(java.lang.String)arguments[3]);
+		}
+
+		if (_methodName98.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes98, parameterTypes)) {
+			BtCostListLocalServiceUtil.correctAmountRmbCostListOfHistoryData(((Long)arguments[0]).longValue());
+
+			return null;
+		}
+
+		if (_methodName99.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes99, parameterTypes)) {
+			BtCostListLocalServiceUtil.deleteCostListByBRPKId(((Long)arguments[0]).longValue());
+
+			return null;
 		}
 
 		throw new UnsupportedOperationException();
@@ -367,8 +408,6 @@ public class BtCostListLocalServiceClpInvoker {
 	private String[] _methodParameterTypes87;
 	private String _methodName88;
 	private String[] _methodParameterTypes88;
-	private String _methodName89;
-	private String[] _methodParameterTypes89;
 	private String _methodName90;
 	private String[] _methodParameterTypes90;
 	private String _methodName91;
@@ -379,4 +418,14 @@ public class BtCostListLocalServiceClpInvoker {
 	private String[] _methodParameterTypes93;
 	private String _methodName94;
 	private String[] _methodParameterTypes94;
+	private String _methodName95;
+	private String[] _methodParameterTypes95;
+	private String _methodName96;
+	private String[] _methodParameterTypes96;
+	private String _methodName97;
+	private String[] _methodParameterTypes97;
+	private String _methodName98;
+	private String[] _methodParameterTypes98;
+	private String _methodName99;
+	private String[] _methodParameterTypes99;
 }

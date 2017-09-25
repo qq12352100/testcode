@@ -291,6 +291,14 @@ public class BusinessTripReimbursementLocalServiceWrapper
 	}
 
 	@Override
+	public java.util.List<java.lang.Object[]> reimbursementTravelForReport(
+		java.lang.String travelType, java.lang.String ticketNo, int status,
+		java.lang.String periodStart, java.lang.String periodEnd) {
+		return _businessTripReimbursementLocalService.reimbursementTravelForReport(travelType,
+			ticketNo, status, periodStart, periodEnd);
+	}
+
+	@Override
 	public com.business.trip.model.BusinessTripReimbursement saveOrUpdateBusinessTripReimbursement(
 		com.business.trip.model.BusinessTripReimbursement businessTripReimbursement,
 		com.liferay.portal.service.ServiceContext serviceContext)
@@ -319,6 +327,20 @@ public class BusinessTripReimbursementLocalServiceWrapper
 			com.liferay.portal.kernel.exception.SystemException {
 		return _businessTripReimbursementLocalService.submitBusinessTripReimbursement(businessTripReimbursement,
 			serviceContext, autoNewAterAccountReject);
+	}
+
+	/**
+	* Get Total Payment Amount
+	*
+	* @param businessTripReimbursement
+	* @return
+	* @throws SystemException
+	*/
+	@Override
+	public java.lang.Double[] getTotalPaymentAmount(
+		com.business.trip.model.BusinessTripReimbursement businessTripReimbursement)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _businessTripReimbursementLocalService.getTotalPaymentAmount(businessTripReimbursement);
 	}
 
 	@Override

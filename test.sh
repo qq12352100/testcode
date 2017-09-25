@@ -1,9 +1,7 @@
 #!/bin/bash
 echo "remove classes file!"
-rm -rf vgc-apon-e-closing-portlet/docroot/WEB-INF/classes
-rm -rf vgc-apon-e-onboarding-portlet/docroot/WEB-INF/classes
-rm -rf vgc-apon-e-transfer-portlet/docroot/WEB-INF/classes
-rm -rf vgc-apon-seat-office-portlet/docroot/WEB-INF/classes
+rm -rf vgc-apon-business-trip-portlet/docroot/WEB-INF/classes
+rm -rf vgc-apon-e-leave-portlet/docroot/WEB-INF/classes
 sleep 1s
 git add .
 sleep 3s

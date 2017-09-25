@@ -18,7 +18,6 @@ import com.business.trip.NoSuchBtCostListException;
 import com.business.trip.model.BtCostList;
 import com.business.trip.model.impl.BtCostListImpl;
 import com.business.trip.model.impl.BtCostListModelImpl;
-import com.business.trip.service.persistence.BtCostListPersistence;
 
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;

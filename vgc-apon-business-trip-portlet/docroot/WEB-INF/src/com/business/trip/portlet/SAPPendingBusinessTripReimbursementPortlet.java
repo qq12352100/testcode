@@ -154,7 +154,7 @@ public class SAPPendingBusinessTripReimbursementPortlet extends MVCPortlet {
 									BigDecimal.ROUND_HALF_UP).doubleValue();
 							if (travel_eur_sum_rmb > 0d) {
 								HashMap<String, String> travel_params_eur = new HashMap<String, String>();
-								travel_params_eur.put("item", "9008402003");
+								travel_params_eur.put("item", "0049100006");
 								travel_params_eur.put("price",String.valueOf(travel_eur_sum_rmb));
 								paramList_EUR_RMB.add(travel_params_eur);
 							}
@@ -182,7 +182,7 @@ public class SAPPendingBusinessTripReimbursementPortlet extends MVCPortlet {
 									BigDecimal.ROUND_HALF_UP).doubleValue();
 							if (travel_eur_sum > 0d) {
 								HashMap<String, String> travel_params_eur = new HashMap<String, String>();
-								travel_params_eur.put("item", "9008402003");
+								travel_params_eur.put("item", "0049100006");
 								travel_params_eur.put("price",String.valueOf(travel_eur_sum));
 								paramList_EUR.add(travel_params_eur);
 							}
@@ -411,9 +411,13 @@ public class SAPPendingBusinessTripReimbursementPortlet extends MVCPortlet {
 		if(airMap!=null){
 			items.add(airMap);
 		}
-		Map<String, String> taxMap= getItemAsSAP( currency,businessTripReimbursementId,new String[]{"Taxi/Bus/Subway"}, triptype);
-		if(taxMap!=null){
-			items.add(taxMap);
+		Map<String, String> telMap= getItemAsSAP( currency,businessTripReimbursementId,new String[]{"Telephone"}, triptype);
+		if(telMap!=null){
+			items.add(telMap);
+		}
+		Map<String, String> carMap= getItemAsSAP( currency,businessTripReimbursementId,new String[]{"Fuel/Oil/CarWash"}, triptype);
+		if(carMap!=null){
+			items.add(carMap);
 		}
 		Map<String, String> accMap= getItemAsSAP( currency,businessTripReimbursementId,new String[]{"Accommodation-Domestic","Accommodation-International"}, triptype);
 		if(accMap!=null){
@@ -423,12 +427,18 @@ public class SAPPendingBusinessTripReimbursementPortlet extends MVCPortlet {
 		if(entMap!=null){
 			items.add(entMap);
 		}
-		Map<String, String> othersMap= getItemAsSAP( currency,businessTripReimbursementId,new String[]{"Fuel/Oil/CarWash", "Car Maintenance","Parking/Garage", "Railway/Ferry", "Rented Car",
-				"Telephone", "Laundry", "Gifts", "Bank Fees",
-				"Currency Loss", "Others"}, triptype);
+		Map<String, String> othersMap= getItemAsSAP( currency,businessTripReimbursementId,new String[]{
+				"Car Maintenance","Parking/Garage", "Railway/Ferry","Taxi/Bus/Subway", "Rented Car"}, triptype);
 		if(othersMap!=null){
 			items.add(othersMap);
 		}
+		Map<String, String> othersMap1= getItemAsSAP( currency,businessTripReimbursementId,new String[]{"Laundry",
+				"Gifts", "Bank Fees",
+				"Currency Loss","Others"}, triptype);
+		if(othersMap1!=null){
+			items.add(othersMap1);
+		}
+		
 		return items;
 	}
 	
@@ -440,10 +450,10 @@ public class SAPPendingBusinessTripReimbursementPortlet extends MVCPortlet {
 		if(airMap!=null){
 			items.add(airMap);
 		}
-		Map<String, String> taxMap= getItemEURToRMBAsSAP( "EUR",businessTripReimbursementId,new String[]{"Taxi/Bus/Subway"}, triptype);
+/*		Map<String, String> taxMap= getItemEURToRMBAsSAP( "EUR",businessTripReimbursementId,new String[]{"Taxi/Bus/Subway"}, triptype);
 		if(taxMap!=null){
 			items.add(taxMap);
-		}
+		}*/
 		Map<String, String> accMap= getItemEURToRMBAsSAP( "EUR",businessTripReimbursementId,new String[]{"Accommodation-Domestic","Accommodation-International"}, triptype);
 		if(accMap!=null){
 			items.add(accMap);
@@ -452,11 +462,24 @@ public class SAPPendingBusinessTripReimbursementPortlet extends MVCPortlet {
 		if(entMap!=null){
 			items.add(entMap);
 		}
-		Map<String, String> othersMap= getItemEURToRMBAsSAP( "EUR",businessTripReimbursementId,new String[]{"Fuel/Oil/CarWash", "Car Maintenance","Parking/Garage", "Railway/Ferry", "Rented Car",
-				"Telephone", "Laundry", "Gifts", "Bank Fees",
-				"Currency Loss", "Others"}, triptype);
+		Map<String, String> carMap= getItemEURToRMBAsSAP( "EUR",businessTripReimbursementId,new String[]{"Fuel/Oil/CarWash"}, triptype);
+		if(carMap!=null){
+			items.add(carMap);
+		}
+		Map<String, String> telMap= getItemEURToRMBAsSAP( "EUR",businessTripReimbursementId,new String[]{"Telephone"}, triptype);
+		if(telMap!=null){
+			items.add(telMap);
+		}
+		Map<String, String> othersMap= getItemEURToRMBAsSAP( "EUR",businessTripReimbursementId,new String[]{"Car Maintenance","Parking/Garage", "Railway/Ferry","Taxi/Bus/Subway", "Rented Car"
+				}, triptype);
 		if(othersMap!=null){
 			items.add(othersMap);
+		}
+		Map<String, String> othersMap1= getItemEURToRMBAsSAP( "EUR",businessTripReimbursementId,new String[]{"Laundry",
+				"Gifts", "Bank Fees",
+				"Currency Loss","Others"}, triptype);
+		if(othersMap1!=null){
+			items.add(othersMap1);
 		}
 		return items;
 	}
@@ -475,44 +498,57 @@ public class SAPPendingBusinessTripReimbursementPortlet extends MVCPortlet {
 		itemdouble=bd.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue(); //閸ユ稖鍨楁禍鏂垮弳  娣団晙缍呯亸蹇旀殶 娴肩姴鍩宻ap
 		
 		if(itemdouble>0d){
-		if (liststring[0].equalsIgnoreCase("Air ticket(If not booked by HRG)")) {
-			if (triptype == 0) {// 閸ヨ棄鍞�
-				item.put("item", "9008401001");
-			} else if (triptype == 1) {
-				item.put("item", "9008402001");
-			}
-		}
-		/*else if (liststring[0].equalsIgnoreCase("Taxi/Bus/Subway")) {
-			if (triptype == 0) {// 閸ヨ棄鍞�
-				item.put("item", "9008401006");
-			} else if (triptype == 1) {
-				item.put("item", "9008402006");
-			}
+			if (liststring[0].equalsIgnoreCase("Air ticket(If not booked by HRG)")) {
+				if (triptype == 0) {// 閸ヨ棄鍞�
+					item.put("item", "0049100002");
+				} else if (triptype == 1) {
+					item.put("item", "0049100005");
+				}
+			} else if (liststring[0].equalsIgnoreCase("Fuel/Oil/CarWash")) {
+				if (triptype == 0) {// 閸ヨ棄鍞�
+					item.put("item", "0042550000");
+				} else if (triptype == 1) {
+					item.put("item", "0042550000");
+				}
 
-		} */
-		else if (liststring[0].equalsIgnoreCase("Accommodation-Domestic")||liststring[0].equalsIgnoreCase("Accommodation-International")) {
-			if (triptype == 0) {// 閸ヨ棄鍞�
-				item.put("item", "9008401005");
-			} else if (triptype == 1) {
-				item.put("item", "9008402005");
-			}
+			} else if (liststring[0].equalsIgnoreCase("Accommodation-Domestic")||liststring[0].equalsIgnoreCase("Accommodation-International")) {
+				if (triptype == 0) {// 閸ヨ棄鍞�
+					item.put("item", "0049100001");
+				} else if (triptype == 1) {
+					item.put("item", "0049100004");
+				}
 
-		} else if (liststring[0].equalsIgnoreCase("Entertainment")) {
-			if (triptype == 0) {// 閸ヨ棄鍞�
-				//audi gl account
-				item.put("item", "9000000051");
-				//item.put("item", "9008401004");
-			} else if (triptype == 1) {
-				item.put("item", "9000000051");
-				//item.put("item", "9008402004");
-			}
-		} else if ((liststring != null && liststring.length == 11)||(liststring[0].equalsIgnoreCase("Taxi/Bus/Subway"))) {
-			if (triptype == 0) {// 閸ヨ棄鍞�
-				item.put("item", "9008401006");
-			} else if (triptype == 1) {
-				item.put("item", "9008402006");
-			}
-		}
+			} else if (liststring[0].equalsIgnoreCase("Entertainment")) {
+				if (triptype == 0) {// 閸ヨ棄鍞�
+					item.put("item", "0049911001");
+				} else if (triptype == 1) {
+					item.put("item", "0049911001");
+				}
+			} else if (liststring[0].equalsIgnoreCase("Telephone")) {
+				if (triptype == 0) {// 閸ヨ棄鍞�
+					item.put("item", "0049000010");
+				} else if (triptype == 1) {
+					item.put("item", "0049000010");
+				}
+			} else if (liststring[0].equalsIgnoreCase("Car Maintenance")) {
+				if (triptype == 0) {// 閸ヨ棄鍞�
+					item.put("item", "0041343908");
+				} else if (triptype == 1) {
+					item.put("item", "0041343908");
+				}
+			}else if (liststring[0].equalsIgnoreCase("Laundry")) {
+				if (triptype == 0) {// 閸ヨ棄鍞�
+					item.put("item", "0049100016");
+				} else if (triptype == 1) {
+					item.put("item", "0049100017");
+				}
+			}/*else if (liststring != null && liststring.length == 11) {
+				if (triptype == 0) {// 閸ヨ棄鍞�
+					item.put("item", "9008401006");
+				} else if (triptype == 1) {
+					item.put("item", "9008402006");
+				}
+			}*/
 		item.put("price", String.valueOf(itemdouble));
 		/**
 		 * EUR no TAX
@@ -554,40 +590,55 @@ public class SAPPendingBusinessTripReimbursementPortlet extends MVCPortlet {
 		if(itemdouble>0d){
 		if (liststring[0].equalsIgnoreCase("Air ticket(If not booked by HRG)")) {
 			if (triptype == 0) {// 閸ヨ棄鍞�
-				item.put("item", "9008401001");
+				item.put("item", "0049100002");
 			} else if (triptype == 1) {
-				item.put("item", "9008402001");
+				item.put("item", "0049100005");
 			}
-		} 
-		/*else if (liststring[0].equalsIgnoreCase("Taxi/Bus/Subway")) {
+		} else if (liststring[0].equalsIgnoreCase("Fuel/Oil/CarWash")) {
 			if (triptype == 0) {// 閸ヨ棄鍞�
-				item.put("item", "9008401006");
+				item.put("item", "0042550000");
 			} else if (triptype == 1) {
-				item.put("item", "9008402006");
+				item.put("item", "0042550000");
 			}
 
-		} */
-		else if (liststring[0].equalsIgnoreCase("Accommodation-Domestic")||liststring[0].equalsIgnoreCase("Accommodation-International")) {
+		} else if (liststring[0].equalsIgnoreCase("Accommodation-Domestic")||liststring[0].equalsIgnoreCase("Accommodation-International")) {
 			if (triptype == 0) {// 閸ヨ棄鍞�
-				item.put("item", "9008401005");
+				item.put("item", "0049100001");
 			} else if (triptype == 1) {
-				item.put("item", "9008402005");
+				item.put("item", "0049100004");
 			}
 
 		} else if (liststring[0].equalsIgnoreCase("Entertainment")) {
 			if (triptype == 0) {// 閸ヨ棄鍞�
-				item.put("item", "9000000051");
+				item.put("item", "0049911001");
 			} else if (triptype == 1) {
-				item.put("item", "9000000051");
-				//item.put("item", "9008402004");
+				item.put("item", "0049911001");
 			}
-		} else if ((liststring != null && liststring.length == 11)||(liststring[0].equalsIgnoreCase("Taxi/Bus/Subway"))) {
+		} else if (liststring[0].equalsIgnoreCase("Telephone")) {
+			if (triptype == 0) {// 閸ヨ棄鍞�
+				item.put("item", "0049000010");
+			} else if (triptype == 1) {
+				item.put("item", "0049000010");
+			}
+		} else if (liststring[0].equalsIgnoreCase("Car Maintenance")) {
+			if (triptype == 0) {// 閸ヨ棄鍞�
+				item.put("item", "0041343908");
+			} else if (triptype == 1) {
+				item.put("item", "0041343908");
+			}
+		}else if (liststring[0].equalsIgnoreCase("Laundry")) {
+			if (triptype == 0) {// 閸ヨ棄鍞�
+				item.put("item", "0049100016");
+			} else if (triptype == 1) {
+				item.put("item", "0049100017");
+			}
+		}/*else if (liststring != null && liststring.length == 11) {
 			if (triptype == 0) {// 閸ヨ棄鍞�
 				item.put("item", "9008401006");
 			} else if (triptype == 1) {
 				item.put("item", "9008402006");
 			}
-		}
+		}*/
 		item.put("price", String.valueOf(itemdouble));
 		item.put("taxprice", String.valueOf(itemtaxdouble));
 		return item;

@@ -563,7 +563,7 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 		String tempApproverName = ParamUtil.getString(actionRequest, "tempApproverName","");
 		//end in 2017/01/23
 		
-		boolean tempIsGetRMB = ParamUtil.getBoolean(actionRequest,"tempIsGetRMB", false);
+		boolean tempIsGetRMB = ParamUtil.getBoolean(actionRequest,"tempIsGetRMB");
 		
 		int tripCategory=ParamUtil.getInteger(uploadPortletRequest, "tripCategory",0);
 		String curency = "";
@@ -984,7 +984,7 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 		String tempApproverId = ParamUtil.getString(actionRequest, "tempApproverId","");
 		String tempApproverName = ParamUtil.getString(actionRequest, "tempApproverName","");
 		//end in 2017/01/23
-		boolean tempIsGetRMB = ParamUtil.getBoolean(actionRequest,"tempIsGetRMB", false);
+		boolean tempIsGetRMB = ParamUtil.getBoolean(actionRequest,"tempIsGetRMB");
 		System.out.println("In Add Detail tempApproverId"+tempApproverId);
 		System.out.println("In Add Detail tempApproverName"+tempApproverName);
 		
@@ -1314,9 +1314,9 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 				btCostList.setTaxRate(taxRate);
 				btCostList.setNetAmount(netAmount);
 				if(EUR.equals(paymentCurrency)){
-					btCostList.setNetAmountRmb(BtExchangeRateLocalServiceUtil.changeEURToRMB(netAmount));
+					btCostList.setNetAmountRmb(BtExchangeRateLocalServiceUtil.changeEURToRMB(paymentAmount));
 				}else{
-					btCostList.setNetAmountRmb(netAmount);
+					btCostList.setNetAmountRmb(paymentAmount);
 				}
 				btCostList.setTaxAmount(taxAmount);
 				//end
@@ -1481,7 +1481,7 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 		String tempApproverId = ParamUtil.getString(actionRequest, "tempApproverId","");
 		String tempApproverName = ParamUtil.getString(actionRequest, "tempApproverName","");
 		//end in 2017/01/23
-		boolean tempIsGetRMB = ParamUtil.getBoolean(actionRequest,"tempIsGetRMB", false);
+		boolean tempIsGetRMB = ParamUtil.getBoolean(actionRequest,"tempIsGetRMB");
 		
 		if(token==tokenInSession){
 		if ("train".equals(tabs2)) {
@@ -1631,7 +1631,7 @@ public class BusinessTripReimbursementPortlet extends MVCPortlet {
 		String tempApproverId = ParamUtil.getString(actionRequest, "tempApproverId","");
 		String tempApproverName = ParamUtil.getString(actionRequest, "tempApproverName","");
 		//end in 2017/01/23
-		boolean tempIsGetRMB = ParamUtil.getBoolean(actionRequest,"tempIsGetRMB", false);
+		boolean tempIsGetRMB = ParamUtil.getBoolean(actionRequest,"tempIsGetRMB");
 		
 		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest
 				.getAttribute(WebKeys.THEME_DISPLAY);

@@ -72,6 +72,10 @@ public class BTApplicationUtil {
 		long targetDepartmentApproverId = ParamUtil.getLong(actionRequest, "targetDepartmentApproverId");
 		String targetDepartmentApproverName = ParamUtil.getString(actionRequest, "targetDepartmentApproverName");
 		int tripType = ParamUtil.getInteger(actionRequest, "tripType");
+		String tripTypeStr = actionRequest.getParameter("tripType");
+		if(tripTypeStr==null||tripTypeStr.trim().equalsIgnoreCase("undefined")){
+			tripType = 99;
+		}
 		Date departureDate = ParamUtil.getDate(actionRequest, "departureDate", sdf_dmy);
 		Date returnDate = ParamUtil.getDate(actionRequest, "returnDate", sdf_dmy);
 		String purposeOfTheTrip = ParamUtil.getString(actionRequest, "purposeOfTheTrip");

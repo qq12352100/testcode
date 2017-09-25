@@ -159,6 +159,10 @@ public class BtCostListLocalServiceClpInvoker {
 		_methodParameterTypes94 = new String[] {
 				"double", "java.lang.String", "double", "java.lang.String"
 			};
+
+		_methodName95 = "correctAmountRmbCostListOfHistoryData";
+
+		_methodParameterTypes95 = new String[] { "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -322,6 +326,13 @@ public class BtCostListLocalServiceClpInvoker {
 				(java.lang.String)arguments[3]);
 		}
 
+		if (_methodName95.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes95, parameterTypes)) {
+			BtCostListLocalServiceUtil.correctAmountRmbCostListOfHistoryData(((Long)arguments[0]).longValue());
+
+			return null;
+		}
+
 		throw new UnsupportedOperationException();
 	}
 
@@ -379,4 +390,6 @@ public class BtCostListLocalServiceClpInvoker {
 	private String[] _methodParameterTypes93;
 	private String _methodName94;
 	private String[] _methodParameterTypes94;
+	private String _methodName95;
+	private String[] _methodParameterTypes95;
 }

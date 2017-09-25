@@ -18,7 +18,6 @@ import com.business.trip.NoSuchBtFlightTrainInfoException;
 import com.business.trip.model.BtFlightTrainInfo;
 import com.business.trip.model.impl.BtFlightTrainInfoImpl;
 import com.business.trip.model.impl.BtFlightTrainInfoModelImpl;
-import com.business.trip.service.persistence.BtFlightTrainInfoPersistence;
 
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;

@@ -18,7 +18,6 @@ import com.business.trip.NoSuchBusinessTripReimbursementException;
 import com.business.trip.model.BusinessTripReimbursement;
 import com.business.trip.model.impl.BusinessTripReimbursementImpl;
 import com.business.trip.model.impl.BusinessTripReimbursementModelImpl;
-import com.business.trip.service.persistence.BusinessTripReimbursementPersistence;
 
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;

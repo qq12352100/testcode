@@ -177,6 +177,10 @@ public class BtTravelExpenseLocalServiceClpInvoker {
 				"java.lang.String", "java.lang.String", "double", "boolean",
 				"boolean", "boolean"
 			};
+
+		_methodName102 = "correctAmountRmbDAOfHistoryData";
+
+		_methodParameterTypes102 = new String[] { "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -370,6 +374,13 @@ public class BtTravelExpenseLocalServiceClpInvoker {
 				((Boolean)arguments[8]).booleanValue());
 		}
 
+		if (_methodName102.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes102, parameterTypes)) {
+			BtTravelExpenseLocalServiceUtil.correctAmountRmbDAOfHistoryData(((Long)arguments[0]).longValue());
+
+			return null;
+		}
+
 		throw new UnsupportedOperationException();
 	}
 
@@ -435,4 +446,6 @@ public class BtTravelExpenseLocalServiceClpInvoker {
 	private String[] _methodParameterTypes97;
 	private String _methodName98;
 	private String[] _methodParameterTypes98;
+	private String _methodName102;
+	private String[] _methodParameterTypes102;
 }

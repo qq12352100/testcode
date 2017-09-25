@@ -8,6 +8,7 @@ System.out.println("supportFileType111:"+request.getParameter("supportFileType")
 String supportFileSize =  ParamUtil.getString(request,"supportFileSize");
 String importFileType =  ParamUtil.getString(request,"importFileType");
 String importError =  ParamUtil.getString(request,"importError");
+String tempIsGetRMB = ParamUtil.getString(request, "tempIsGetRMB");
 System.out.println("importError:"+importError);
 
 //String myApplicationsPlid = request.getParameter("myApplicationsPlid");
@@ -242,6 +243,10 @@ if(Validator.isNotNull(businessTripApplicationid)){
 					flag = false;
 					break;
 				}
+			}else{
+				alert('Please upload reimbursement supporting document');
+				flag = false;
+				break;
 			}
 		}
 		return flag;
@@ -435,6 +440,8 @@ if(Validator.isNotNull(businessTripApplicationid)){
 				alert("import flight PDF Error!");
 			}	
 		}
+		
+		changeRMBAmountDisplay("<%=tempIsGetRMB%>");
 	}
 	
 	function changeGetRMB(obj){
@@ -443,8 +450,41 @@ if(Validator.isNotNull(businessTripApplicationid)){
 		document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />tempIsGetRMB.value = obj.checked;
 		document.<portlet:namespace />importFm.<portlet:namespace />tempIsGetRMB.value = obj.checked;
 		document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />tempIsGetRMB.value = obj.checked;
+		//document.<portlet:namespace />btCostListsSearchContainer.<portlet:namespace />col-vgc-apon-business-trip-reimbursement-cost-list-rmb-amount.style.display = "none";
+		//$("#<portlet:namespace/>btCostListsSearchContainerSearchContainer table tbody tr td::nth-child(7)").hide();  
+		changeRMBAmountDisplay(obj.checked+"");
+	
 	}
-
+	
+	function changeRMBAmountDisplay(checked){
+		if(checked=="true"){
+			$("#<portlet:namespace />btCostListsSearchContainer_col-vgc-apon-business-trip-reimbursement-cost-list-rmb-amount").show();
+			$("#<portlet:namespace />btCostListsSearchContainerSearchContainer table tbody tr ").find("td[class='table-cell special']").each(function(i){ 
+				$(this).show();
+			});
+			$("#<portlet:namespace />btTravelExpensesSearchContainer_col-vgc-apon-business-trip-reimbursement-travel-expense-dally-rmb").show();
+			$("#<portlet:namespace />btTravelExpensesSearchContainerSearchContainer table tbody tr ").find("td[class='table-cell special']").each(function(i){ 
+				$(this).show();
+			});	
+			
+			$("#<portlet:namespace />totalRMBAmountOfCost").show(); 
+			$("#<portlet:namespace />totalRMBAmountOfEURTravelExpense").show(); 
+			
+		}else{
+		   $("#<portlet:namespace />btCostListsSearchContainer_col-vgc-apon-business-trip-reimbursement-cost-list-rmb-amount").hide();
+			$("#<portlet:namespace />btCostListsSearchContainerSearchContainer table tbody tr ").find("td[class='table-cell special']").each(function(i){ 
+				$(this).hide();
+			});
+			
+			$("#<portlet:namespace />btTravelExpensesSearchContainer_col-vgc-apon-business-trip-reimbursement-travel-expense-dally-rmb").hide();
+			$("#<portlet:namespace />btTravelExpensesSearchContainerSearchContainer table tbody tr ").find("td[class='table-cell special']").each(function(i){ 
+				$(this).hide();
+			});	
+			$("#<portlet:namespace />totalRMBAmountOfCost").hide();
+			$("#<portlet:namespace />totalRMBAmountOfEURTravelExpense").hide(); 
+		}
+	}
+	
 	function changeApplicantAgent(obj){
 		console.log(obj.checked);
 		//document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />isApplicantAgent.value = document.<portlet:namespace />fm.<portlet:namespace />isApplicantAgent.checked;

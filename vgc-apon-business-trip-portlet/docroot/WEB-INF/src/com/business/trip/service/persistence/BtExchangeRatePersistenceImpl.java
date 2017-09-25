@@ -18,7 +18,6 @@ import com.business.trip.NoSuchBtExchangeRateException;
 import com.business.trip.model.BtExchangeRate;
 import com.business.trip.model.impl.BtExchangeRateImpl;
 import com.business.trip.model.impl.BtExchangeRateModelImpl;
-import com.business.trip.service.persistence.BtExchangeRatePersistence;
 
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;

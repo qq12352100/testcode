@@ -25,10 +25,12 @@ import com.audit.trail.service.AuditTrailLogLocalServiceUtil;
 import com.business.trip.model.BusinessTripReimbursement;
 import com.business.trip.service.BtCostListLocalServiceUtil;
 import com.business.trip.service.BtHotelInfoLocalServiceUtil;
+import com.business.trip.service.BtTravelExpenseLocalServiceUtil;
 import com.business.trip.service.BusinessTripReimbursementLocalServiceUtil;
 import com.business.trip.service.base.BusinessTripReimbursementLocalServiceBaseImpl;
 import com.business.trip.util.ActionConstants;
 import com.business.trip.util.BusinessTripReimbursementLogEnum;
+import com.business.trip.util.DateUtil;
 import com.delegation.model.ApplicantDelegation;
 import com.delegation.service.ApplicantDelegationLocalServiceUtil;
 import com.delegation.service.ApproverDelegationLocalServiceUtil;
@@ -37,13 +39,17 @@ import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.OrderFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.SQLQuery;
+import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
@@ -61,6 +67,14 @@ import com.liferay.portlet.asset.service.AssetLinkLocalServiceUtil;
 import com.vgc.apon.model.SAPUser;
 import com.vgc.apon.service.SAPUserLocalServiceUtil;
 
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 /**
  * The implementation of the business trip reimbursement local service.
  *
@@ -77,6 +91,106 @@ import com.vgc.apon.service.SAPUserLocalServiceUtil;
  */
 public class BusinessTripReimbursementLocalServiceImpl
 	extends BusinessTripReimbursementLocalServiceBaseImpl {
+	
+	public List<Object[]> reimbursementTravelForReport(String travelType, String ticketNo, int status, String periodStart,String periodEnd){
+		Session session = null;
+		try {
+			session = businessTripReimbursementPersistence.openSession();
+			StringBuilder query = new StringBuilder();
+			query.append("SELECT br.TICKETNO,br.COSTCENTER,br.DEPARTMENT,br.STAFFCODE,br.PRINTNAME,br.VISITCOUNTRIESCITIES,br.DEPARTUREDATE,br.RETURNDATE");//前7个一样
+			if(travelType.equals("0")){//0-国内单子
+				//8,9
+				query.append(" ,'RMB',br.TOTALTRAVELEXPENSERMB");
+				//10
+				query.append(" ,(SELECT sum(CO.PAYMENTAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID and (CO.ITEM like 'Accommodation-International' or CO.ITEM like 'Accommodation-Domestic'))");
+				//11=10-12
+				query.append(" ,trunc((SELECT sum(CO.PAYMENTAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID and (CO.ITEM like 'Accommodation-International' or CO.ITEM like 'Accommodation-Domestic'))*(1-1/1.06),2)");
+				//12=10/1.06
+				query.append(" ,trunc((SELECT sum(CO.PAYMENTAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID and (CO.ITEM like 'Accommodation-International' or CO.ITEM like 'Accommodation-Domestic'))/1.06,2)");
+				//13=14-10
+				query.append(" ,br.COSTLISTFOREIGNTOTALRMB-(SELECT sum(CO.PAYMENTAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID and (CO.ITEM like 'Accommodation-International' or CO.ITEM like 'Accommodation-Domestic'))");
+				//14
+				query.append(" ,br.COSTLISTFOREIGNTOTALRMB");
+				//15,???
+				query.append(" ,bt.ADVANCEPAYMENT");
+				//16=14-15
+				query.append(" ,br.COSTLISTFOREIGNTOTALRMB-bt.ADVANCEPAYMENT");
+				//17=16+9
+				query.append(" ,br.COSTLISTFOREIGNTOTALRMB-bt.ADVANCEPAYMENT+br.TOTALTRAVELEXPENSERMB");
+			}else{//1-国际单子
+				//8如员工勾选了get RMB,把国际sheet 里J列的币种改为RMB即可
+				query.append(" ,DECODE(br.ISPAYBYRMB,1,'RMB','EUR')");
+				//9如员工勾选了get RMB,VGCAPON_BTTRAVELEXPENSE查rmb总和
+				query.append(" ,DECODE(br.ISPAYBYRMB,1,(SELECT sum(TR.ALLOWANCERMB) from VGCAPON_BTTRAVELEXPENSE tr where TR.BUSINESSTRIPPKID=BR.BUSINESSTRIPREIMBURSEMENTID and TR.CURRENCY_='EUR'),br.TOTALTRAVELEXPENSEEUR)");
+				//10如员工勾选了get RMB,列出COSTLISTFOREIGNTOTALRMB
+				query.append(" ,DECODE(br.ISPAYBYRMB,1,br.COSTLISTFOREIGNTOTALRMB,br.COSTLISTFOREIGNTOTALEUR)");
+				//11,如果cash advance选的是EUR，是点不了get RMB的，所以8-12都是EUR，如果cash advance选得是RMB，不管点不点get RMB都放后面20
+				query.append(" ,DECODE(bt.CURRENCY_,'EUR',bt.ADVANCEPAYMENT,0)");
+				//12=10-11+9
+				query.append(" ,(DECODE(br.ISPAYBYRMB,1,br.COSTLISTFOREIGNTOTALRMB,br.COSTLISTFOREIGNTOTALEUR)-DECODE(bt.CURRENCY_,'EUR',bt.ADVANCEPAYMENT,0)+DECODE(br.ISPAYBYRMB,1,(SELECT sum(TR.ALLOWANCERMB) from VGCAPON_BTTRAVELEXPENSE tr where TR.BUSINESSTRIPPKID=BR.BUSINESSTRIPREIMBURSEMENTID and TR.CURRENCY_='EUR'),br.TOTALTRAVELEXPENSEEUR))");
+				//13,14
+				query.append(" ,'RMB',br.TOTALTRAVELEXPENSERMB");
+				//15
+				query.append(" ,(SELECT sum(CO.PAYMENTAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID and (CO.ITEM like 'Accommodation-International' or CO.ITEM like 'Accommodation-Domestic'))");
+				//16=15-17
+				query.append(" ,trunc((SELECT sum(CO.PAYMENTAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID and (CO.ITEM like 'Accommodation-International' or CO.ITEM like 'Accommodation-Domestic'))*(1-1/1.06),2)");
+				//17=15/1.06
+				query.append(" ,trunc((SELECT sum(CO.PAYMENTAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID and (CO.ITEM like 'Accommodation-International' or CO.ITEM like 'Accommodation-Domestic'))/1.06,2)");
+				//18=19-15
+				query.append(" ,br.COSTLISTFOREIGNTOTALRMB-(SELECT sum(CO.PAYMENTAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID and (CO.ITEM like 'Accommodation-International' or CO.ITEM like 'Accommodation-Domestic'))");
+				//19
+				query.append(" ,br.COSTLISTFOREIGNTOTALRMB");
+				//20，
+				query.append(" ,DECODE(bt.CURRENCY_,'RMB',bt.ADVANCEPAYMENT,0)");
+				//21=19-20
+				query.append(" ,br.COSTLISTFOREIGNTOTALRMB-DECODE(bt.CURRENCY_,'RMB',bt.ADVANCEPAYMENT,0)");
+			}
+			//HRG comfirm date
+			query.append(" ,(SELECT ka.COMPLETIONDATE from KALEOINSTANCE ka where ka.classpk = br.BUSINESSTRIPREIMBURSEMENTID and ka.CLASSNAME like 'com.business.trip.model.BusinessTripReimbursement')");
+			query.append(" FROM VGCAPON_BTREIMBURSEMENT br,VGCAPON_BTAPPLICATION bt WHERE br.BUSSINESSTIRPTICKETNO = bt.TICKETNO and br.TRIPTYPE =? ");
+			if (Validator.isNotNull(periodStart)) {
+				query.append("  AND br.CREATEDATE >=? ");
+			}
+			if (Validator.isNotNull(periodEnd)) {
+				query.append(" AND br.CREATEDATE <=? ");
+			}
+			String[] ticketNos =ticketNo.split(",");
+			if (Validator.isNotNull(ticketNo)) {
+				query.append(" AND (");
+				for(int i=0;i<ticketNos.length;i++){
+					query.append(" br.TICKETNO LIKE ? OR ");
+				}
+				query.append(" 1=2 ) ");
+			}
+			SQLQuery q = session.createSQLQuery(query.toString());
+			q.setCacheable(false);
+			QueryPos qPos = QueryPos.getInstance(q); 
+			
+			qPos.add(travelType);
+			if (Validator.isNotNull(periodStart)) {
+				qPos.add(DateUtil.parseYMDHMS(periodStart + " 00:00:00"));
+			}
+			if (Validator.isNotNull(periodEnd)) {
+				qPos.add(DateUtil.parseYMDHMS(periodEnd + " 23:59:59"));
+			}
+			if (Validator.isNotNull(ticketNo)) {
+				for(int i2=0;i2<ticketNos.length;i2++){
+					qPos.add(StringPool.PERCENT + ticketNos[i2] + StringPool.PERCENT);
+				}
+			}
+			
+			List<Object[]> list = q.list();
+			
+			return list;
+		} catch (Exception e) {
+				e.printStackTrace();
+		} finally {
+			businessTripReimbursementPersistence.closeSession(session);
+		}
+		return Collections.emptyList();
+	}
+
+	
 
 	// Save or Update the BusinessTripApplication
 	public BusinessTripReimbursement saveOrUpdateBusinessTripReimbursement(
@@ -959,4 +1073,5 @@ public class BusinessTripReimbursementLocalServiceImpl
 						serviceContext);
 				return businessTripReimbursement;
 				}
+				
 }

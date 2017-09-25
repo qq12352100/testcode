@@ -57,7 +57,9 @@
 							onFocus="WdatePicker({lang:'en',dateFmt:'dd.MM.yyyy HH:mm',maxDate:'<%=maxDate %>',minDate:'<%=minDate %>'})" /></li>														
 				  <li class="md01"><liferay-ui:message key="vgc-apon-business-trip-reimbursement-cost-list-entertainment-type"></liferay-ui:message></li>
 				  <li class="md022">  
-				        <select name="<portlet:namespace/>entertainmentType" id="entertainmentType" onchange="selectEntertainmentType();">
+				        <select name="<portlet:namespace/>entertainmentType" id="entertainmentType" 
+				        <%=businessTripApplication.getTripType()==0 ? "disabled='true'" : "" %>
+				        onchange="selectEntertainmentType();">
 						<%
 						   String type =btCostList.getType()==null?"":btCostList.getType();					
 							for (String curType : new String[]{"Domestic","International"}) {

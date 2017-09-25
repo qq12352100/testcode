@@ -16,6 +16,7 @@ package com.business.trip.service.impl;
 
 import com.business.trip.model.BtTravelExpense;
 import com.business.trip.model.BusinessTripReimbursement;
+import com.business.trip.service.BtExchangeRateLocalServiceUtil;
 import com.business.trip.service.BtTravelExpenseLocalServiceUtil;
 import com.business.trip.service.base.BtTravelExpenseLocalServiceBaseImpl;
 import com.business.trip.util.TravelExpenseUtil;
@@ -473,150 +474,25 @@ public class BtTravelExpenseLocalServiceImpl extends
 	   return allowance;
    }
    
-  /** 
-   private double getAllowanceTwoDaysDeparture(String departure,String arrival,double rateOfDma,boolean isHasBreakfast,boolean isHasLunch,boolean isHasDinner){
-		double allowance = 0;
-		
-		int departureDate = Integer.parseInt(departure.replaceAll(":",""));
-		System.out.println("departureDate" + departureDate);
-		
-//		if(departureDate<=1200){
-//			allowance = rateOfDma;
-//		}else if(departureDate>1200 && departureDate<=1400){
-//			allowance = rateOfDma * 0.8;
-//		}else if(departureDate>1400 && departureDate<=1700){
-//			allowance = rateOfDma * 0.5;
-//		}else if(departureDate>1700 && departureDate<=1900){
-//			allowance = rateOfDma * 0.3;
-//		}else{
-//			allowance = 0d;
-//		}
-		
-		if(departureDate<=1700){
-			allowance = rateOfDma;
-			if (!isHasBreakfast) {
-				allowance -= rateOfDma * 0.2;
-			}
-			if (!isHasLunch) {
-				allowance -= rateOfDma * 0.3;
-			}
-			if (!isHasDinner) {
-				allowance -= rateOfDma * 0.3;
-			}
-		}else{
-			if(departureDate >1700 && departureDate <=1900){
-				if (isHasDinner) {
-					allowance = rateOfDma*0.3;
+	/**
+	 * To corrected the history data  cost list netAmountRMB value
+	 * @param businessTripReimbursementId
+	 * @throws SystemException 
+	 */
+	public void  correctAmountRmbDAOfHistoryData(long businessTripReimbursementId) throws SystemException{
+		List<BtTravelExpense>  allowanceList =	btTravelExpensePersistence.findByBusinessTripPkId(businessTripReimbursementId);
+		if(allowanceList != null){
+			for(BtTravelExpense allowance : allowanceList){
+				if("RMB".equals(allowance.getCurrency())){
+					allowance.setAllowanceRmb(allowance.getAllowance());
 				}else{
-					allowance = rateOfDma*0.2;
+					if(allowance.getAllowanceRmb() == 0 || allowance.getAllowanceRmb()== allowance.getAllowance()){
+						allowance.setAllowanceRmb(BtExchangeRateLocalServiceUtil.changeEURToRMB(allowance.getAllowance()));
+					}
 				}
-			}else{
-				allowance = rateOfDma*0.2;
-			}
-			
-			if(isHasBreakfast){
-				allowance += rateOfDma * 0.2;
-			}
-			if(isHasLunch){
-				allowance += rateOfDma * 0.3;
+				this.updateBtTravelExpense(allowance);
 			}
 		}
 		
-		if(departureDate > 1200 && departureDate <= 1400){
-			if(allowance > rateOfDma*0.8){
-				allowance = rateOfDma*0.8;
-			}
-		}else if(departureDate > 1400 && departureDate <= 1700){
-			if(allowance > rateOfDma*0.5){
-				allowance = rateOfDma*0.5;
-			}
-		}else if(departureDate > 1700 && departureDate <= 1900){
-			if(allowance > rateOfDma*0.3){
-				allowance = rateOfDma*0.3;
-			}
-		}
-		
-		if (allowance < rateOfDma * 0.2) {
-			allowance = rateOfDma * 0.2;
-		}
-		
-		System.out.println("getAllowanceTwoDaysFirst" + departure+arrival);
-		return allowance;
 	}
-   private double getAllowanceTwoDaysArrival(String departure,String arrival,double rateOfDma,boolean isHasBreakfast,boolean isHasLunch,boolean isHasDinner){
-	   double allowance = 0;
-		
-	   int arrivalDate = Integer.parseInt(arrival.replaceAll(":",""));
-	   System.out.println("arrivalDate" + arrivalDate);
-	   
-//		if(arrivalDate>1200){
-//			allowance = rateOfDma;
-//		}else if(arrivalDate>=1000 && arrivalDate<=1200){
-//			allowance = rateOfDma * 0.8;
-//		}else if(arrivalDate>=700 && arrivalDate<1000){
-//			allowance = rateOfDma * 0.5;
-//		}else if(arrivalDate>=500 && arrivalDate<700){
-//			allowance = rateOfDma * 0.3;
-//		}else{
-//			allowance = 0d;
-//		}
-	   if(arrivalDate > 1200){
-		   allowance = rateOfDma;
-			if(!isHasBreakfast){
-				allowance -= rateOfDma * 0.2;
-			}
-			if(!isHasLunch){
-				allowance -= rateOfDma * 0.3;
-			}
-			if(!isHasDinner){
-				allowance -= rateOfDma * 0.3;
-			}
-	   }else{ 
-		   if(arrivalDate < 500){
-			   allowance = rateOfDma*0.2;
-		   }else if(arrivalDate >= 500 &&arrivalDate < 700){
-			   if(isHasBreakfast){
-				   allowance = rateOfDma*0.3;
-			   } else{
-				   allowance = rateOfDma*0.2;
-			   }
-		   }else{
-			   allowance = rateOfDma*0.3;
-			   if(isHasBreakfast){
-				   allowance += rateOfDma * 0.2;
-			   }
-			   if(isHasLunch){
-				   allowance += rateOfDma * 0.3;
-			   }
-			   if(isHasDinner){
-				   allowance += rateOfDma * 0.3;
-			   }
-		   }
-	   }
-	   
-	   if(arrivalDate >= 500 && arrivalDate < 700){
-		   if(allowance > rateOfDma*0.3){
-			   allowance = rateOfDma*0.3;
-		   }
-	   }else if(arrivalDate >= 700 && arrivalDate < 1000){
-		   if(allowance > rateOfDma*0.5){
-			   allowance = rateOfDma*0.5;
-		   }
-	   }else if(arrivalDate >= 1000 && arrivalDate < 1200){
-		   if(allowance > rateOfDma*0.8){
-			   allowance = rateOfDma*0.8;
-		   }
-	   }
-	   
-	   if(allowance > rateOfDma){
-		   allowance = rateOfDma;
-	   }
-	   
-	   if (allowance < rateOfDma * 0.2) {
-		   allowance = rateOfDma * 0.2;
-	   }
-	   
-		System.out.println("getAllowanceTwoDaysSecond" + departure+arrival);
-	   return allowance;
-   }*/
 }

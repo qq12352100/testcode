@@ -18,7 +18,6 @@ import com.business.trip.NoSuchBtCarRentalInfoException;
 import com.business.trip.model.BtCarRentalInfo;
 import com.business.trip.model.impl.BtCarRentalInfoImpl;
 import com.business.trip.model.impl.BtCarRentalInfoModelImpl;
-import com.business.trip.service.persistence.BtCarRentalInfoPersistence;
 
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;

@@ -16,14 +16,19 @@
 
 <%@include file="/html/init.jsp"%>
 <%
+	StringBuffer showSB = new StringBuffer();
 	BusinessTripApplication businessTripApplication = null;
 	long businessTripApplicationId = ParamUtil.getLong(request, "businessTripApplicationId");
+	 showSB.append(" ##businessTripApplicationId===");
+	 showSB.append(businessTripApplicationId);
 	int sapStatus=0;
 	String transitionName = ParamUtil.getString(renderRequest, "transitionName", "");
 	//transitionName = "recall";
 	String isClickAgent = ParamUtil.getString(renderRequest, "isClickAgent","");
 	String tabs2 = ParamUtil.get(request, "tabs2", "flight");
 	String tripType = PropsUtil.get("vgc.apon.business.trip.application.type");
+	 showSB.append("  ##tripType ===");
+	 showSB.append(tripType);
 	boolean isNew = true;
 
 	long sCode = themeDisplay.getUser().getFacebookId();
@@ -40,6 +45,7 @@
 	if (businessTripApplicationId > 0) {
 		businessTripApplication = BusinessTripApplicationLocalServiceUtil.fetchBusinessTripApplication(businessTripApplicationId);
 		if(businessTripApplication!=null) {
+			showSB.append("  ##isNew=== false");
 			isNew = false;
 		}
 		businessTripApplication = businessTripApplication!=null?businessTripApplication:BusinessTripApplicationLocalServiceUtil.createBusinessTripApplication(businessTripApplicationId);
@@ -47,6 +53,8 @@
 		businessTripApplicationId = CounterLocalServiceUtil.increment(BusinessTripApplication.class.getName(),1);
 		businessTripApplication = BusinessTripApplicationLocalServiceUtil.createBusinessTripApplication(businessTripApplicationId);
 	}
+	 showSB.append("  ##get BT OBJ===");
+	 showSB.append(businessTripApplication.toString());
 	String disabled="";
 	String readonly="";
 	if(!isNew&&businessTripApplication!=null){
@@ -132,7 +140,12 @@
 		tt= ParamUtil.getInteger(request, "tripTypeAsForm",99);
 	}else{
 		tt = ParamUtil.getInteger(request, "tripType",businessTripApplication.getTripType());
+		 if(tt==99){
+			 tt =businessTripApplication.getTripType();
+		 }
 	}
+	showSB.append("  ##tt=== ");
+	showSB.append(tt);
 	boolean isPassValue = ParamUtil.getBoolean(request, "isPassValue",false);
 	String departureDate = ParamUtil.getString(request, "departureDate",businessTripApplication.getDepartureDate()!=null?sdf_dmy.format(businessTripApplication.getDepartureDate()):"");
 	String returnDate = ParamUtil.getString(request, "returnDate",businessTripApplication.getReturnDate()!=null?sdf_dmy.format(businessTripApplication.getReturnDate()):"");
@@ -511,7 +524,7 @@ width: 270px;
 				<liferay-ui:message
 					key="vgc-apon-business-trip-application-cash-advance" />
 			</div>
-				<p style="padding-left:5px;padding-top: 10px;font-style:italic; color: red;">The advance payment can be edited only AFTER the business trip was fully approved.The field will then become editable.Reimbursement currency should be consistent with cash advance you claimed.</p>
+				<p style="padding-left:5px;padding-top: 10px;font-style:italic; color: red;">The advance payment can be edited only AFTER the business trip was fully approved.The field will then become editabe.Reimbursement currency should be consistent with cash advance you claimed.</p>
 			<ul>
 				<li class="md01"><liferay-ui:message
 						key="vgc-apon-business-trip-application-advance-payment" /></li>
@@ -538,8 +551,10 @@ width: 270px;
 			</ul>			
 			<ul>
 				<li class="md01"><liferay-ui:message key="vgc-apon-business-trip-application-payment-methods"></liferay-ui:message></li>
-				<li class="md03">Bank Transfer</li>
+				<li class="md02">Bank Transfer</li>
+				<li style="padding-left:42px;font-style:italic; color: red;width:400px;margin-left:54px;">Note:VGIC can not reimburse EUR,VGIC employees must NOT change this option or the application will be rejected.</p>
 			</ul>
+		
 			<ul id="hotelandcar">
 				<li class="md01"><liferay-ui:message key="vgc-apon-business-trip-application-hotel-and-car-rental-total-cost"></liferay-ui:message></li>
 				<li class="md03"><%= String.format("%.2f", totalCostRmb) %>&nbsp;RMB&nbsp;<%= String.format("%.2f", totalCostEur)%>&nbsp;EUR</li>
@@ -637,7 +652,7 @@ width: 270px;
 				<liferay-ui:message
 							key="vgc.apon.audit.trail.log.approval.status.information" />
 			</div>
-			<div class="gridtb" style="width:1223px;">
+			<div class="gridtb">
 				<ul>
 					<li class="od03"><liferay-ui:message
 							key="vgc.apon.audit.trail.log.no" /></li>
@@ -769,6 +784,10 @@ width: 270px;
 	<aui:input type="hidden" name="currency" value='<%=currency%>'/>
 	<aui:input type="hidden" name="tripTypeAsForm"  id="tripTypeAsForm" />
 </aui:form>
+
+<div  id="showSB"  style="display:none">
+		<%=showSB.toString() %>
+</div>
 
 
 <aui:script>
@@ -1239,6 +1258,12 @@ width: 270px;
 		document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />targetDepartmentApproverName.value = document.<portlet:namespace />fm.<portlet:namespace />targetDepartmentApproverName.value;
 		document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />tripType.value = document.<portlet:namespace />fm.<portlet:namespace />tripType.value;
 		document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />tripType.value = document.<portlet:namespace />fm.<portlet:namespace />tripType.value;
+		 var radionum = document.getElementsByName("<portlet:namespace />tripType");
+		 for(var i=0;i<radionum.length;i++){
+			 if(radionum[i].checked){
+				 document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />tripType.value =document.<portlet:namespace />fm.<portlet:namespace />tripType.value= radionum[i].value;
+				 document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />tripType.value =document.<portlet:namespace />fm.<portlet:namespace />tripType.value= radionum[i].value;
+			 } }
 		document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />departureDate.value = document.<portlet:namespace />fm.<portlet:namespace />departureDate.value;
 		document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />departureDate.value = document.<portlet:namespace />fm.<portlet:namespace />departureDate.value;
 		document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />returnDate.value = document.<portlet:namespace />fm.<portlet:namespace />returnDate.value;
@@ -1511,32 +1536,18 @@ function CheckTripType(val) {
 				navs[0].getElementsByTagName('a')[0].click();
 				// Liferay.Portal.Tabs.show('_businesstripapplication_WAR_vgcaponbusinesstripportlet_tabs111810399459711211111045981171151051101011151154511611410511245971121121081059997116105111110451021081051031041164510511010211111410997116105111110TabsId');
 			}
-
 			ali.style.display = "none";
 			hotelandcar.style.display = "none";
 			car.style.display = "none";
-
+			document.getElementById("domf").color = "#FF0000"
+			document.getElementById("intf").color = "#000000"
 		} else if (val == 1) {
 			paymentCurrencyApp.disabled = false;
 			ali.style.display = "block";
 			hotelandcar.style.display = "block";
 			car.style.display = "block";
-		}
-		
-		
-		var radios = document.getElementsByName("<portlet:namespace/>tripType");
-		var val;
-		for(var i=0;i<radios.length;i++){
-			 if(radios[i].checked) {
-				 if(radios[i].value ==0){
-					document.getElementById("domf").color = "#FF0000"
-					document.getElementById("intf").color = "#000000"
-				 }else if(radios[i].value ==1){
-					 document.getElementById("intf").color = "#FF0000"
-					 document.getElementById("domf").color = "#000000"
-				 }
-			
-			 }
+			 document.getElementById("intf").color = "#FF0000"
+			 document.getElementById("domf").color = "#000000"
 		}
 	}
 

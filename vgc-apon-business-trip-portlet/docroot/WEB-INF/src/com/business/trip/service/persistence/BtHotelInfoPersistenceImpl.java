@@ -18,7 +18,6 @@ import com.business.trip.NoSuchBtHotelInfoException;
 import com.business.trip.model.BtHotelInfo;
 import com.business.trip.model.impl.BtHotelInfoImpl;
 import com.business.trip.model.impl.BtHotelInfoModelImpl;
-import com.business.trip.service.persistence.BtHotelInfoPersistence;
 
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;

@@ -104,7 +104,7 @@ public class AutoCloseMessageListener implements MessageListener {
 		mailbody.append("<div class='emailTmp'>")
 				.append("<p>Dear Applicant, </p>")
 				.append("<p>Based on travel expense advance policy, you can only apply cash advance 3 days in advance for RMB or 7 days in advance for EUR.</p>")
-				.append("<p>As it�s due date now, cash advance application won�t be supported. Please view the detail information in <a href='")
+				.append("<p>As it's due date now, cash advance application won't be supported. Please view the detail information in <a href='")
 				.append(PropsUtil.get("vgc.apon.system.href.url")).append("'>APON System</a>.</p>")
 				.append("<p>PLEASE DO NOT REPLY to this email, as it is system generated.</p>")
 				.append("</div>");		

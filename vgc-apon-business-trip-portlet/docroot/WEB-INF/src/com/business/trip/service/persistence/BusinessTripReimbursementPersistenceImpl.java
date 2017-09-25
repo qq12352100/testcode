@@ -1840,6 +1840,8 @@ public class BusinessTripReimbursementPersistenceImpl
 		businessTripReimbursementImpl.setCostListForeignTotalRmb(businessTripReimbursement.getCostListForeignTotalRmb());
 		businessTripReimbursementImpl.setRemark(businessTripReimbursement.getRemark());
 		businessTripReimbursementImpl.setIsPaybyRmb(businessTripReimbursement.isIsPaybyRmb());
+		businessTripReimbursementImpl.setEvpId(businessTripReimbursement.getEvpId());
+		businessTripReimbursementImpl.setEvpName(businessTripReimbursement.getEvpName());
 		businessTripReimbursementImpl.setStatus(businessTripReimbursement.getStatus());
 		businessTripReimbursementImpl.setSapStatus(businessTripReimbursement.getSapStatus());
 		businessTripReimbursementImpl.setSapComments(businessTripReimbursement.getSapComments());

@@ -14,12 +14,6 @@
 
 package com.business.trip.service.impl;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import com.audit.trail.model.AuditTrailLog;
 import com.audit.trail.service.AuditTrailLogLocalServiceUtil;
 import com.business.trip.model.BusinessTripReimbursement;
@@ -31,7 +25,6 @@ import com.business.trip.service.base.BusinessTripReimbursementLocalServiceBaseI
 import com.business.trip.util.ActionConstants;
 import com.business.trip.util.BusinessTripReimbursementLogEnum;
 import com.business.trip.util.DateUtil;
-import com.delegation.model.ApplicantDelegation;
 import com.delegation.service.ApplicantDelegationLocalServiceUtil;
 import com.delegation.service.ApproverDelegationLocalServiceUtil;
 import com.global.management.service.GlobalEmailLocalServiceUtil;
@@ -97,62 +90,74 @@ public class BusinessTripReimbursementLocalServiceImpl
 		try {
 			session = businessTripReimbursementPersistence.openSession();
 			StringBuilder query = new StringBuilder();
-			query.append("SELECT br.TICKETNO,br.COSTCENTER,br.DEPARTMENT,br.STAFFCODE,br.PRINTNAME,br.VISITCOUNTRIESCITIES,br.DEPARTUREDATE,br.RETURNDATE");//前7个一样
+			query.append("SELECT br.TICKETNO,br.STAFFCODE,br.PRINTNAME,DECODE(br.DEPARTMENT,null,br.DIVISION,br.DEPARTMENT),br.COSTCENTER,br.VISITCOUNTRIESCITIES,br.DEPARTUREDATE,br.RETURNDATE");//前7个一样
 			if(travelType.equals("0")){//0-国内单子
 				//8,9
 				query.append(" ,'RMB',br.TOTALTRAVELEXPENSERMB");
-				//10
+				//10,L
 				query.append(" ,(SELECT sum(CO.PAYMENTAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID and (CO.ITEM like 'Accommodation-International' or CO.ITEM like 'Accommodation-Domestic'))");
-				//11=10-12
-				query.append(" ,trunc((SELECT sum(CO.PAYMENTAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID and (CO.ITEM like 'Accommodation-International' or CO.ITEM like 'Accommodation-Domestic'))*(1-1/1.06),2)");
-				//12=10/1.06
-				query.append(" ,trunc((SELECT sum(CO.PAYMENTAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID and (CO.ITEM like 'Accommodation-International' or CO.ITEM like 'Accommodation-Domestic'))/1.06,2)");
-				//13=14-10
-				query.append(" ,br.COSTLISTFOREIGNTOTALRMB-(SELECT sum(CO.PAYMENTAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID and (CO.ITEM like 'Accommodation-International' or CO.ITEM like 'Accommodation-Domestic'))");
-				//14
-				query.append(" ,br.COSTLISTFOREIGNTOTALRMB");
-				//15,???
-				query.append(" ,bt.ADVANCEPAYMENT");
-				//16=14-15
-				query.append(" ,br.COSTLISTFOREIGNTOTALRMB-bt.ADVANCEPAYMENT");
-				//17=16+9
-				query.append(" ,br.COSTLISTFOREIGNTOTALRMB-bt.ADVANCEPAYMENT+br.TOTALTRAVELEXPENSERMB");
-			}else{//1-国际单子
+				//11,M
+				query.append(" ,(SELECT sum(CO.TAXAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID and (CO.ITEM like 'Accommodation-International' or CO.ITEM like 'Accommodation-Domestic'))");
+				//12,N
+				query.append(" ,(SELECT sum(CO.NETAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID and (CO.ITEM like 'Accommodation-International' or CO.ITEM like 'Accommodation-Domestic'))");
+				//13,O
+				query.append(" ,(SELECT sum(CO.PAYMENTAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID and CO.ITEM not like 'Accommodation-International' and CO.ITEM not like 'Accommodation-Domestic')");
+				//14,P		(COSTLIST中所有的)
+				query.append(" ,(SELECT sum(CO.PAYMENTAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID)");
+				//15,Q
+				query.append(" ,br.ADVANCEPAYMENT");
+				//16,R
+				query.append(" ,br.COSTLISTINLANDTOTALRMB-br.ADVANCEPAYMENT");
+				//17,S
+				query.append(" ,br.COSTLISTINLANDTOTALRMB-br.ADVANCEPAYMENT+br.TOTALTRAVELEXPENSERMB");
+			} else {//1-国际单子
 				//8如员工勾选了get RMB,把国际sheet 里J列的币种改为RMB即可
 				query.append(" ,DECODE(br.ISPAYBYRMB,1,'RMB','EUR')");
 				//9如员工勾选了get RMB,VGCAPON_BTTRAVELEXPENSE查rmb总和
 				query.append(" ,DECODE(br.ISPAYBYRMB,1,(SELECT sum(TR.ALLOWANCERMB) from VGCAPON_BTTRAVELEXPENSE tr where TR.BUSINESSTRIPPKID=BR.BUSINESSTRIPREIMBURSEMENTID and TR.CURRENCY_='EUR'),br.TOTALTRAVELEXPENSEEUR)");
 				//10如员工勾选了get RMB,列出COSTLISTFOREIGNTOTALRMB
 				query.append(" ,DECODE(br.ISPAYBYRMB,1,br.COSTLISTFOREIGNTOTALRMB,br.COSTLISTFOREIGNTOTALEUR)");
-				//11,如果cash advance选的是EUR，是点不了get RMB的，所以8-12都是EUR，如果cash advance选得是RMB，不管点不点get RMB都放后面20
-				query.append(" ,DECODE(bt.CURRENCY_,'EUR',bt.ADVANCEPAYMENT,0)");
-				//12=10-11+9
-				query.append(" ,(DECODE(br.ISPAYBYRMB,1,br.COSTLISTFOREIGNTOTALRMB,br.COSTLISTFOREIGNTOTALEUR)-DECODE(bt.CURRENCY_,'EUR',bt.ADVANCEPAYMENT,0)+DECODE(br.ISPAYBYRMB,1,(SELECT sum(TR.ALLOWANCERMB) from VGCAPON_BTTRAVELEXPENSE tr where TR.BUSINESSTRIPPKID=BR.BUSINESSTRIPREIMBURSEMENTID and TR.CURRENCY_='EUR'),br.TOTALTRAVELEXPENSEEUR))");
-				//13,14
+				//11,M	欧元或者点了get RMB的时候放这
+				query.append(" ,(case when br.CURRENCY_ like 'EUR' or br.ISPAYBYRMB = 1 then br.ADVANCEPAYMENT else 0 end)");
+				//12,N
+				query.append(" ,(DECODE(br.ISPAYBYRMB,1,br.COSTLISTFOREIGNTOTALRMB,br.COSTLISTFOREIGNTOTALEUR)-(case when br.CURRENCY_ like 'EUR' or br.ISPAYBYRMB = 1 then br.ADVANCEPAYMENT else 0 end)+DECODE(br.ISPAYBYRMB,1,(SELECT sum(TR.ALLOWANCERMB) from VGCAPON_BTTRAVELEXPENSE tr where TR.BUSINESSTRIPPKID=BR.BUSINESSTRIPREIMBURSEMENTID and TR.CURRENCY_='EUR'),br.TOTALTRAVELEXPENSEEUR))");
+				//13,14,O,P
 				query.append(" ,'RMB',br.TOTALTRAVELEXPENSERMB");
-				//15
-				query.append(" ,(SELECT sum(CO.PAYMENTAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID and (CO.ITEM like 'Accommodation-International' or CO.ITEM like 'Accommodation-Domestic'))");
-				//16=15-17
-				query.append(" ,trunc((SELECT sum(CO.PAYMENTAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID and (CO.ITEM like 'Accommodation-International' or CO.ITEM like 'Accommodation-Domestic'))*(1-1/1.06),2)");
-				//17=15/1.06
-				query.append(" ,trunc((SELECT sum(CO.PAYMENTAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID and (CO.ITEM like 'Accommodation-International' or CO.ITEM like 'Accommodation-Domestic'))/1.06,2)");
-				//18=19-15
-				query.append(" ,br.COSTLISTFOREIGNTOTALRMB-(SELECT sum(CO.PAYMENTAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID and (CO.ITEM like 'Accommodation-International' or CO.ITEM like 'Accommodation-Domestic'))");
-				//19
-				query.append(" ,br.COSTLISTFOREIGNTOTALRMB");
-				//20，
-				query.append(" ,DECODE(bt.CURRENCY_,'RMB',bt.ADVANCEPAYMENT,0)");
-				//21=19-20
-				query.append(" ,br.COSTLISTFOREIGNTOTALRMB-DECODE(bt.CURRENCY_,'RMB',bt.ADVANCEPAYMENT,0)");
+				//15,Q
+				query.append(" ,(SELECT sum(CO.PAYMENTAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID and co.PAYMENTCURRENCY='RMB' and (CO.ITEM like 'Accommodation-International' or CO.ITEM like 'Accommodation-Domestic'))");
+				//16,R
+				query.append(" ,(SELECT sum(CO.TAXAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID and co.PAYMENTCURRENCY='RMB' and (CO.ITEM like 'Accommodation-International' or CO.ITEM like 'Accommodation-Domestic'))");
+				//17,S
+				query.append(" ,(SELECT sum(CO.NETAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID and co.PAYMENTCURRENCY='RMB' and (CO.ITEM like 'Accommodation-International' or CO.ITEM like 'Accommodation-Domestic'))");
+				//18,T
+				query.append(" ,(SELECT sum(CO.PAYMENTAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID and co.PAYMENTCURRENCY='RMB' and CO.ITEM not like 'Accommodation-International' and CO.ITEM not like 'Accommodation-Domestic')");
+				//19,U	COSTLIST中所有PAYMENTCURRENCY是rmb的
+				query.append(" ,(SELECT sum(CO.PAYMENTAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID and co.PAYMENTCURRENCY='RMB')");
+				//20,V		
+				query.append(" ,(case when br.CURRENCY_ like 'RMB' and br.ISPAYBYRMB != 1 then br.ADVANCEPAYMENT else 0 end)");
+				//21,W=U-V
+				query.append(" ,(SELECT sum(CO.PAYMENTAMOUNT) from VGCAPON_BTCOSTLIST co where CO.BUSINESSTRIPPKID = BR.BUSINESSTRIPREIMBURSEMENTID and co.PAYMENTCURRENCY='RMB')-(case when br.CURRENCY_ like 'RMB' and br.ISPAYBYRMB != 1 then br.ADVANCEPAYMENT else 0 end)");
 			}
 			//HRG comfirm date
-			query.append(" ,(SELECT ka.COMPLETIONDATE from KALEOINSTANCE ka where ka.classpk = br.BUSINESSTRIPREIMBURSEMENTID and ka.CLASSNAME like 'com.business.trip.model.BusinessTripReimbursement')");
-			query.append(" FROM VGCAPON_BTREIMBURSEMENT br,VGCAPON_BTAPPLICATION bt WHERE br.BUSSINESSTIRPTICKETNO = bt.TICKETNO and br.TRIPTYPE =? ");
+//			query.append(" ,(SELECT ka.COMPLETIONDATE from KALEOINSTANCE ka where ka.classpk = br.BUSINESSTRIPREIMBURSEMENTID and ka.CLASSNAME like 'com.business.trip.model.BusinessTripReimbursement')");
+			query.append(" ,br.STATUSDATE ");
+			query.append(" ,br.status ");
+			query.append(" ,br.BUSINESSTRIPREIMBURSEMENTID ");
+			query.append(" FROM VGCAPON_BTREIMBURSEMENT br,VGCAPON_BTAPPLICATION bt WHERE br.BUSSINESSTIRPTICKETNO = bt.TICKETNO and br.TRIPTYPE =? ");//br.status not in (2,-2) and 
+			//条件
+			if(travelType.equals("2")){
+				query.append("  AND br.ISPAYBYRMB != 1 ");
+			}else if(travelType.equals("3")){
+				query.append("  AND br.ISPAYBYRMB = 1 ");
+			}
 			if (Validator.isNotNull(periodStart)) {
-				query.append("  AND br.CREATEDATE >=? ");
+				query.append("  AND br.STATUSDATE >= ? ");
 			}
 			if (Validator.isNotNull(periodEnd)) {
-				query.append(" AND br.CREATEDATE <=? ");
+				query.append(" AND br.STATUSDATE <= ? ");
+			}
+			if (status != -1) {
+				query.append(" AND br.status =? ");
 			}
 			String[] ticketNos =ticketNo.split(",");
 			if (Validator.isNotNull(ticketNo)) {
@@ -162,20 +167,30 @@ public class BusinessTripReimbursementLocalServiceImpl
 				}
 				query.append(" 1=2 ) ");
 			}
+			System.out.println("bkk>>"+query.toString());
 			SQLQuery q = session.createSQLQuery(query.toString());
 			q.setCacheable(false);
 			QueryPos qPos = QueryPos.getInstance(q); 
-			
-			qPos.add(travelType);
+			//参数
+			if(travelType.equals("0")){
+				qPos.add(0);
+			}else{
+				qPos.add(1);
+			}
 			if (Validator.isNotNull(periodStart)) {
+				System.out.println("bkk>>"+periodStart);
 				qPos.add(DateUtil.parseYMDHMS(periodStart + " 00:00:00"));
 			}
 			if (Validator.isNotNull(periodEnd)) {
+				System.out.println("bkk>>"+periodEnd);
 				qPos.add(DateUtil.parseYMDHMS(periodEnd + " 23:59:59"));
+			}
+			if (status != -1) {
+				qPos.add(status);
 			}
 			if (Validator.isNotNull(ticketNo)) {
 				for(int i2=0;i2<ticketNos.length;i2++){
-					qPos.add(StringPool.PERCENT + ticketNos[i2] + StringPool.PERCENT);
+					qPos.add(StringPool.PERCENT + ticketNos[i2].trim() + StringPool.PERCENT);
 				}
 			}
 			
@@ -191,7 +206,6 @@ public class BusinessTripReimbursementLocalServiceImpl
 	}
 
 	
-
 	// Save or Update the BusinessTripApplication
 	public BusinessTripReimbursement saveOrUpdateBusinessTripReimbursement(
 			BusinessTripReimbursement businessTripReimbursement, ServiceContext serviceContext)
@@ -272,18 +286,17 @@ public class BusinessTripReimbursementLocalServiceImpl
 		serviceContext.setAttribute("vgcapon_btReimbursement_IsEnterDuringTrip", IsEnterDuringTrip);
 		serviceContext.setAttribute("vgcapon_btReimbursement_IsEnterFee", IsEnterFee);
 		
-		long staffCode=themeDisplay.getUser().getFacebookId();
+		//long staffCode=themeDisplay.getUser().getFacebookId();
 		/**
 		 * ticket rejected by Accounting ,then the themeDisplay.getuser is Account, here should be applicant.
 		 */
 		if(autoNewAterAccountReject){
-			staffCode=businessTripReimbursement.getStaffCode();
+			//staffCode=businessTripReimbursement.getStaffCode();
 			serviceContext.setUserId(businessTripReimbursement.getUserId());
 		}
-		if(businessTripReimbursement.getIsApplicantAgent()) {
-			ApplicantDelegation applicantDelegation = ApplicantDelegationLocalServiceUtil.fetchByP_S(ApproverDelegationLocalServiceUtil.getProcessOfBusinessTripReimbursement(), String.valueOf(UserLocalServiceUtil.fetchUserById(businessTripReimbursement.getUserId()).getFacebookId()));
-			staffCode=UserLocalServiceUtil.fetchUserById(applicantDelegation.getUserId()).getFacebookId();
-		}
+	/*	if(businessTripReimbursement.getIsApplicantAgent()) {
+			staffCode = businessTripReimbursement.getStaffCode();
+		}*/
 //		long supervisorUserId=SAPUserLocalServiceUtil.getSupervisorUserIdByStaffCode(String.valueOf(staffCode));
       User supervisorUser =UserLocalServiceUtil.fetchUserByFacebookId(PortalUtil.getDefaultCompanyId(),businessTripReimbursement.getApproverId());
      long  supervisorUserId = supervisorUser.getUserId();
@@ -293,14 +306,14 @@ public class BusinessTripReimbursementLocalServiceImpl
 		if(businessTripReimbursement.getIsCrossDepartment()){
 			System.out.println("**************businessTripReimbursement.getTargetDepartmentApproverId()*****="+businessTripReimbursement.getTargetDepartmentApproverId());
 			User user = UserLocalServiceUtil.fetchUserByFacebookId(PortalUtil.getDefaultCompanyId(),businessTripReimbursement.getTargetDepartmentApproverId());
-			System.out.println("**************user*****="+user.getLastName()+user.getFirstName());
 			if(user != null){
 				supervisorUserId = user.getUserId();
 			}
 		}
 		
 		Role supervisorRole = ApproverDelegationLocalServiceUtil.findAgentRoleByP_U(ApproverDelegationLocalServiceUtil.getProcessOfBusinessTripReimbursement(), supervisorUserId);
-		long evpUserId = SAPUserLocalServiceUtil.getDivisionManagerUserIdByStaffCode(String.valueOf(staffCode));
+		User evpUser =UserLocalServiceUtil.fetchUserByFacebookId(PortalUtil.getDefaultCompanyId(),businessTripReimbursement.getEvpId());
+	    long  evpUserId = evpUser.getUserId();
 		Role evpRole = ApproverDelegationLocalServiceUtil.findAgentRoleByP_U(ApproverDelegationLocalServiceUtil.getProcessOfBusinessTripReimbursement(), evpUserId);
 		List<Role> headControllingRoles = ApproverDelegationLocalServiceUtil.findAgentRolesByP_R(ApproverDelegationLocalServiceUtil.getProcessOfBusinessTripReimbursement(), "BR_Head of Controlling");
 		List<Role> hrgRoles = ApproverDelegationLocalServiceUtil.findAgentRolesByP_R(ApproverDelegationLocalServiceUtil.getProcessOfBusinessTripReimbursement(), "BR_HRG");
@@ -346,12 +359,9 @@ public class BusinessTripReimbursementLocalServiceImpl
 		String cssContent = this.getCssContent();		
 		long staffCode=applicant.getFacebookId();
 		if(businessTripReimbursement.getIsApplicantAgent()) {
-			ApplicantDelegation applicantDelegation = ApplicantDelegationLocalServiceUtil.fetchByP_S(ApproverDelegationLocalServiceUtil.getProcessOfBusinessTripReimbursement(), String.valueOf(UserLocalServiceUtil.fetchUserById(businessTripReimbursement.getUserId()).getFacebookId()));
-			staffCode=Long.valueOf(applicantDelegation.getStaffCode());
+			staffCode= businessTripReimbursement.getStaffCode();
 		}
 		SAPUser sAPUser=SAPUserLocalServiceUtil.getSapUserByStaffCode(String.valueOf(staffCode));
-	//  long supervisorUserId = SAPUserLocalServiceUtil.getSupervisorUserIdByStaffCode(String.valueOf(staffCode));	
-	//	User user = UserLocalServiceUtil.fetchUserById(supervisorUserId);
 		User user =UserLocalServiceUtil.fetchUserByFacebookId(PortalUtil.getDefaultCompanyId(),businessTripReimbursement.getApproverId());
 		
 		/**
@@ -379,6 +389,67 @@ public class BusinessTripReimbursementLocalServiceImpl
 		GlobalEmailLocalServiceUtil.sendEmail(toAddresses, null, subject, cssContent, mailbody.toString(), null);		
 	}
 	
+	/**
+	 * Get Total Payment Amount
+	 * 
+	 * @param businessTripReimbursement
+	 * @return
+	 * @throws SystemException
+	 */
+	public  Double[] getTotalPaymentAmount(BusinessTripReimbursement businessTripReimbursement) throws SystemException{
+		double rmbAmount = 0.0;
+		double eurAmount =0.0;
+		Long businessTripReimbursementId = businessTripReimbursement.getBusinessTripReimbursementId();
+		if (businessTripReimbursement.getTripType() == 0) {
+			//RMB costList
+			rmbAmount = BtCostListLocalServiceUtil.findSumInvoiceAmountByCurrency(businessTripReimbursementId, "RMB");
+			eurAmount = BtCostListLocalServiceUtil.findSumInvoiceAmountByCurrency(businessTripReimbursementId, "EUR");
+			// travelExpense will be post to HR salary system.
+		} else if (businessTripReimbursement.getTripType() == 1) {
+			//RMB costList
+			rmbAmount = BtCostListLocalServiceUtil.findSumInvoiceAmountByCurrency(businessTripReimbursementId, "RMB");
+	
+			 /**
+			  * change the EUR to RMB then post to SAP
+			  */
+			 if(businessTripReimbursement.getIsPaybyRmb()){
+				double eurToRmbAmount = BtCostListLocalServiceUtil.findEURPayByRMBByCurrency(businessTripReimbursementId);
+				 if(eurToRmbAmount> 0d){
+					 rmbAmount = rmbAmount + eurToRmbAmount;
+				 }
+				double travel_eur_sum_rmb = BtTravelExpenseLocalServiceUtil.findSumInRMBByCurrency(businessTripReimbursementId,"EUR");
+				if (travel_eur_sum_rmb > 0d) {
+					rmbAmount = rmbAmount + travel_eur_sum_rmb;
+				}
+			 }else{
+				eurAmount = BtCostListLocalServiceUtil.findSumInvoiceAmountByCurrency(businessTripReimbursementId, "EUR");
+				double travel_eur_sum = BtTravelExpenseLocalServiceUtil.findSumByCurrency(businessTripReimbursementId,"EUR");
+				if (travel_eur_sum > 0d) {
+					eurAmount = eurAmount + travel_eur_sum;
+				}
+			}
+		}
+		
+		/**
+		 * subtract advance cash payment amount
+		 */
+		double cashAmount =businessTripReimbursement.getAdvancePayment();
+		 if(cashAmount > 0){
+			 if("RMB".equals( businessTripReimbursement.getCurrency())){
+				 rmbAmount = rmbAmount - cashAmount;
+			 }else{
+				 eurAmount = eurAmount - cashAmount;
+			 }
+		 }
+		 BigDecimal bd2 = new BigDecimal(rmbAmount);
+		 rmbAmount = bd2.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
+		 bd2 = new BigDecimal(eurAmount);
+		 eurAmount = bd2.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
+		 Double[] totalAmount = new Double[2];
+		 totalAmount[0] = rmbAmount;
+		 totalAmount[1] = eurAmount;
+		 return totalAmount;
+	}
 	
 	//After payment completed Send email to applicant
 	public void paymentCompletedSendEmailtoApplicant(BusinessTripReimbursement businessTripReimbursement) throws SystemException {
@@ -390,11 +461,16 @@ public class BusinessTripReimbursementLocalServiceImpl
 		if(businessTripReimbursement.getIsApplicantAgent()){
 			toAddresses = ApplicantDelegationLocalServiceUtil.findEmailsByP_U(ApproverDelegationLocalServiceUtil.getProcessOfBusinessTripReimbursement(), applicant);
 		}
+		
+		Double[] totalAmount = getTotalPaymentAmount(businessTripReimbursement);
+		
 		StringBuffer mailbody = new StringBuffer();
 		mailbody.append("<div class='emailTmp'>")
 		.append("<p>Dear Applicant, </p>")
 		.append("<p>APON kindly notifies you that the business Trip Reimbursement").append("-"+businessTripReimbursement.getTicketNo())
 		.append(" has been paid. Please view it in <a href='").append(PropsUtil.get("vgc.apon.system.href.url")).append("'>APON System</a>.</p>")
+		.append("<p>Total RMB Amount : " + totalAmount[0]+"RMB </p>")
+		.append("<p>Total EUR Amount : " + totalAmount[1]+"EUR </p>")
 		.append("<p>PLEASE DO NOT REPLY to this email, as it is system generated.</p>")
 		.append("</div>");
 
@@ -403,6 +479,8 @@ public class BusinessTripReimbursementLocalServiceImpl
 				System.out.println("paymentCompletedSendEmailtoApplicant toAddresses:"+to);
 			}
 		}
+		System.out.println("paymentCompletedSendEmailtoApplicant mailbody.toString():"+mailbody.toString());
+		
 		GlobalEmailLocalServiceUtil.sendEmail(toAddresses, null, subject, cssContent, mailbody.toString(), null);		
 	}
 	
@@ -432,22 +510,58 @@ public class BusinessTripReimbursementLocalServiceImpl
 			throws SystemException {
 		return businessTripReimbursementPersistence.findByBussinessTirpTicketNo(bussinessTirpTicketNo);
 	}
+	
+	private void saveOrUpdateAuditLog(BusinessTripReimbursementLogEnum eLogEnum,
+			boolean IsInternationalTrip, boolean IsEnterFee,
+			boolean IsEnterDuringTrip, String supervisorName, String evpName,
+			long companyId, long groupId, long businessTripReimbursementId)
+			throws PortalException, SystemException {
+		String approverUser = "";
+		boolean isSaveLog = false;
+		if (eLogEnum.getNumber() == 99) {
+			approverUser = supervisorName;
+			isSaveLog = true;
+		} else if (eLogEnum.getNumber() == 100) {
+			if (IsInternationalTrip) {
+				approverUser = evpName;
+				isSaveLog = true;
+			}
+		} else if (eLogEnum.getNumber() == 101) {
+			if (IsEnterDuringTrip && !IsEnterFee) {
+				approverUser = this.getOperationUserByRoleName(companyId,
+						eLogEnum.getRole());
+				isSaveLog = true;
+			}
+		} else {
+			approverUser = this.getOperationUserByRoleName(companyId,
+					eLogEnum.getRole());
+			isSaveLog = true;
+		}
+		if (isSaveLog) {
+			AuditTrailLogLocalServiceUtil.saveAuditTrailLog(companyId, groupId,
+					businessTripReimbursementId,
+					BusinessTripReimbursement.class.getName(),
+					eLogEnum.getNumber(),
+					getRoleTrailLogName(eLogEnum.getRole()), approverUser,
+					ActionConstants.STATUS_PENDING_TO_APPROVE, null, "");
+
+		}
+	}
+	
 	//
 	public void saveOrUpdateAuditTrailLog(long companyId, long groupId,
 			long businessTripReimbursementId,long operationUserId,String operationUser,
 			String action,String operationComment) throws SystemException, PortalException {
 		BusinessTripReimbursement businessTripReimbursement=BusinessTripReimbursementLocalServiceUtil.fetchBusinessTripReimbursement(businessTripReimbursementId);
-		User users=UserLocalServiceUtil.fetchUser(businessTripReimbursement.getUserId());
-		long staffCode=users.getFacebookId();
+		//User users=UserLocalServiceUtil.fetchUser(businessTripReimbursement.getUserId());
+/*		long staffCode=users.getFacebookId();
 		if(businessTripReimbursement.getIsApplicantAgent()) {
-			ApplicantDelegation applicantDelegation = ApplicantDelegationLocalServiceUtil.fetchByP_S(ApproverDelegationLocalServiceUtil.getProcessOfBusinessTripReimbursement(), String.valueOf(UserLocalServiceUtil.fetchUserById(businessTripReimbursement.getUserId()).getFacebookId()));
-			staffCode=UserLocalServiceUtil.fetchUserById(applicantDelegation.getUserId()).getFacebookId();
-		}
+			staffCode = businessTripReimbursement.getStaffCode();
+		}*/
 		String tripType = PropsUtil.get("vgc.apon.business.trip.reimbursement.type");
 		boolean IsInternationalTrip=businessTripReimbursement.getTripType()==1||BtHotelInfoLocalServiceUtil.isNeedEVPApprove(businessTripReimbursementId, tripType)?true:false;
 		boolean IsEnterDuringTrip=BtCostListLocalServiceUtil.isEntertainmentCondition(businessTripReimbursementId,0)?true:false;
 		boolean IsEnterFee=BtCostListLocalServiceUtil.isEntertainmentCondition(businessTripReimbursementId,1)?true:false;
-		long evpUserId=SAPUserLocalServiceUtil.getDivisionManagerUserIdByStaffCode(String.valueOf(staffCode));
 		User supervisorUser=null;
 		System.out.println("**************businessTripReimbursement.getTargetDepartmentApproverId()*********="+businessTripReimbursement.getTargetDepartmentApproverId());
 		if(businessTripReimbursement.getIsCrossDepartment()){
@@ -458,7 +572,7 @@ public class BusinessTripReimbursementLocalServiceImpl
 			  //supervisorUser=UserLocalServiceUtil.fetchUser(supervisorUserId);
 		}
 		
-		User evpUser=UserLocalServiceUtil.fetchUser(evpUserId);
+		User evpUser= UserLocalServiceUtil.fetchUserByFacebookId(companyId, businessTripReimbursement.getEvpId());
 		Date now = new Date();
 		String supervisorName = supervisorUser!=null?supervisorUser.getFirstName()+" "+supervisorUser.getLastName():"Guest";
 		System.out.println("*****************supervisorName="+supervisorName);
@@ -472,8 +586,7 @@ public class BusinessTripReimbursementLocalServiceImpl
 		if (ActionConstants.SUBMIT.equals(action)) {
 			String submitComment = "";
 			if(businessTripReimbursement.getIsApplicantAgent()) {
-				ApplicantDelegation applicantDelegation = ApplicantDelegationLocalServiceUtil.fetchByP_S(ApproverDelegationLocalServiceUtil.getProcessOfBusinessTripReimbursement(), String.valueOf(UserLocalServiceUtil.fetchUserById(businessTripReimbursement.getUserId()).getFacebookId()));
-				submitComment = "On behalf of "+ApplicantDelegationLocalServiceUtil.getAgentName(applicantDelegation);
+				submitComment = "On behalf of "+ApplicantDelegationLocalServiceUtil.getAgentNameByAgentStaffCode(companyId, businessTripReimbursement.getStaffCode());
 			}
 			if (list == null || list.size() == 0) {
 				for (BusinessTripReimbursementLogEnum eLogEnum : BusinessTripReimbursementLogEnum
@@ -486,46 +599,7 @@ public class BusinessTripReimbursementLocalServiceImpl
 								operationUser,
 								ActionConstants.STATUS_SUBMITTED, now, submitComment);
 					} else {
-						String approverUser = "";
-						if(eLogEnum.getNumber()==99){
-							approverUser = supervisorName;
-							AuditTrailLogLocalServiceUtil.saveAuditTrailLog(
-									companyId, groupId, businessTripReimbursementId,
-									BusinessTripReimbursement.class.getName(),
-									eLogEnum.getNumber(), getRoleTrailLogName(eLogEnum.getRole()),
-									approverUser,
-									ActionConstants.STATUS_PENDING_TO_APPROVE, null,"");
-						}else if(eLogEnum.getNumber()==100){
-							if(IsInternationalTrip){
-								approverUser = evpName;
-								AuditTrailLogLocalServiceUtil.saveAuditTrailLog(
-										companyId, groupId, businessTripReimbursementId,
-										BusinessTripReimbursement.class.getName(),
-										eLogEnum.getNumber(), getRoleTrailLogName(eLogEnum.getRole()),
-										approverUser,
-										ActionConstants.STATUS_PENDING_TO_APPROVE, null,"");
-							}
-						}else if(eLogEnum.getNumber()==101){
-							if(IsEnterDuringTrip&&!IsEnterFee){
-								approverUser = this.getOperationUserByRoleName(
-										companyId, eLogEnum.getRole());
-								AuditTrailLogLocalServiceUtil.saveAuditTrailLog(
-										companyId, groupId, businessTripReimbursementId,
-										BusinessTripReimbursement.class.getName(),
-										eLogEnum.getNumber(), getRoleTrailLogName(eLogEnum.getRole()),
-										approverUser,
-										ActionConstants.STATUS_PENDING_TO_APPROVE, null,"");
-							}
-						}else{
-							approverUser = this.getOperationUserByRoleName(
-									companyId, eLogEnum.getRole());
-							AuditTrailLogLocalServiceUtil.saveAuditTrailLog(
-									companyId, groupId, businessTripReimbursementId,
-									BusinessTripReimbursement.class.getName(),
-									eLogEnum.getNumber(), getRoleTrailLogName(eLogEnum.getRole()),
-									approverUser,
-									ActionConstants.STATUS_PENDING_TO_APPROVE, null,"");
-						}
+						saveOrUpdateAuditLog(eLogEnum, IsInternationalTrip, IsEnterFee, IsEnterDuringTrip, supervisorName, evpName, companyId, groupId, businessTripReimbursementId);
 					}
 				}
 			} else {
@@ -548,54 +622,14 @@ public class BusinessTripReimbursementLocalServiceImpl
 				for (BusinessTripReimbursementLogEnum eLogEnum : BusinessTripReimbursementLogEnum
 						.values()) {
 					if (eLogEnum.getNumber() != 1) {
-						String approverUser = "";
-						if(eLogEnum.getNumber()==99){
-							approverUser = supervisorName;
-							AuditTrailLogLocalServiceUtil.saveAuditTrailLog(
-									companyId, groupId, businessTripReimbursementId,
-									BusinessTripReimbursement.class.getName(),
-									eLogEnum.getNumber(), getRoleTrailLogName(eLogEnum.getRole()),
-									approverUser,
-									ActionConstants.STATUS_PENDING_TO_APPROVE, null,"");
-						}else if(eLogEnum.getNumber()==100){
-							if(IsInternationalTrip){
-								approverUser = evpName;
-								AuditTrailLogLocalServiceUtil.saveAuditTrailLog(
-										companyId, groupId, businessTripReimbursementId,
-										BusinessTripReimbursement.class.getName(),
-										eLogEnum.getNumber(), getRoleTrailLogName(eLogEnum.getRole()),
-										approverUser,
-										ActionConstants.STATUS_PENDING_TO_APPROVE, null,"");
-							}
-						}else if(eLogEnum.getNumber()==101){
-							if(IsEnterDuringTrip&&!IsEnterFee){
-								approverUser = this.getOperationUserByRoleName(
-										companyId, eLogEnum.getRole());
-								AuditTrailLogLocalServiceUtil.saveAuditTrailLog(
-										companyId, groupId, businessTripReimbursementId,
-										BusinessTripReimbursement.class.getName(),
-										eLogEnum.getNumber(), getRoleTrailLogName(eLogEnum.getRole()),
-										approverUser,
-										ActionConstants.STATUS_PENDING_TO_APPROVE, null,"");
-							}
-						}else{
-							approverUser = this.getOperationUserByRoleName(
-									companyId, eLogEnum.getRole());
-							AuditTrailLogLocalServiceUtil.saveAuditTrailLog(
-									companyId, groupId, businessTripReimbursementId,
-									BusinessTripReimbursement.class.getName(),
-									eLogEnum.getNumber(), getRoleTrailLogName(eLogEnum.getRole()),
-									approverUser,
-									ActionConstants.STATUS_PENDING_TO_APPROVE, null,"");
-						}
+						saveOrUpdateAuditLog(eLogEnum, IsInternationalTrip, IsEnterFee, IsEnterDuringTrip, supervisorName, evpName, companyId, groupId, businessTripReimbursementId);
 					}
 				}
 			}
 		}else if(ActionConstants.SUBMIT_TO_HRG.equals(action)){
 			String submitComment = "";
 			if(businessTripReimbursement.getIsApplicantAgent()) {
-				ApplicantDelegation applicantDelegation = ApplicantDelegationLocalServiceUtil.fetchByP_S(ApproverDelegationLocalServiceUtil.getProcessOfBusinessTripReimbursement(), String.valueOf(UserLocalServiceUtil.fetchUserById(businessTripReimbursement.getUserId()).getFacebookId()));
-				submitComment = "On behalf of "+ApplicantDelegationLocalServiceUtil.getAgentName(applicantDelegation);
+				submitComment = "On behalf of "+ApplicantDelegationLocalServiceUtil.getAgentNameByAgentStaffCode(companyId, businessTripReimbursement.getStaffCode());
 			}
 			
 			AuditTrailLogLocalServiceUtil.saveAuditTrailLog(companyId,
@@ -686,15 +720,19 @@ public class BusinessTripReimbursementLocalServiceImpl
 		long staffCode=users.getFacebookId();
 		SAPUser sAPUser=SAPUserLocalServiceUtil.getSapUserByStaffCode(String.valueOf(staffCode));
 		User supervisorUser=null;
-		User divisionManageUser=null;
-		if(sAPUser!=null&&sAPUser.getSupervisorFgId()!=null&&!sAPUser.getSupervisorFgId().equals("")){
-			long supervisorUserId=SAPUserLocalServiceUtil.getSupervisorUserIdByStaffCode(String.valueOf(sAPUser.getSupervisorFgId()));
-			supervisorUser = UserLocalServiceUtil.fetchUserById(supervisorUserId);
+		
+		long approveId = businessTripReimbursement.getApproverId();
+		if(approveId==0 && sAPUser!=null&&sAPUser.getSupervisorFgId()!=null&&!sAPUser.getSupervisorFgId().equals("")){
+			//long supervisorUserId=SAPUserLocalServiceUtil.getSupervisorUserIdByStaffCode(String.valueOf(sAPUser.getSupervisorFgId()));
+			approveId = Long.valueOf(sAPUser.getSupervisorFgId());
 		}
-		if(sAPUser!=null&&sAPUser.getDivisionManagerId()!=null&&!sAPUser.getDivisionManagerId().equals("")){
-			long divisionManagerUserId=SAPUserLocalServiceUtil.getSupervisorUserIdByStaffCode(String.valueOf(sAPUser.getDivisionManagerId()));
-			divisionManageUser = UserLocalServiceUtil.fetchUserById(divisionManagerUserId);
+		supervisorUser = UserLocalServiceUtil.fetchUserByFacebookId(businessTripReimbursement.getCompanyId(),approveId);
+		User evpUser=null;
+		Long evpId = businessTripReimbursement.getEvpId();
+		if(evpId==0&&sAPUser!=null&&sAPUser.getDivisionManagerId()!=null&&!sAPUser.getDivisionManagerId().equals("")){
+			evpId = Long.valueOf(sAPUser.getDivisionManagerId());
 		}
+		evpUser = UserLocalServiceUtil.fetchUserByFacebookId(businessTripReimbursement.getCompanyId(),evpId);
 		
 		System.out.println("pendRole:"+pendRole);
 		String[] toAddresses= new String[]{};
@@ -702,7 +740,7 @@ public class BusinessTripReimbursementLocalServiceImpl
 			String supervisorEmail[] = supervisorUser!=null?ApproverDelegationLocalServiceUtil.findEmailsByP_U(ApproverDelegationLocalServiceUtil.getProcessOfBusinessTripReimbursement(),supervisorUser):new String[]{};
 			toAddresses = supervisorEmail;
 		}else if("EVP".equals(pendRole)){
-			String divisionManageEmail[] = divisionManageUser!=null?ApproverDelegationLocalServiceUtil.findEmailsByP_U(ApproverDelegationLocalServiceUtil.getProcessOfBusinessTripReimbursement(),divisionManageUser):new String[]{};
+			String divisionManageEmail[] = evpUser!=null?ApproverDelegationLocalServiceUtil.findEmailsByP_U(ApproverDelegationLocalServiceUtil.getProcessOfBusinessTripReimbursement(),evpUser):new String[]{};
 			toAddresses = divisionManageEmail;
 		}else{
 			toAddresses =ApproverDelegationLocalServiceUtil.findEmailsByP_R(ApproverDelegationLocalServiceUtil.getProcessOfBusinessTripReimbursement(),getRoleNameByTrailLogName(pendRole));
@@ -739,11 +777,13 @@ public class BusinessTripReimbursementLocalServiceImpl
 	
 	public int getCurrentOperationNo(List<AuditTrailLog> list){
 		int operationNo = 0;
-		for (AuditTrailLog auditTrailLog : list) {
-			if (auditTrailLog.getOperationStatus().equals(
-					ActionConstants.STATUS_PENDING_TO_APPROVE)) {
-				operationNo = auditTrailLog.getOperationNo();
-				break;
+		if(list != null && list.size()>0){
+			for (AuditTrailLog auditTrailLog : list) {
+				if (auditTrailLog.getOperationStatus().equals(
+						ActionConstants.STATUS_PENDING_TO_APPROVE)) {
+					operationNo = auditTrailLog.getOperationNo();
+					break;
+				}
 			}
 		}
 		return operationNo;
@@ -751,13 +791,15 @@ public class BusinessTripReimbursementLocalServiceImpl
 	
 	public int getOperationNo(List<AuditTrailLog> list) {
 		int operationNo = 0;
-		for (AuditTrailLog auditTrailLog : list) {
-			if (!auditTrailLog.getOperationStatus().equals(
-					ActionConstants.STATUS_PENDING_TO_APPROVE)) {
-				operationNo = auditTrailLog.getOperationNo();
-			} else {
-				operationNo = operationNo + 1;
-				break;
+		if(list != null ){
+			for (AuditTrailLog auditTrailLog : list) {
+				if (!auditTrailLog.getOperationStatus().equals(
+						ActionConstants.STATUS_PENDING_TO_APPROVE)) {
+					operationNo = auditTrailLog.getOperationNo();
+				} else {
+					operationNo = operationNo + 1;
+					break;
+				}
 			}
 		}
 		return operationNo;
@@ -801,16 +843,27 @@ public class BusinessTripReimbursementLocalServiceImpl
 		return ddName;
 	}
 	
-	//SAP For Reimbursement
-	
-			public long findCountByS_U_SAP(int status,
-					String ticketNo, String printName, int sapStatus, String startDate,
-					String endDate, String sapDocumentId) throws SystemException, ParseException{
-				//
-				SimpleDateFormat sdf_dmy = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-				
-				DynamicQuery query = DynamicQueryFactoryUtil
-						.forClass(BusinessTripReimbursement.class);
+		private Criterion getSapStatusCriterion(int sapStatus){
+			Criterion criterion = null;
+			if (sapStatus==1) {
+				criterion = RestrictionsFactoryUtil.eq("sapStatus", 1);
+			}else if (sapStatus==2) {
+				criterion = RestrictionsFactoryUtil.eq("sapStatus", 2);
+			}else if(sapStatus==-2){
+				 criterion = RestrictionsFactoryUtil.eq("sapStatus",-2);
+			}else {
+				criterion = RestrictionsFactoryUtil.eq("sapStatus", 0);
+				criterion = RestrictionsFactoryUtil.or(criterion,
+						RestrictionsFactoryUtil.eq("sapStatus", -1));
+			}
+			return criterion;
+		}
+		
+	     private DynamicQuery getQueryValidateCommonField(String ticketNo,String printName,String startDate,
+					String endDate, String sapDocumentId) throws ParseException{
+	    	 
+	    	    SimpleDateFormat sdf_dmy = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+	    	    DynamicQuery query = DynamicQueryFactoryUtil.forClass(BusinessTripReimbursement.class);
 
 				if (Validator.isNotNull(printName)) {
 					query.add(RestrictionsFactoryUtil.ilike("printName", "%"
@@ -830,25 +883,21 @@ public class BusinessTripReimbursementLocalServiceImpl
 //					query.add(RestrictionsFactoryUtil.between("SUBMITTEDDATE",
 //							sdf_dmy.parse(startDate), sdf_dmy.parse(endDate)));
 				}
+				
+				return query;
+	     }
+	     
+	//SAP For Reimbursement
+	
+			public long findCountByS_U_SAP(int status,
+					String ticketNo, String printName, int sapStatus, String startDate,
+					String endDate, String sapDocumentId) throws SystemException, ParseException{
+				//
+				
+				DynamicQuery query = getQueryValidateCommonField(ticketNo, printName, startDate, endDate, sapDocumentId);
+				
 				query.add(RestrictionsFactoryUtil.eq("status", status));
-				if (sapStatus==1) {
-					Criterion criterion = null;
-					criterion = RestrictionsFactoryUtil.eq("sapStatus", 1);
-					query.add(criterion);
-				}else if (sapStatus==2) {
-					Criterion criterion = null;
-					criterion = RestrictionsFactoryUtil.eq("sapStatus", 2);
-					query.add(criterion);
-				}else if(sapStatus==-2){
-					Criterion criterion = RestrictionsFactoryUtil.eq("sapStatus",-2);
-					query.add(criterion);
-				}else {
-					Criterion criterion = null;
-					criterion = RestrictionsFactoryUtil.eq("sapStatus", 0);
-					criterion = RestrictionsFactoryUtil.or(criterion,
-							RestrictionsFactoryUtil.eq("sapStatus", -1));
-					query.add(criterion);
-				}
+				query.add(getSapStatusCriterion(sapStatus));
 				return dynamicQueryCount(query);
 			}
 			
@@ -858,47 +907,8 @@ public class BusinessTripReimbursementLocalServiceImpl
 			public long findRejectCountByS_U_SAP(String ticketNo, String printName, int sapStatus, String startDate,
 					String endDate, String sapDocumentId) throws SystemException, ParseException{
 				//
-				SimpleDateFormat sdf_dmy = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-				
-				DynamicQuery query = DynamicQueryFactoryUtil
-						.forClass(BusinessTripReimbursement.class);
-
-				if (Validator.isNotNull(printName)) {
-					query.add(RestrictionsFactoryUtil.ilike("printName", "%"
-							+ printName + "%"));
-				}
-				if (Validator.isNotNull(ticketNo)) {
-					query.add(RestrictionsFactoryUtil.ilike("ticketNo", "%" + ticketNo
-							+ "%"));
-				}
-				if (Validator.isNotNull(sapDocumentId)) {
-					query.add(RestrictionsFactoryUtil.ilike("sapDocumentId", "%" + sapDocumentId
-							+ "%"));
-				}
-				if (Validator.isNotNull(startDate) && (Validator.isNotNull(endDate))) {
-					query.add(RestrictionsFactoryUtil.ge("submittedDate", sdf_dmy.parse(startDate+" 00:00:00")));
-					query.add(RestrictionsFactoryUtil.le("submittedDate", sdf_dmy.parse(endDate+" 23:59:59")));
-//					query.add(RestrictionsFactoryUtil.between("SUBMITTEDDATE",
-//							sdf_dmy.parse(startDate), sdf_dmy.parse(endDate)));
-				}
-				if (sapStatus==1) {
-					Criterion criterion = null;
-					criterion = RestrictionsFactoryUtil.eq("sapStatus", 1);
-					query.add(criterion);
-				}else if (sapStatus==2) {
-					Criterion criterion = null;
-					criterion = RestrictionsFactoryUtil.eq("sapStatus", 2);
-					query.add(criterion);
-				}else if(sapStatus==-2){
-					Criterion criterion = RestrictionsFactoryUtil.eq("sapStatus",-2);
-					query.add(criterion);
-				}else {
-					Criterion criterion = null;
-					criterion = RestrictionsFactoryUtil.eq("sapStatus", 0);
-					criterion = RestrictionsFactoryUtil.or(criterion,
-							RestrictionsFactoryUtil.eq("sapStatus", -1));
-					query.add(criterion);
-				}
+				DynamicQuery query = getQueryValidateCommonField(ticketNo, printName, startDate, endDate, sapDocumentId);
+				query.add(getSapStatusCriterion(sapStatus));
 				return dynamicQueryCount(query);
 			}
 			
@@ -908,58 +918,21 @@ public class BusinessTripReimbursementLocalServiceImpl
 					String ticketNo, String printName, int sapStatus, String startDate,
 					String endDate,String sapDocumentId,int start, int end) throws SystemException, ParseException {
 				//
-				SimpleDateFormat sdf_dmy = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-				DynamicQuery query = DynamicQueryFactoryUtil
-						.forClass(BusinessTripReimbursement.class);
-
-				if (Validator.isNotNull(printName)) {
-					query.add(RestrictionsFactoryUtil.ilike("printName", "%"
-							+ printName + "%"));
-				}
-				if (Validator.isNotNull(ticketNo)) {
-					query.add(RestrictionsFactoryUtil.ilike("ticketNo", "%" + ticketNo
-							+ "%"));
-				}
-				if (Validator.isNotNull(sapDocumentId)) {
-					query.add(RestrictionsFactoryUtil.ilike("sapDocumentId", "%" + sapDocumentId
-							+ "%"));
-				}
-				if (Validator.isNotNull(startDate) && (Validator.isNotNull(endDate))) {
-					query.add(RestrictionsFactoryUtil.ge("submittedDate", sdf_dmy.parse(startDate+" 00:00:00")));
-					query.add(RestrictionsFactoryUtil.le("submittedDate", sdf_dmy.parse(endDate+" 23:59:59")));
-//					query.add(RestrictionsFactoryUtil.between("SUBMITTEDDATE",
-//							sdf_dmy.parse(startDate), sdf_dmy.parse(endDate)));
-				}
+				DynamicQuery query =  getQueryValidateCommonField(ticketNo, printName, startDate, endDate, sapDocumentId);
 				query.add(RestrictionsFactoryUtil.eq("status", status));
-				if (sapStatus==1) {
-					Criterion criterion = null;
-					criterion = RestrictionsFactoryUtil.eq("sapStatus", 1);
-					query.add(criterion);
-				}else if (sapStatus==2) {
-					Criterion criterion = null;
-					criterion = RestrictionsFactoryUtil.eq("sapStatus", 2);
-					query.add(criterion);
-				}else if(sapStatus==-2){
-					Criterion criterion = RestrictionsFactoryUtil.eq("sapStatus",-2);
-					query.add(criterion);
-				}else {
-					Criterion criterion = null;
-					criterion = RestrictionsFactoryUtil.eq("sapStatus", 0);
-					criterion = RestrictionsFactoryUtil.or(criterion,
-							RestrictionsFactoryUtil.eq("sapStatus", -1));
-					query.add(criterion);
-				}
-				if(sapStatus<1){
-				query.addOrder(OrderFactoryUtil.asc("sapStatus"));
-				}else{
-				query.addOrder(OrderFactoryUtil.desc("sapStatus"));
+				query.add(getSapStatusCriterion(sapStatus));
+				
+				if (sapStatus < 1) {
+					query.addOrder(OrderFactoryUtil.asc("sapStatus"));
+				} else {
+					query.addOrder(OrderFactoryUtil.desc("sapStatus"));
 				}
 				query.addOrder(OrderFactoryUtil.desc("submittedDate"));
 				query.setLimit(start, end);
-				
+
 				return dynamicQuery(query);
 			}
-		
+			
 			/**
 			 * select reject ticket by account For Reimbursement
 			 * 
@@ -978,50 +951,14 @@ public class BusinessTripReimbursementLocalServiceImpl
 			public List<BusinessTripReimbursement> findRejectByS_U_SAP(String ticketNo, String printName, int sapStatus, String startDate,
 					String endDate,String sapDocumentId,int start, int end) throws SystemException, ParseException {
 				//
-				SimpleDateFormat sdf_dmy = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-				DynamicQuery query = DynamicQueryFactoryUtil
-						.forClass(BusinessTripReimbursement.class);
+				DynamicQuery query =  getQueryValidateCommonField(ticketNo, printName, startDate, endDate, sapDocumentId);
 
-				if (Validator.isNotNull(printName)) {
-					query.add(RestrictionsFactoryUtil.ilike("printName", "%"
-							+ printName + "%"));
-				}
-				if (Validator.isNotNull(ticketNo)) {
-					query.add(RestrictionsFactoryUtil.ilike("ticketNo", "%" + ticketNo
-							+ "%"));
-				}
-				if (Validator.isNotNull(sapDocumentId)) {
-					query.add(RestrictionsFactoryUtil.ilike("sapDocumentId", "%" + sapDocumentId
-							+ "%"));
-				}
-				if (Validator.isNotNull(startDate) && (Validator.isNotNull(endDate))) {
-					query.add(RestrictionsFactoryUtil.ge("submittedDate", sdf_dmy.parse(startDate+" 00:00:00")));
-					query.add(RestrictionsFactoryUtil.le("submittedDate", sdf_dmy.parse(endDate+" 23:59:59")));
-//					query.add(RestrictionsFactoryUtil.between("SUBMITTEDDATE",
-//							sdf_dmy.parse(startDate), sdf_dmy.parse(endDate)));
-				}
-				if (sapStatus==1) {
-					Criterion criterion = null;
-					criterion = RestrictionsFactoryUtil.eq("sapStatus", 1);
-					query.add(criterion);
-				}else if (sapStatus==2) {
-					Criterion criterion = null;
-					criterion = RestrictionsFactoryUtil.eq("sapStatus", 2);
-					query.add(criterion);
-				}else if(sapStatus==-2){
-					Criterion criterion = RestrictionsFactoryUtil.eq("sapStatus",-2);
-					query.add(criterion);
-				}else {
-					Criterion criterion = null;
-					criterion = RestrictionsFactoryUtil.eq("sapStatus", 0);
-					criterion = RestrictionsFactoryUtil.or(criterion,
-							RestrictionsFactoryUtil.eq("sapStatus", -1));
-					query.add(criterion);
-				}
-				if(sapStatus<1){
-				query.addOrder(OrderFactoryUtil.asc("sapStatus"));
-				}else{
-				query.addOrder(OrderFactoryUtil.desc("sapStatus"));
+				query.add(getSapStatusCriterion(sapStatus));
+				
+				if (sapStatus < 1) {
+					query.addOrder(OrderFactoryUtil.asc("sapStatus"));
+				} else {
+					query.addOrder(OrderFactoryUtil.desc("sapStatus"));
 				}
 				query.addOrder(OrderFactoryUtil.desc("submittedDate"));
 				query.setLimit(start, end);
@@ -1058,7 +995,7 @@ public class BusinessTripReimbursementLocalServiceImpl
 					}
 					if(sapStatus ==2){
 						System.out.println("After payment complete , then send eamil to applicant");
-						 BusinessTripReimbursementLocalServiceUtil.paymentCompletedSendEmailtoApplicant(businessTripReimbursement);
+						 //BusinessTripReimbursementLocalServiceUtil.paymentCompletedSendEmailtoApplicant(businessTripReimbursement);
 					}
 				}else if(sapStatus==-2){
 					

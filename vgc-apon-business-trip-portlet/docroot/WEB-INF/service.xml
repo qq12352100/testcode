@@ -158,6 +158,9 @@
 		<column name="costListForeignTotalRmb" type="double" />
 		<column name="remark" type="String" />
 		<column name="isPaybyRmb" type="boolean" />
+		<!-- evp -->
+		<column name="evpId" type="long" />
+		<column name="evpName" type="String" />
 		
 		<!-- Workflow -->
 		<column name="status" type="int" />

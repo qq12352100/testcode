@@ -34,9 +34,6 @@ import com.business.trip.service.BusinessTripApplicationLocalServiceUtil;
 import com.business.trip.util.ActionConstants;
 import com.business.trip.util.BTApplicationUtil;
 import com.business.trip.util.BusinessTripConstants;
-import com.delegation.model.ApplicantDelegation;
-import com.delegation.service.ApplicantDelegationLocalServiceUtil;
-import com.delegation.service.ApproverDelegationLocalServiceUtil;
 import com.file.management.model.FileManagement;
 import com.file.management.service.FileManagementLocalServiceUtil;
 import com.global.management.service.GlobalToolLocalServiceUtil;
@@ -56,11 +53,9 @@ import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.User;
-import com.liferay.portal.model.WorkflowInstanceLink;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portal.service.WorkflowInstanceLinkLocalServiceUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
@@ -103,8 +98,8 @@ public class BusinessTripApplicationPortlet extends MVCPortlet {
 		DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 		long businessTripApplicationId = ParamUtil.getLong(
 				uploadPortletRequest, "businessTripApplicationId");
-		Boolean isApplicantAgent = ParamUtil.getBoolean(uploadPortletRequest,
-				"isApplicantAgent", false);
+		
+		
 		long staffCode = ParamUtil.getLong(uploadPortletRequest, "staffCode");
 		if (staffCode == 0) {
 			staffCode = 190002l;
@@ -155,6 +150,9 @@ public class BusinessTripApplicationPortlet extends MVCPortlet {
 				uploadPortletRequest, "carRentalTotalCostRmb");
 		double carRentalTotalCostEur = ParamUtil.getDouble(
 				uploadPortletRequest, "carRentalTotalCostEur");
+		
+		Long applicantAgentUserId = ParamUtil.getLong(uploadPortletRequest, "applicantAgentPerson");
+		
 		String remark = ParamUtil.getString(uploadPortletRequest, "remark");
 
 		BusinessTripApplication businessTripApplication = BusinessTripApplicationLocalServiceUtil
@@ -171,7 +169,15 @@ public class BusinessTripApplicationPortlet extends MVCPortlet {
 			Date now = new Date();
 			businessTripApplication.setCreateDate(now);
 		}
-		businessTripApplication.setIsApplicantAgent(isApplicantAgent);
+		/**
+		 * if the current user is applicant agent
+		 */
+		if(!applicantAgentUserId.equals(themeDisplay.getUserId())){
+			businessTripApplication.setIsApplicantAgent(true);
+		}else{
+			businessTripApplication.setIsApplicantAgent(false);
+		}
+		
 		businessTripApplication
 				.setProcessType(BusinessTripConstants.PROCESS_TYPE_BUSINESS_TRIP_APPLICATION);
 		businessTripApplication
@@ -277,8 +283,8 @@ public class BusinessTripApplicationPortlet extends MVCPortlet {
 			
 			sb.append(businessTripApplication.getStatus()!=0?"pending":"completed");
 			if(businessTripApplication.getStatus()==0) {
-				Thread thread1 = new Thread();
-				thread1.sleep(2000);
+				//Thread thread1 = new Thread();
+				Thread.sleep(2000);
 			}
 		} else {
 			businessTripApplication = BusinessTripApplicationLocalServiceUtil
@@ -659,6 +665,16 @@ public class BusinessTripApplicationPortlet extends MVCPortlet {
 		actionResponse.setRenderParameter("carRentalTotalCostEur",
 				String.valueOf(carRentalTotalCostEur));
 		// actionResponse.setRenderParameter("mvcPath","/html/businessTripApplication/view.jsp");
+		BusinessTripApplication businessTripApplication = BusinessTripApplicationLocalServiceUtil.fetchBusinessTripApplication(businessTripApplicationId);
+		if(null!=businessTripApplication ){
+			businessTripApplication.setHotelTotalCostEur(hotelTotalCostEur);
+			businessTripApplication.setHotelTotalCostRmb(hotelTotalCostRmb);
+			businessTripApplication.setCarRentalTotalCostEur(carRentalTotalCostEur);
+			businessTripApplication.setCarRentalTotalCostRmb(carRentalTotalCostRmb);
+			businessTripApplication.setTotalCostEur(totalCostEur);
+			businessTripApplication.setTotalCostRmb(totalCostRmb);
+			BusinessTripApplicationLocalServiceUtil.updateBusinessTripApplication(businessTripApplication);
+		}
 		BTApplicationUtil.passRenderParameter(actionRequest, actionResponse);
 	}
 
@@ -754,6 +770,16 @@ public class BusinessTripApplicationPortlet extends MVCPortlet {
 		actionResponse.setRenderParameter("carRentalTotalCostEur",
 				String.valueOf(carRentalTotalCostEur));
 		// actionResponse.setRenderParameter("mvcPath","/html/businessTripApplication/view.jsp");
+		BusinessTripApplication businessTripApplication = BusinessTripApplicationLocalServiceUtil.fetchBusinessTripApplication(businessTripApplicationId);
+		if(null!=businessTripApplication ){
+			businessTripApplication.setHotelTotalCostEur(hotelTotalCostEur);
+			businessTripApplication.setHotelTotalCostRmb(hotelTotalCostRmb);
+			businessTripApplication.setCarRentalTotalCostEur(carRentalTotalCostEur);
+			businessTripApplication.setCarRentalTotalCostRmb(carRentalTotalCostRmb);
+			businessTripApplication.setTotalCostEur(totalCostEur);
+			businessTripApplication.setTotalCostRmb(totalCostRmb);
+			BusinessTripApplicationLocalServiceUtil.updateBusinessTripApplication(businessTripApplication);
+		}
 		BTApplicationUtil.passRenderParameter(actionRequest, actionResponse);
 	}
 
@@ -761,32 +787,48 @@ public class BusinessTripApplicationPortlet extends MVCPortlet {
 	public void applicantAgent(ActionRequest actionRequest,
 			ActionResponse actionResponse) throws IOException,
 			PortletException, SystemException {
-		boolean isApplicantAgent = ParamUtil.getBoolean(actionRequest,
-				"isApplicantAgent", false);
-		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest
-				.getAttribute(WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay = (ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		User user = themeDisplay.getUser();
 		long staffCode = user.getFacebookId();
-		if (isApplicantAgent) {
-			ApplicantDelegation applicantDelegation = ApplicantDelegationLocalServiceUtil
-					.fetchByP_S(ApproverDelegationLocalServiceUtil
-							.getProcessOfBusinessTripApplication(), String
-							.valueOf(staffCode));
-			staffCode = UserLocalServiceUtil.fetchUserById(
-					applicantDelegation.getUserId()).getFacebookId();
+		Long applicantAgentUserId = ParamUtil.getLong(actionRequest, "applicantAgentPerson");
+		actionResponse.setRenderParameter("applicantAgentPerson",String.valueOf(applicantAgentUserId));
+		/**
+		 * if the current user is applicant agent
+		 */
+		if(!applicantAgentUserId.equals(user.getUserId())){
+			staffCode = UserLocalServiceUtil.fetchUserById(applicantAgentUserId).getFacebookId();
 		}
-		long businessTripApplicationId = ParamUtil.getLong(actionRequest,
-				"businessTripApplicationId");
-		actionResponse.setRenderParameter("staffCode",
-				String.valueOf(staffCode));
-		actionResponse.setRenderParameter("isApplicantAgent",
-				String.valueOf(isApplicantAgent));
-		actionResponse.setRenderParameter("businessTripApplicationId",
-				String.valueOf(businessTripApplicationId));
-		actionResponse.setRenderParameter("isClickAgent", "Yes");
-		// actionResponse.setRenderParameter("mvcPath","/html/businessTripApplication/view.jsp");
-	}
+		actionResponse.setRenderParameter("staffCode",String.valueOf(staffCode));
+		long businessTripApplicationId = ParamUtil.getLong(actionRequest,"businessTripApplicationId");
+		actionResponse.setRenderParameter("businessTripApplicationId",String.valueOf(businessTripApplicationId));
+		
+		
+		
+		int tripType = ParamUtil.getInteger(actionRequest, "tripType");
+		String tripTypeStr = actionRequest.getParameter("tripType");
+		if(tripTypeStr==null||tripTypeStr.trim().equalsIgnoreCase("undefined")){
+			tripType = 99;
+		}
+		
+		String departureDate = ParamUtil.getString(actionRequest, "departureDate");
+		String returnDate = ParamUtil.getString(actionRequest, "departureDate");
 
+		String purposeOfTheTrip = ParamUtil.getString(actionRequest, "purposeOfTheTrip");
+		String visitCountriesCities = ParamUtil.getString(actionRequest, "visitCountriesCities");
+		double advancePayment = ParamUtil.getDouble(actionRequest, "advancePayment");
+		String currency = ParamUtil.getString(actionRequest, "currency");
+
+		
+		actionResponse.setRenderParameter("tripType", String.valueOf(tripType));
+		actionResponse.setRenderParameter("departureDate", departureDate);
+		actionResponse.setRenderParameter("returnDate",returnDate);
+		actionResponse.setRenderParameter("purposeOfTheTrip", purposeOfTheTrip);
+		actionResponse.setRenderParameter("visitCountriesCities", visitCountriesCities);
+		actionResponse.setRenderParameter("advancePayment", String.valueOf(advancePayment));
+		actionResponse.setRenderParameter("currency", currency);
+	}
+	
+	
 	// For the select_approver.jsp query
 	public void searchApprover(ActionRequest actionRequest,
 			ActionResponse actionResponse) throws SystemException {

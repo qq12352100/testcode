@@ -26,7 +26,7 @@
 	long businessTripReimbursementId = ParamUtil.getLong(request, "businessTripReimbursementId");
 	String transitionName = ParamUtil.getString(renderRequest, "transitionName", "");
 	String tabsTohereDiv= ParamUtil.get(request, "tabs2","");
-	String tabs2 = ParamUtil.get(request, "tabs2", "flight");
+	String tabs2 = ParamUtil.get(request, "tabs2", "costList");
 	if(renderRequest.getAttribute("tabs2")!=null){
 		tabs2 = (String)renderRequest.getAttribute("tabs2");
 	}
@@ -35,15 +35,15 @@
 	boolean isNew = true;
 
 	long sCode = themeDisplay.getUser().getFacebookId();
+	System.out.println("****************view.jsp************scode="+sCode);
+	
 	Date now = new Date();
-	ApplicantDelegation applicantDelegation = ApplicantDelegationLocalServiceUtil.fetchByP_S(ApproverDelegationLocalServiceUtil.getProcessOfBusinessTripReimbursement(),String.valueOf(sCode));
-	boolean isHasAppliantAgent = applicantDelegation!=null && now.after(applicantDelegation.getEffectiveStartDate()) && now.before(applicantDelegation.getEffectiveEndDate())?true:false;
-	String agentName = applicantDelegation!=null?ApplicantDelegationLocalServiceUtil.getAgentName(applicantDelegation):"";
+	Map<Long,String> applicantAgentMap = ApplicantDelegationLocalServiceUtil.getApplicantAgentMap(ApproverDelegationLocalServiceUtil.getProcessOfBusinessTripReimbursement(),String.valueOf(sCode));
+	boolean isHasAppliantAgent = applicantAgentMap.size()>0?true:false;
 	
 	String prefixUrl = "/web"+themeDisplay.getScopeGroup().getFriendlyURL();	 
 	String myApplicationsPageUrl = prefixUrl+PropsUtil.get("vgc.apon.my.applications.page.friendly.url");
-	long myApplicationsPlid = PortalUtil.getPlidFromFriendlyURL(
-	themeDisplay.getCompanyId(),myApplicationsPageUrl);
+	long myApplicationsPlid = PortalUtil.getPlidFromFriendlyURL(themeDisplay.getCompanyId(),myApplicationsPageUrl);
 	
 	if (businessTripReimbursementId > 0) {
 		businessTripReimbursement = BusinessTripReimbursementLocalServiceUtil.fetchBusinessTripReimbursement(businessTripReimbursementId);
@@ -85,11 +85,38 @@
 		String infoerror="<script>alert("+"\""+error+"\""+")</script>";
 		out.print(infoerror);
 	}
+	
+	long curStaffcode = sCode;
+	
+	long agentUser = themeDisplay.getUserId();
+	//for draf and recall
+	if(!isNew && businessTripReimbursement!=null){
+		curStaffcode = businessTripReimbursement.getStaffCode();
+		User agentUserTemp = UserLocalServiceUtil.fetchUserByFacebookId(themeDisplay.getCompanyId(),businessTripReimbursement.getStaffCode());
+		if(user !=null){
+			agentUser = agentUserTemp.getUserId();
+		}
+	}
 	BusinessTripApplication businessTripApplication=(BusinessTripApplication)renderRequest.getAttribute("businessTripApplication");
 	if(businessTripApplication!=null&&businessTripReimbursement!=null){
+		System.out.println("****businessTripApplication="+businessTripApplication.getTicketNo());
+		//if applicant agent
+		if(businessTripApplication.getStaffCode()!= sCode){
+			System.out.println("****************view.jsp1************businessTripApplication.getStaffCode()="+businessTripApplication.getStaffCode());
+			businessTripReimbursement.setIsApplicantAgent(true);
+			User agentUserTemp = UserLocalServiceUtil.fetchUserByFacebookId(themeDisplay.getCompanyId(),businessTripApplication.getStaffCode());
+			if(user !=null){
+				agentUser = agentUserTemp.getUserId();
+			}
+		}else{
+			System.out.println("****************view.jsp2************businessTripApplication.getStaffCode()="+businessTripApplication.getStaffCode());
+			businessTripReimbursement.setIsApplicantAgent(false);
+		}
+		curStaffcode = businessTripApplication.getStaffCode();
 		businessTripReimbursement=JspUtil.include(businessTripReimbursement, businessTripApplication,totalTravelExpenseRmb,totalTravelExpenseEur,costListInlandTotalRmb,costListForeignTotalEur,costListForeignTotalRmb);
 		
 		if(cmd2==null||cmd2.equals("")){
+			System.out.println("****************view.jsp************businessTripApplication.getBusinessTripApplicationId()="+businessTripApplication.getBusinessTripApplicationId());
 			BtFlightTrainInfoLocalServiceUtil.deleteBtFlightTrainInfoByB_T(businessTripReimbursementId, tripType);
 			BtFlightTrainInfoLocalServiceUtil.copyBtFlightTrainInfoByB_T(businessTripApplication.getBusinessTripApplicationId(), businessTripReimbursementId, tripType2, tripType);
 			
@@ -102,6 +129,7 @@
 			BtCarRentalInfoLocalServiceUtil.deleteBtFlightTrainInfoByB_T(businessTripReimbursementId, tripType);
 			BtCarRentalInfoLocalServiceUtil.copyBtCarRentalInfoByB_T(businessTripApplication.getBusinessTripApplicationId(), businessTripReimbursementId, tripType2, tripType);	
 		}else{
+			System.out.println("****************view.jsp************cmd2="+cmd2);
 			businessTripReimbursement.setTotalCostRmb(totalCostRmb);
 			businessTripReimbursement.setTotalCostEur(totalCostEur);
 			businessTripReimbursement.setHotelTotalCostRmb(hotelTotalCostRmb);
@@ -115,15 +143,28 @@
 			businessTripReimbursement.setFlightTaxes(flightTaxes);
 			businessTripReimbursement.setFlightTransactionFee(flightTransactionFee);
 		}
+	}
 	
-		String url = themeDisplay.getURLPortal();
-		url = url.indexOf("9080") != -1 || url.indexOf("8080") != -1 ? "" : url.substring(url.lastIndexOf('/'));
-		
-		businessTripApplicationPageUrl=url+"/web/vcic/my-applications?p_p_id=mysubmissionslist_WAR_vgcaponmysubmissionsportlet"+
-	"&_mysubmissionslist_WAR_vgcaponmysubmissionsportlet_tabs2=completed"+
-	"&_mysubmissionslist_WAR_vgcaponmysubmissionsportlet_pkId="+businessTripApplication.getBusinessTripApplicationId()+
-	"&_mysubmissionslist_WAR_vgcaponmysubmissionsportlet_operationType=ReimbursementToViewApplication"+
-	"&_mysubmissionslist_WAR_vgcaponmysubmissionsportlet_mvcPath=/html/mysubmissionslist/details/business_trip_application_details.jsp";
+	boolean isEvpOrPresident = SAPUserLocalServiceUtil.isEvpOrInPresidentOffice(String.valueOf(curStaffcode));
+	System.out.println("********************isEvpOrPresident="+isEvpOrPresident);
+	boolean isEvp = SAPUserLocalServiceUtil.isEvp(String.valueOf(curStaffcode));
+	boolean isInPresidentOffice = SAPUserLocalServiceUtil.isInPresidentOffice(String.valueOf(curStaffcode));
+
+	List<SAPUser> evpList = null;
+	List<SAPUser> approverList = null;
+	if(isEvpOrPresident){
+		evpList = SAPUserLocalServiceUtil.findEVPApproverForEVPOrPresident(String.valueOf(curStaffcode));
+		approverList = SAPUserLocalServiceUtil.findSuperApproverForEVPTeam(String.valueOf(curStaffcode));
+	}
+ 	//JAVA-654 when the approver is wrong and already submit, when recall, can be right. 
+	if(!isNew && businessTripReimbursement!=null&&!isEvp){
+		SAPUser sapUser = SAPUserLocalServiceUtil.getSapUserByStaffCode(String.valueOf(businessTripReimbursement.getStaffCode()));
+		businessTripReimbursement.setApproverId(Long.valueOf(Validator.isNotNull(sapUser.getSupervisorFgId())?sapUser.getSupervisorFgId():"0"));
+		businessTripReimbursement.setApproverName(sapUser.getSupervisorFgName());
+		if(!isEvpOrPresident){
+			businessTripReimbursement.setEvpId(Long.valueOf(sapUser.getDivisionManagerId()));
+			businessTripReimbursement.setEvpName(sapUser.getDepartmentManagerName());
+		}
 	}
 	
 	PortletURL portletURL = renderResponse.createRenderURL();
@@ -135,7 +176,7 @@
 	String supportFileType = PropsUtil.get("vgc.apon.support.upload.file.type");
 	String supportFileSize = PropsUtil.get("vgc.apon.support.upload.file.size");
 	String addPagePath = "/html/businessTripReimbursement/flightTrainInformationAdd.jsp";
-	String selectedTabPage = "vgc-apon-business-trip-reimbursement-flight-information-final";
+	String selectedTabPage = "vgc-apon-business-trip-reimbursement-cost-list";
 	if("train".equals(tabs2)) {
 		addPagePath = "/html/businessTripReimbursement/trainInformationAdd.jsp";
 		selectedTabPage = "vgc-apon-business-trip-reimbursement-train-information-final";
@@ -159,9 +200,6 @@
 	String importFileType = PropsUtil.get("vgc.apon.support.import.pdf.file.type");
 	String importError = ParamUtil.getString(request, "importError","");	
 	
-	boolean tempIsAppliantAgent = ParamUtil.getBoolean(request, "isApplicantAgent",false);
-	String tempApproverId = ParamUtil.getString(request, "tempApproverId","");
-	String tempApproverName = ParamUtil.getString(request, "tempApproverName","");
 	String tempIsGetRMBStr = ParamUtil.getString(request, "tempIsGetRMB");
 	Boolean tempIsGetRMB = null;
 	if(tempIsGetRMBStr==null || "".equals(tempIsGetRMBStr)){
@@ -169,6 +207,30 @@
 	}else{
 		tempIsGetRMB = Boolean.valueOf(tempIsGetRMBStr);
 	}
+	
+	String mustCheckedGetRmb = "";
+	if(businessTripReimbursement.getTripType()==1&&businessTripReimbursement.getAdvancePayment()>0&&"RMB".equals(businessTripReimbursement.getCurrency())){
+		mustCheckedGetRmb="Y";
+	}
+    //after change cost list, then get parameter
+	String tempApproverId = ParamUtil.getString(request,"tempApproverId","");
+	String tempApproverName = ParamUtil.getString(request,"tempApproverName","");
+	String tempEvpId = ParamUtil.getString(request, "tempEvpId","");
+	String tempEvpName = ParamUtil.getString(request, "tempEvpName","");
+	//atfer select BT ,happened change
+	if("Y".equals((String)renderRequest.getAttribute("selectBT"))){
+		 tempApproverId = (String)renderRequest.getAttribute("tempApproverId");
+		 tempApproverName = (String)renderRequest.getAttribute("tempApproverName");
+		 tempEvpId = (String)renderRequest.getAttribute("tempEvpId");
+		 tempEvpName = (String)renderRequest.getAttribute("tempEvpName");
+	}
+	//for history data when recall no evp
+	if(("".equals(tempEvpId)||"0".equals(tempEvpId)) && !isNew && businessTripReimbursement.getEvpId()==0){
+		SAPUser sapUser = SAPUserLocalServiceUtil.getSapUserByStaffCode(String.valueOf(businessTripReimbursement.getStaffCode()));
+		tempEvpId = sapUser!=null?sapUser.getDivisionManagerId():"";
+		tempEvpName = sapUser!=null?sapUser.getDivisionManagerName():"";
+	}
+	System.out.println("****************************view.jsp*************tempEvpId="+tempEvpId+";tempEvpName="+tempEvpName);
 %>
 
 <portlet:actionURL var="addBusinessTripReimbursementURL" windowState="normal">
@@ -235,9 +297,11 @@
 	<aui:input type="hidden" name="flightTransactionFee"
 		value='<%=businessTripReimbursement.getFlightTransactionFee()%>' />
 	<aui:input type="hidden" name="token" value='<%=token%>' />	
-	
-	<input type="hidden" name="<portlet:namespace/>isApplicantAgent"
-		value='<%=businessTripReimbursement.getIsApplicantAgent()||tempIsAppliantAgent?"true":"false"%>' />
+			
+	<input type="hidden" name="<portlet:namespace/>tempEvpId"
+		value='<%="".equals(tempEvpId)?businessTripReimbursement.getEvpId():tempEvpId%>' />
+	<input type="hidden" name="<portlet:namespace/>tempEvpName"
+		value='<%="".equals(tempEvpName)?businessTripReimbursement.getEvpName():tempEvpName%>' />
 		
 	<input type="hidden" name="<portlet:namespace/>tempApproverId"
 		value='<%="".equals(tempApproverId)?businessTripReimbursement.getApproverId():tempApproverId%>' />
@@ -290,15 +354,16 @@
 	<input type="file" style="display: none" id="pdfImport"
 		name="<portlet:namespace/>pdfImport" onchange="importPdf();" />
 		
-		<input type="hidden" name="<portlet:namespace/>isApplicantAgent"
-		value='<%=businessTripReimbursement.getIsApplicantAgent()||tempIsAppliantAgent?"true":"false"%>' />
-		
 	<input type="hidden" name="<portlet:namespace/>tempApproverId"
 		value='<%="".equals(tempApproverId)?businessTripReimbursement.getApproverId():tempApproverId%>' />
 	<input type="hidden" name="<portlet:namespace/>tempApproverName"
 		value='<%="".equals(tempApproverName)?businessTripReimbursement.getApproverName():tempApproverName%>' />
 	<input type="hidden" name="<portlet:namespace/>tempIsGetRMB"
 		value='<%=tempIsGetRMB%>' />	
+	<input type="hidden" name="<portlet:namespace/>tempEvpId"
+		value='<%="".equals(tempEvpId)?businessTripReimbursement.getEvpId():tempEvpId%>' />
+	<input type="hidden" name="<portlet:namespace/>tempEvpName"
+		value='<%="".equals(tempEvpName)?businessTripReimbursement.getEvpName():tempEvpName%>' />
 </aui:form>
 
 <%-- <portlet:resourceURL var="downloadURL"></portlet:resourceURL> --%>
@@ -312,7 +377,6 @@
 <aui:model-context bean="<%=businessTripReimbursement%>"
 	model="<%=BusinessTripReimbursement.class%>" />
 
-<!--  First company car applicant page -->
 <aui:form name="fm" method="POST"
 	action="<%=addBusinessTripReimbursementURL%>"
 	enctype="multipart/form-data">
@@ -362,6 +426,7 @@
 		<aui:input type="hidden" name="flightTransactionFee"
 			value='<%=businessTripReimbursement.getFlightTransactionFee()%>' />
 			<aui:input type="hidden" name="token" value='<%=token%>' />	
+		
 	</aui:fieldset>
 
 	<div class="mainbody">
@@ -410,17 +475,33 @@
 			<div class="subtitle">
 				<liferay-ui:message
 					key="vgc-apon-business-trip-application-personal-information" />
-				<%
-					if(isHasAppliantAgent) {
-				%>
-				<input type="checkbox" name="<portlet:namespace/>isApplicantAgent"
-					value='<%=true%>' onclick="changeApplicantAgent(this);"
-					<%=businessTripReimbursement.getIsApplicantAgent()||tempIsAppliantAgent?"checked='checked'":""%> />
-				<liferay-ui:message key="vgc-apon-on-behalf-of-x"
-					arguments="<%=agentName%>" />
-				<%
-					}
-				%>
+						<%
+				    if(isHasAppliantAgent) {
+				%>	
+				 <b>&nbsp;&nbsp;<liferay-ui:message key="vgc-aponv2-on-behalf-of"/>
+					<select name="<portlet:namespace/>applicantAgentPerson"  id="applicantAgentPerson" disabled='disabled' >
+					<option value="<%=themeDisplay.getUser().getUserId()%>" selected>--none--</option>
+					<%
+					 for (Entry<Long, String> entry : applicantAgentMap.entrySet()) {
+					%>
+					   <option value="<%=entry.getKey()%>"
+							<%=entry.getKey().equals(agentUser)?"selected='selected'":""%>><%=entry.getValue()%></option>
+					<%
+					 }
+					
+					%>
+					</select>
+				  
+				</b>
+				<%	
+				} else{
+					%>	
+						<select name="<portlet:namespace/>applicantAgentPerson"  id="applicantAgentPerson" style="display : none">
+						<option value="<%=themeDisplay.getUser().getUserId()%>" selected>--none--</option>
+						</select>
+					<%	
+				}
+					%>	
 			</div>
 			<ul>
 				<li class="md01"><liferay-ui:message
@@ -501,21 +582,74 @@
 			<ul>
 				<li class="md01"><liferay-ui:message
 						key="vgc-apon-business-trip-application-approver" /></li>
-				<li class="md02"><input type="text" maxlength="75"
-					name="<portlet:namespace/>approverName" readonly="readonly"
-					 id="approverName"
-					value="<%="".equals(tempApproverName)?businessTripReimbursement.getApproverName():tempApproverName%>" />
-					
-						<input type="hidden" maxlength="75"
-							name="<portlet:namespace/>approverId" id="approverId"
-							value="<%="".equals(tempApproverId)?businessTripReimbursement.getApproverId():tempApproverId%>"/>
-					</li>
-				<li class="md01"><liferay-ui:message
-						key="vgc-apon-business-trip-application-cross-department" /></li>
-				<li class="md022"><input type="checkbox" id="crossDepartment"
+				<li class="md02">
+				  <%
+				     if(isEvp){
+				      String approverId =String.valueOf(businessTripReimbursement.getApproverId());
+				      if(!"".equals(tempApproverId)){
+				    	  approverId = tempApproverId;
+				      }
+				  %>
+				    <select id ="approverId" name="<portlet:namespace/>approverId" onchange="changeApprover(this)">
+				    <%
+					 for (SAPUser u : approverList) {
+					%>
+					   <option value="<%=u.getStaffCode() %>"
+							<%=u.getStaffCode().equals(approverId)?"selected='selected'":""%>><%=u.getFirstName()+" "+u.getLastName() %></option>
+					<%
+					 }
+					%>
+				    </select>
+				      <input type="hidden" maxlength="75" name="<portlet:namespace/>approverName" readonly="readonly" id="approverName" value="<%="".equals(tempApproverName)?businessTripReimbursement.getApproverName():tempApproverName%>" />
+				  <%
+				     }else{
+				  %>
+					<input type="hidden" maxlength="75" name="<portlet:namespace/>approverId" id="approverId" value="<%="".equals(tempApproverId)?businessTripReimbursement.getApproverId():tempApproverId%>"/>
+				    <input type="text" maxlength="75" name="<portlet:namespace/>approverName" readonly="readonly" id="approverName" value="<%="".equals(tempApproverName)?businessTripReimbursement.getApproverName():tempApproverName%>" />
+				    
+				<%} %>
+				</li>
+				<li class="md01"><liferay-ui:message key="vgc-apon-business-trip-application-evp" /></li>
+                <li class="md022">
+                 <%
+				     if(isEvpOrPresident){
+				      String evpId =String.valueOf(businessTripReimbursement.getEvpId());
+				      if(!"".equals(tempEvpId)){
+				    	  evpId = tempEvpId;
+				      }
+				    %>
+				    <select id ="evpId" name="<portlet:namespace/>evpId" onchange="changeEvpApprover(this)" required>
+				    <%
+				      if(isInPresidentOffice){
+				    %>
+				        <option value ="-1" selected></option>
+				    <%
+				      }
+					if(evpList != null && evpList.size()>0){
+						    for (SAPUser u : evpList) {
+							%>
+							   <option value="<%=u.getStaffCode() %>"
+									<%=u.getStaffCode().equals(evpId)?"selected='selected'":""%>><%=u.getFirstName()+" "+u.getLastName() %></option>
+							<%
+							 }
+					}
+					%>
+				    </select>
+				     <input type="hidden" maxlength="75" name="<portlet:namespace/>evpName" id="evpName" value="<%="".equals(tempEvpName)?businessTripReimbursement.getEvpName():tempEvpName%>" readonly="readonly"/>
+				  <%
+				     }else{
+				  %>
+					 <input type="hidden" maxlength="75" name="<portlet:namespace/>evpId" id="evpId" value="<%="".equals(tempEvpId)?businessTripReimbursement.getEvpId():tempEvpId%>"   />
+				     <input type="text" maxlength="75" name="<portlet:namespace/>evpName" id="evpName" value="<%="".equals(tempEvpName)?businessTripReimbursement.getEvpName():tempEvpName%>" readonly="readonly"/>
+				    
+				<%} %>                          
+                 </li>
+			<li class="md01"><liferay-ui:message key="vgc-apon-business-trip-application-cross-department" /></li>
+				<li class="md02"><input type="checkbox" id="crossDepartment"
 					name="<portlet:namespace/>isCrossDepartment" value='<%=true%>'
 					<%=businessTripReimbursement.getIsCrossDepartment()?"checked='checked'":""%>
 					disabled="disabled" /></li>
+			
 			</ul>
 			<ul style='display: <%=businessTripReimbursement.getIsCrossDepartment()?"block":"none" %>'>
 				<li class="md01"><liferay-ui:message
@@ -596,9 +730,9 @@
 				%>	
 					<li class="md01"><liferay-ui:message key="vgc-apon-business-trip-application-is-payed-byRMB" /></li>
 					<li class="md022"><input type="checkbox" id="isPaybyRmb" name="<portlet:namespace/>isPaybyRmb" value='<%=true%>' onclick="changeGetRMB(this);"
-						<%--  <%=tempIsGetRMB?"checked='checked'":""%> --%>  checked='checked'
+						<%=tempIsGetRMB?"checked='checked'":""%>
 					 />
-					 <li style="padding-left:42px;font-style:italic;color: red;width:400px;margin-left: 660px;margin-top: -20px;">Note:VGIC can not reimburse EUR,VGIC employees must NOT change this option or the application will be rejected.<p></p></li>
+					 
 					 </li>
 				 <%
 				   }
@@ -606,26 +740,21 @@
 					
 			</ul>
 		</div>
-		<p style="padding-left:10px;"><liferay-ui:message key="vgc-apon-business-trip-reimbursement-remark"/></p>
-		<%
-			if(businessTripApplication!=null&&businessTripApplication.getStatus()==0){
-		%>
-		<a href="<%=businessTripApplicationPageUrl%>" target="_blank"> <liferay-ui:message
-				key="vgc-apon-business-trip-reimbursement-view-business-trip-application" /></a><br />
-		<br />
-		<%
-			}
-		%>
+		<%-- <p style="padding-left:10px;"><liferay-ui:message key="vgc-apon-business-trip-reimbursement-remark"/></p> --%>
 		<input type="hidden" id="tohere" value="<%=tabsTohereDiv%>"/>
 		<div id="toherediv"></div>
+		<!-- ,vgc-apon-business-trip-reimbursement-train-information-final -->
 		<liferay-ui:tabs
-			names="vgc-apon-business-trip-reimbursement-flight-information-final,vgc-apon-business-trip-reimbursement-train-information-final,vgc-apon-business-trip-reimbursement-hotel-information-final,vgc-apon-business-trip-reimbursement-car-rental-final,vgc-apon-business-trip-reimbursement-travel-expense,vgc-apon-business-trip-reimbursement-cost-list"
-			refresh='<%=false%>' value='<%=selectedTabPage%>' type="tabs">
+			names="vgc-apon-business-trip-reimbursement-cost-list,vgc-apon-business-trip-reimbursement-travel-expense,vgc-apon-business-trip-reimbursement-flight-information-final,vgc-apon-business-trip-reimbursement-hotel-information-final,vgc-apon-business-trip-reimbursement-car-rental-final"
+			refresh='<%=false %>' value='<%=selectedTabPage %>' type="tabs">
 			<liferay-ui:section>
-				<%@ include file="/html/businessTripReimbursement/flightTrainInformationView.jsp"%>
+				<%@ include file="/html/businessTripReimbursement/costListView.jsp"%>
 			</liferay-ui:section>
 			<liferay-ui:section>
-				<%@ include	file="/html/businessTripReimbursement/trainInformationView.jsp"%> 
+				<%@ include file="/html/businessTripReimbursement/travelExpenseView.jsp"%>
+			</liferay-ui:section>
+			<liferay-ui:section>
+				<%@ include file="/html/businessTripReimbursement/flightTrainInformationView.jsp"%>
 			</liferay-ui:section>
 			<liferay-ui:section>
 				<%@ include file="/html/businessTripReimbursement/hotelInformationView.jsp"%>
@@ -633,14 +762,12 @@
 			<liferay-ui:section>
 				<%@ include file="/html/businessTripReimbursement/carRentalView.jsp"%>
 			</liferay-ui:section>
-			<liferay-ui:section>
-				<%@ include file="/html/businessTripReimbursement/travelExpenseView.jsp"%>
-			</liferay-ui:section>
-			<liferay-ui:section>
-				<%@ include file="/html/businessTripReimbursement/costListView.jsp"%>
-			</liferay-ui:section>
+<%-- 			<liferay-ui:section>
+				<%@ include	file="/html/businessTripReimbursement/trainInformationView.jsp"%> 
+			</liferay-ui:section> --%>
 		</liferay-ui:tabs>
 		<p style="padding-left:10px;font-style:italic; color: red;"><liferay-ui:message key="vgc-apon-business-trip-reimbursement-hotel-remark"/></p>
+		
 		<%
 		String advanceStyle="";
 		if(businessTripApplication!=null){
@@ -704,7 +831,7 @@
 			<div class="gridtb">
 				<ul>
 					<li class="od01">Attachment Name</li>
-					<li class="od02">File Name<font color="red">* (Attachment is mandatory)</font></li>
+					<li class="od02">File Name</li>
 					<li class="od01">Upload Date</li>
 					<li class="od01 lcol">Action</li>
 				</ul>
@@ -786,7 +913,6 @@
 			value="<%=businessTripReimbursement!=null&&businessTripReimbursement.getBussinessTirpTicketNo()!=null?String.valueOf(businessTripReimbursement.getBussinessTirpTicketNo()):\"\"%>" />
 		<aui:input name="businessTripReimbursementId" type="hidden"
 			value="<%=businessTripReimbursementId%>" />
-		<aui:input name="isApplicantAgent" type="hidden" />
 		
 	<input type="hidden" name="<portlet:namespace/>tempApproverId"
 		value='<%="".equals(tempApproverId)?businessTripReimbursement.getApproverId():tempApproverId%>' />
@@ -807,11 +933,7 @@
 	<aui:fieldset>
 		<aui:input type="hidden" name="bussinessTirpTicketNo2" />
 		<aui:input name="businessTripReimbursementId2" type="hidden" />
-	</aui:fieldset>
-	
-		<input type="hidden" name="<portlet:namespace/>isApplicantAgent"
-		value='<%=businessTripReimbursement.getIsApplicantAgent()||tempIsAppliantAgent?"true":"false"%>' />
-		
+	</aui:fieldset>	
 </aui:form>
 
 <!-- add one detail info -->
@@ -937,15 +1059,16 @@
 		
 		<aui:input type="hidden" name="token" value='<%=token%>' />	
 		
-	<input type="hidden" name="<portlet:namespace/>isApplicantAgent"
-		value='<%=businessTripReimbursement.getIsApplicantAgent()||tempIsAppliantAgent?"true":"false"%>' />
-
 	<input type="hidden" name="<portlet:namespace/>tempApproverId"
 		value='<%="".equals(tempApproverId)?businessTripReimbursement.getApproverId():tempApproverId%>' />
 	<input type="hidden" name="<portlet:namespace/>tempApproverName"
 		value='<%="".equals(tempApproverName)?businessTripReimbursement.getApproverName():tempApproverName%>' />
 	<input type="hidden" name="<portlet:namespace/>tempIsGetRMB"
 		value='<%=tempIsGetRMB%>' />	
+	<input type="hidden" name="<portlet:namespace/>tempEvpId"
+		value='<%="".equals(tempEvpId)?businessTripReimbursement.getEvpId():tempEvpId%>' />
+	<input type="hidden" name="<portlet:namespace/>tempEvpName"
+		value='<%="".equals(tempEvpName)?businessTripReimbursement.getEvpName():tempEvpName%>' />
 </aui:form>
 <liferay-util:include page="/html/businessTripReimbursement/view_js.jsp"  servletContext="<%= this.getServletContext() %>">
 	<liferay-util:param name="businessTripReimbursement" value="<%=String.valueOf(businessTripReimbursementId) %>"/>
@@ -956,5 +1079,7 @@
 	<liferay-util:param name="tempIsGetRMB" value="<%=String.valueOf(tempIsGetRMB) %>"/>
 	<liferay-util:param name="myApplicationsPlid" value="<%=String.valueOf(myApplicationsPlid) %>"/>
 	<liferay-util:param name="businessTripApplication" value="<%=Validator.isNotNull(businessTripApplication)?String.valueOf(businessTripApplication.getBusinessTripApplicationId()):StringPool.BLANK %>"/>
+    <liferay-portlet:param name="mustCheckedGetRmb" value="<%=mustCheckedGetRmb %>"/>
+
 </liferay-util:include>
 

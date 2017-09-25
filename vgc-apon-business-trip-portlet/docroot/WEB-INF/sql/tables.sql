@@ -116,6 +116,8 @@ create table VgcApon_BtReimbursement (
 	costListForeignTotalRmb DOUBLE,
 	remark VARCHAR(512) null,
 	isPaybyRmb BOOLEAN,
+	evpId LONG,
+	evpName VARCHAR(75) null,
 	status INTEGER,
 	sapStatus INTEGER,
 	sapComments VARCHAR(1024) null,
@@ -304,3 +306,6 @@ ALTER TABLE vgcapon_BtTravelExpense ADD allowanceRmb NUMBER(30,20);
 ALTER TABLE vgcapon_BtCostList ADD netAmountRmb NUMBER(30,20);
 ALTER TABLE VGCAPON_BTREIMBURSEMENT ADD isPaybyRmb NUMBER(1,0);
 Alter table VGCAPON_BTCOSTLIST modify(REASONESINFO  varchar(250));
+
+ALTER TABLE VGCAPON_BTREIMBURSEMENT ADD EVPID  NUMBER(30) NULL;
+ALTER TABLE VGCAPON_BTREIMBURSEMENT ADD EVPNAME VARCHAR(75) NULL;

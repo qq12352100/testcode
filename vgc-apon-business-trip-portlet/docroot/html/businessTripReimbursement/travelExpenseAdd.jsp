@@ -132,7 +132,7 @@ String selectedRateUrl = "/html/businessTripReimbursement/travelExpenseRateOfDma
 		
 				</ul>
 				<ul>
-					<li class="nd02"><span style="font-size:12px;">Remark: Please tick mark if you need daily meal allowance.</span></li>
+					<li class="nd02"><span style="font-size:10px;"> </span></li>
 					<li class="nd02"><input type="checkbox"
 						name="<portlet:namespace/>isHasBreakfast"
 						<%=isHasBreakfast == true ? "checked='checked'": ""%>

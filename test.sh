@@ -13,7 +13,9 @@ do
 	rm -rf "$s"/docroot/WEB-INF/lib
 	rm -rf "$s"/docroot/WEB-INF/service
 	
-	#rm -rf "$s"/docroot/WEB-INF/src/com/business/trip/model/impl
+	rm -rf "$s"/docroot/WEB-INF/src/com/business/trip/model/impl
+	rm -rf "$s"/docroot/WEB-INF/src/com/business/trip/service/base
+	rm -rf "$s"/docroot/WEB-INF/src/com/business/trip/service/persistence
 	
 	#find "$s"/docroot/WEB-INF/src/com -type d -name "model" 
 done

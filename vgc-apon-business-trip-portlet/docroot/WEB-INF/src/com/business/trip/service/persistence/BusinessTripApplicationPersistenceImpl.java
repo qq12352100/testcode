@@ -18,6 +18,7 @@ import com.business.trip.NoSuchBusinessTripApplicationException;
 import com.business.trip.model.BusinessTripApplication;
 import com.business.trip.model.impl.BusinessTripApplicationImpl;
 import com.business.trip.model.impl.BusinessTripApplicationModelImpl;
+import com.business.trip.service.persistence.BusinessTripApplicationPersistence;
 
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;

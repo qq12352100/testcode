@@ -14,7 +14,6 @@
 
 package com.business.trip.service.impl;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import com.business.trip.model.BtCostList;
@@ -61,26 +60,20 @@ public class BtCostListLocalServiceImpl extends BtCostListLocalServiceBaseImpl {
 		return btCostListPersistence.findByB_C(businessTripPkId, paymentCurrency);
 	}
 	
-	private Criterion getCommonItemsCriterion(List<String> items){
-		Criterion criterion = null;
-		if(items != null){
-			for(String item:items){
-				if(criterion==null){
-					criterion = RestrictionsFactoryUtil.eq("item", item);
-				}else{
-					criterion=RestrictionsFactoryUtil.or(criterion,RestrictionsFactoryUtil.eq("item", item));
-				}
-			}
-		}
-		return criterion;
-	}
 	public Double findSumByCurrency(long businessTripPkId,String paymentCurrency,List<String> items) throws SystemException{
 		DynamicQuery query = DynamicQueryFactoryUtil
 				.forClass(BtCostList.class);
 		query.setProjection(ProjectionFactoryUtil.sum("netAmount"));
 		query.add(RestrictionsFactoryUtil.eq("paymentCurrency", paymentCurrency));
 		query.add(RestrictionsFactoryUtil.eq("businessTripPkId", businessTripPkId));
-		Criterion criterion = getCommonItemsCriterion(items);
+		Criterion criterion = null;
+		for(String item:items){
+			if(criterion==null){
+				criterion = RestrictionsFactoryUtil.eq("item", item);
+			}else{
+				criterion=RestrictionsFactoryUtil.or(criterion,RestrictionsFactoryUtil.eq("item", item));
+			}
+		}
 		query.add(criterion);
 		List<Double>  sumlist=dynamicQuery(query);
 		if(null!=sumlist&&sumlist.size()>0&&criterion!=null){
@@ -96,7 +89,14 @@ public class BtCostListLocalServiceImpl extends BtCostListLocalServiceBaseImpl {
 		query.setProjection(ProjectionFactoryUtil.sum("invoiceAmount"));
 		query.add(RestrictionsFactoryUtil.eq("paymentCurrency", paymentCurrency));
 		query.add(RestrictionsFactoryUtil.eq("businessTripPkId", businessTripPkId));
-		Criterion criterion = getCommonItemsCriterion(items);
+		Criterion criterion = null;
+		for(String item:items){
+			if(criterion==null){
+				criterion = RestrictionsFactoryUtil.eq("item", item);
+			}else{
+				criterion=RestrictionsFactoryUtil.or(criterion,RestrictionsFactoryUtil.eq("item", item));
+			}
+		}
 		query.add(criterion);
 		List<Double>  sumlist=dynamicQuery(query);
 		if(null!=sumlist&&sumlist.size()>0&&criterion!=null){
@@ -106,34 +106,6 @@ public class BtCostListLocalServiceImpl extends BtCostListLocalServiceBaseImpl {
 		}
 	}
 	
-	public Double findSumInvoiceAmountByCurrency(long businessTripPkId,String paymentCurrency) throws SystemException{
-		DynamicQuery query = DynamicQueryFactoryUtil
-				.forClass(BtCostList.class);
-		query.setProjection(ProjectionFactoryUtil.sum("invoiceAmount"));
-		query.add(RestrictionsFactoryUtil.eq("paymentCurrency", paymentCurrency));
-		query.add(RestrictionsFactoryUtil.eq("businessTripPkId", businessTripPkId));
-		List<Double>  sumlist=dynamicQuery(query);
-		
-		if(null!=sumlist&&sumlist.size()>0){
-			return sumlist.get(0)==null?0:sumlist.get(0);
-		}else{
-			return 0d;
-		}
-	}
-	
-	public Double findEURPayByRMBByCurrency(long businessTripPkId) throws SystemException{
-		DynamicQuery query = DynamicQueryFactoryUtil
-				.forClass(BtCostList.class);
-		query.setProjection(ProjectionFactoryUtil.sum("netAmountRmb"));
-		query.add(RestrictionsFactoryUtil.eq("paymentCurrency", "EUR"));
-		query.add(RestrictionsFactoryUtil.eq("businessTripPkId", businessTripPkId));
-		List<Double>  sumlist=dynamicQuery(query);
-		if(null!=sumlist&&sumlist.size()>0){
-			return sumlist.get(0)==null?0:sumlist.get(0);
-		}else{
-			return 0d;
-		}
-	}
 	
 	public Double findSumNetAmountRmbByCurrency(long businessTripPkId,String paymentCurrency,List<String> items) throws SystemException{
 		DynamicQuery query = DynamicQueryFactoryUtil
@@ -141,7 +113,14 @@ public class BtCostListLocalServiceImpl extends BtCostListLocalServiceBaseImpl {
 		query.setProjection(ProjectionFactoryUtil.sum("netAmountRmb"));
 		query.add(RestrictionsFactoryUtil.eq("paymentCurrency", paymentCurrency));
 		query.add(RestrictionsFactoryUtil.eq("businessTripPkId", businessTripPkId));
-		Criterion criterion = getCommonItemsCriterion(items);
+		Criterion criterion = null;
+		for(String item:items){
+			if(criterion==null){
+				criterion = RestrictionsFactoryUtil.eq("item", item);
+			}else{
+				criterion=RestrictionsFactoryUtil.or(criterion,RestrictionsFactoryUtil.eq("item", item));
+			}
+		}
 		query.add(criterion);
 		List<Double>  sumlist=dynamicQuery(query);
 		if(null!=sumlist&&sumlist.size()>0&&criterion!=null){
@@ -158,7 +137,14 @@ public class BtCostListLocalServiceImpl extends BtCostListLocalServiceBaseImpl {
 		query.setProjection(ProjectionFactoryUtil.sum("taxAmount"));
 		query.add(RestrictionsFactoryUtil.eq("paymentCurrency", paymentCurrency));
 		query.add(RestrictionsFactoryUtil.eq("businessTripPkId", businessTripPkId));
-		Criterion criterion = getCommonItemsCriterion(items);
+		Criterion criterion = null;
+		for(String item:items){
+			if(criterion==null){
+				criterion = RestrictionsFactoryUtil.eq("item", item);
+			}else{
+				criterion=RestrictionsFactoryUtil.or(criterion,RestrictionsFactoryUtil.eq("item", item));
+			}
+		}
 		query.add(criterion);
 		List<Double>  sumlist=dynamicQuery(query);
 		if(null!=sumlist&&sumlist.size()>0&&criterion!=null){
@@ -211,45 +197,4 @@ public class BtCostListLocalServiceImpl extends BtCostListLocalServiceBaseImpl {
 		}
 		return newTotal;
 	}
-	
-	/**
-	 * To corrected the history data  cost list netAmountRMB value
-	 * @param businessTripReimbursementId
-	 * @throws SystemException 
-	 */
-	public void  correctAmountRmbCostListOfHistoryData(long businessTripReimbursementId) throws SystemException{
-		List<BtCostList> costList =	btCostListPersistence.findByBusinessTripPkId(businessTripReimbursementId);
-		if(costList != null){
-			BigDecimal bd2 = null;
-			for(BtCostList cost : costList){
-				if(cost.getNetAmount()==0.0){
-					bd2 = new BigDecimal(cost.getPaymentAmount()-cost.getTaxAmount());
-					cost.setNetAmount( bd2.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-				}else if("RMB".equals(cost.getPaymentCurrency())&&cost.getTaxAmount()==0.0){
-					bd2 = new BigDecimal(cost.getPaymentAmount()-cost.getNetAmount());
-					cost.setTaxAmount( bd2.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-				}
-				if("RMB".equals(cost.getPaymentCurrency())){
-					cost.setNetAmountRmb(cost.getPaymentAmount());
-				}else{
-					if(cost.getNetAmountRmb() == 0 || cost.getNetAmountRmb()== cost.getPaymentAmount()){
-						cost.setNetAmountRmb(BtExchangeRateLocalServiceUtil.changeEURToRMB(cost.getPaymentAmount()));
-					}
-				}
-				this.updateBtCostList(cost);
-			}
-		}
-		
-	}
-
-	/**
-	 * Delete all cost list by bussiness trip pk id
-	 * 
-	 * @param businessTripReimbursementId
-	 * @throws SystemException
-	 */
-	public void deleteCostListByBRPKId(long businessTripReimbursementId) throws SystemException{
-		btCostListPersistence.removeByBusinessTripPkId(businessTripReimbursementId);
-	}
-	
 }

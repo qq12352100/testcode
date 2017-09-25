@@ -116,8 +116,6 @@ public class BusinessTripReimbursementModelImpl extends BaseModelImpl<BusinessTr
 			{ "costListForeignTotalRmb", Types.DOUBLE },
 			{ "remark", Types.VARCHAR },
 			{ "isPaybyRmb", Types.BOOLEAN },
-			{ "evpId", Types.BIGINT },
-			{ "evpName", Types.VARCHAR },
 			{ "status", Types.INTEGER },
 			{ "sapStatus", Types.INTEGER },
 			{ "sapComments", Types.VARCHAR },
@@ -135,7 +133,7 @@ public class BusinessTripReimbursementModelImpl extends BaseModelImpl<BusinessTr
 			{ "submittedDate", Types.TIMESTAMP },
 			{ "companyId", Types.BIGINT }
 		};
-	public static final String TABLE_SQL_CREATE = "create table VgcApon_BtReimbursement (businessTripReimbursementId LONG not null primary key,ticketNo VARCHAR(75) null,bussinessTirpTicketNo VARCHAR(75) null,processType VARCHAR(75) null,subType VARCHAR(75) null,printName VARCHAR(75) null,staffCode LONG,companyName VARCHAR(75) null,division VARCHAR(75) null,department VARCHAR(75) null,costCenter VARCHAR(75) null,personalID VARCHAR(75) null,passportNo VARCHAR(75) null,officePhone VARCHAR(75) null,mobilePhone VARCHAR(75) null,email VARCHAR(75) null,officeSite VARCHAR(75) null,approverId LONG,approverName VARCHAR(75) null,isCrossDepartment BOOLEAN,targetDepartmentId LONG,targetDepartmentName VARCHAR(75) null,targetCostCenter VARCHAR(75) null,targetDepartmentApproverId LONG,targetDepartmentApproverName VARCHAR(75) null,tripType INTEGER,departureDate DATE null,returnDate DATE null,purposeOfTheTrip VARCHAR(512) null,visitCountriesCities VARCHAR(75) null,advancePayment DOUBLE,currency_ VARCHAR(75) null,paymentMethods VARCHAR(75) null,totalCostRmb DOUBLE,totalCostEur DOUBLE,orgTotalCostRmb DOUBLE,orgTotalCostEur DOUBLE,hotelTotalCostRmb DOUBLE,hotelTotalCostEur DOUBLE,carRentalTotalCostRmb DOUBLE,carRentalTotalCostEur DOUBLE,flightCurrency VARCHAR(75) null,flightTotal DOUBLE,flightAirFare DOUBLE,flightTaxes DOUBLE,flightTransactionFee DOUBLE,totalTravelExpenseRmb DOUBLE,totalTravelExpenseEur DOUBLE,costListInlandTotalRmb DOUBLE,costListForeignTotalEur DOUBLE,costListForeignTotalRmb DOUBLE,remark VARCHAR(512) null,isPaybyRmb BOOLEAN,evpId LONG,evpName VARCHAR(75) null,status INTEGER,sapStatus INTEGER,sapComments VARCHAR(1024) null,sapDocumentId VARCHAR(512) null,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,isApplicantAgent BOOLEAN,isApproverAgent BOOLEAN,groupId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,submittedDate DATE null,companyId LONG)";
+	public static final String TABLE_SQL_CREATE = "create table VgcApon_BtReimbursement (businessTripReimbursementId LONG not null primary key,ticketNo VARCHAR(75) null,bussinessTirpTicketNo VARCHAR(75) null,processType VARCHAR(75) null,subType VARCHAR(75) null,printName VARCHAR(75) null,staffCode LONG,companyName VARCHAR(75) null,division VARCHAR(75) null,department VARCHAR(75) null,costCenter VARCHAR(75) null,personalID VARCHAR(75) null,passportNo VARCHAR(75) null,officePhone VARCHAR(75) null,mobilePhone VARCHAR(75) null,email VARCHAR(75) null,officeSite VARCHAR(75) null,approverId LONG,approverName VARCHAR(75) null,isCrossDepartment BOOLEAN,targetDepartmentId LONG,targetDepartmentName VARCHAR(75) null,targetCostCenter VARCHAR(75) null,targetDepartmentApproverId LONG,targetDepartmentApproverName VARCHAR(75) null,tripType INTEGER,departureDate DATE null,returnDate DATE null,purposeOfTheTrip VARCHAR(512) null,visitCountriesCities VARCHAR(75) null,advancePayment DOUBLE,currency_ VARCHAR(75) null,paymentMethods VARCHAR(75) null,totalCostRmb DOUBLE,totalCostEur DOUBLE,orgTotalCostRmb DOUBLE,orgTotalCostEur DOUBLE,hotelTotalCostRmb DOUBLE,hotelTotalCostEur DOUBLE,carRentalTotalCostRmb DOUBLE,carRentalTotalCostEur DOUBLE,flightCurrency VARCHAR(75) null,flightTotal DOUBLE,flightAirFare DOUBLE,flightTaxes DOUBLE,flightTransactionFee DOUBLE,totalTravelExpenseRmb DOUBLE,totalTravelExpenseEur DOUBLE,costListInlandTotalRmb DOUBLE,costListForeignTotalEur DOUBLE,costListForeignTotalRmb DOUBLE,remark VARCHAR(512) null,isPaybyRmb BOOLEAN,status INTEGER,sapStatus INTEGER,sapComments VARCHAR(1024) null,sapDocumentId VARCHAR(512) null,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,isApplicantAgent BOOLEAN,isApproverAgent BOOLEAN,groupId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,submittedDate DATE null,companyId LONG)";
 	public static final String TABLE_SQL_DROP = "drop table VgcApon_BtReimbursement";
 	public static final String ORDER_BY_JPQL = " ORDER BY businessTripReimbursement.createDate ASC";
 	public static final String ORDER_BY_SQL = " ORDER BY VgcApon_BtReimbursement.createDate ASC";
@@ -252,8 +250,6 @@ public class BusinessTripReimbursementModelImpl extends BaseModelImpl<BusinessTr
 		attributes.put("costListForeignTotalRmb", getCostListForeignTotalRmb());
 		attributes.put("remark", getRemark());
 		attributes.put("isPaybyRmb", getIsPaybyRmb());
-		attributes.put("evpId", getEvpId());
-		attributes.put("evpName", getEvpName());
 		attributes.put("status", getStatus());
 		attributes.put("sapStatus", getSapStatus());
 		attributes.put("sapComments", getSapComments());
@@ -606,18 +602,6 @@ public class BusinessTripReimbursementModelImpl extends BaseModelImpl<BusinessTr
 
 		if (isPaybyRmb != null) {
 			setIsPaybyRmb(isPaybyRmb);
-		}
-
-		Long evpId = (Long)attributes.get("evpId");
-
-		if (evpId != null) {
-			setEvpId(evpId);
-		}
-
-		String evpName = (String)attributes.get("evpName");
-
-		if (evpName != null) {
-			setEvpName(evpName);
 		}
 
 		Integer status = (Integer)attributes.get("status");
@@ -1404,31 +1388,6 @@ public class BusinessTripReimbursementModelImpl extends BaseModelImpl<BusinessTr
 	}
 
 	@Override
-	public long getEvpId() {
-		return _evpId;
-	}
-
-	@Override
-	public void setEvpId(long evpId) {
-		_evpId = evpId;
-	}
-
-	@Override
-	public String getEvpName() {
-		if (_evpName == null) {
-			return StringPool.BLANK;
-		}
-		else {
-			return _evpName;
-		}
-	}
-
-	@Override
-	public void setEvpName(String evpName) {
-		_evpName = evpName;
-	}
-
-	@Override
 	public int getStatus() {
 		return _status;
 	}
@@ -1837,8 +1796,6 @@ public class BusinessTripReimbursementModelImpl extends BaseModelImpl<BusinessTr
 		businessTripReimbursementImpl.setCostListForeignTotalRmb(getCostListForeignTotalRmb());
 		businessTripReimbursementImpl.setRemark(getRemark());
 		businessTripReimbursementImpl.setIsPaybyRmb(getIsPaybyRmb());
-		businessTripReimbursementImpl.setEvpId(getEvpId());
-		businessTripReimbursementImpl.setEvpName(getEvpName());
 		businessTripReimbursementImpl.setStatus(getStatus());
 		businessTripReimbursementImpl.setSapStatus(getSapStatus());
 		businessTripReimbursementImpl.setSapComments(getSapComments());
@@ -2199,16 +2156,6 @@ public class BusinessTripReimbursementModelImpl extends BaseModelImpl<BusinessTr
 
 		businessTripReimbursementCacheModel.isPaybyRmb = getIsPaybyRmb();
 
-		businessTripReimbursementCacheModel.evpId = getEvpId();
-
-		businessTripReimbursementCacheModel.evpName = getEvpName();
-
-		String evpName = businessTripReimbursementCacheModel.evpName;
-
-		if ((evpName != null) && (evpName.length() == 0)) {
-			businessTripReimbursementCacheModel.evpName = null;
-		}
-
 		businessTripReimbursementCacheModel.status = getStatus();
 
 		businessTripReimbursementCacheModel.sapStatus = getSapStatus();
@@ -2298,7 +2245,7 @@ public class BusinessTripReimbursementModelImpl extends BaseModelImpl<BusinessTr
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(143);
+		StringBundler sb = new StringBundler(139);
 
 		sb.append("{businessTripReimbursementId=");
 		sb.append(getBusinessTripReimbursementId());
@@ -2406,10 +2353,6 @@ public class BusinessTripReimbursementModelImpl extends BaseModelImpl<BusinessTr
 		sb.append(getRemark());
 		sb.append(", isPaybyRmb=");
 		sb.append(getIsPaybyRmb());
-		sb.append(", evpId=");
-		sb.append(getEvpId());
-		sb.append(", evpName=");
-		sb.append(getEvpName());
 		sb.append(", status=");
 		sb.append(getStatus());
 		sb.append(", sapStatus=");
@@ -2449,7 +2392,7 @@ public class BusinessTripReimbursementModelImpl extends BaseModelImpl<BusinessTr
 
 	@Override
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(217);
+		StringBundler sb = new StringBundler(211);
 
 		sb.append("<model><model-name>");
 		sb.append("com.business.trip.model.BusinessTripReimbursement");
@@ -2668,14 +2611,6 @@ public class BusinessTripReimbursementModelImpl extends BaseModelImpl<BusinessTr
 		sb.append(getIsPaybyRmb());
 		sb.append("]]></column-value></column>");
 		sb.append(
-			"<column><column-name>evpId</column-name><column-value><![CDATA[");
-		sb.append(getEvpId());
-		sb.append("]]></column-value></column>");
-		sb.append(
-			"<column><column-name>evpName</column-name><column-value><![CDATA[");
-		sb.append(getEvpName());
-		sb.append("]]></column-value></column>");
-		sb.append(
 			"<column><column-name>status</column-name><column-value><![CDATA[");
 		sb.append(getStatus());
 		sb.append("]]></column-value></column>");
@@ -2804,8 +2739,6 @@ public class BusinessTripReimbursementModelImpl extends BaseModelImpl<BusinessTr
 	private double _costListForeignTotalRmb;
 	private String _remark;
 	private boolean _isPaybyRmb;
-	private long _evpId;
-	private String _evpName;
 	private int _status;
 	private int _originalStatus;
 	private boolean _setOriginalStatus;

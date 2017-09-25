@@ -18,6 +18,7 @@ import com.business.trip.NoSuchBtReimbursementSAPInfoException;
 import com.business.trip.model.BtReimbursementSAPInfo;
 import com.business.trip.model.impl.BtReimbursementSAPInfoImpl;
 import com.business.trip.model.impl.BtReimbursementSAPInfoModelImpl;
+import com.business.trip.service.persistence.BtReimbursementSAPInfoPersistence;
 
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;

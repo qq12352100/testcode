@@ -16,28 +16,21 @@
 
 <%@include file="/html/init.jsp"%>
 <%
-	StringBuffer showSB = new StringBuffer();
 	BusinessTripApplication businessTripApplication = null;
 	long businessTripApplicationId = ParamUtil.getLong(request, "businessTripApplicationId");
-	 showSB.append(" ##businessTripApplicationId===");
-	 showSB.append(businessTripApplicationId);
 	int sapStatus=0;
 	String transitionName = ParamUtil.getString(renderRequest, "transitionName", "");
 	//transitionName = "recall";
+	String isClickAgent = ParamUtil.getString(renderRequest, "isClickAgent","");
 	String tabs2 = ParamUtil.get(request, "tabs2", "flight");
 	String tripType = PropsUtil.get("vgc.apon.business.trip.application.type");
-	 showSB.append("  ##tripType ===");
-	 showSB.append(tripType);
-	 
 	boolean isNew = true;
-	
-	long sCode = themeDisplay.getUser().getFacebookId();
 
-	
+	long sCode = themeDisplay.getUser().getFacebookId();
 	Date now = new Date();
-	
-	Map<Long,String> applicantAgentMap = ApplicantDelegationLocalServiceUtil.getApplicantAgentMap(ApproverDelegationLocalServiceUtil.getProcessOfBusinessTripApplication(),String.valueOf(sCode));
-	boolean isHasAppliantAgent = applicantAgentMap.size()>0?true:false;
+	ApplicantDelegation applicantDelegation = ApplicantDelegationLocalServiceUtil.fetchByP_S(ApproverDelegationLocalServiceUtil.getProcessOfBusinessTripApplication(),String.valueOf(sCode));
+	boolean isHasAppliantAgent = applicantDelegation!=null && now.after(applicantDelegation.getEffectiveStartDate()) && now.before(applicantDelegation.getEffectiveEndDate())?true:false;
+	String agentName = applicantDelegation!=null?ApplicantDelegationLocalServiceUtil.getAgentName(applicantDelegation):"";
 	
 	String prefixUrl = "/web"+themeDisplay.getScopeGroup().getFriendlyURL();	 
 	String myApplicationsPageUrl = prefixUrl+PropsUtil.get("vgc.apon.my.applications.page.friendly.url");
@@ -47,8 +40,6 @@
 	if (businessTripApplicationId > 0) {
 		businessTripApplication = BusinessTripApplicationLocalServiceUtil.fetchBusinessTripApplication(businessTripApplicationId);
 		if(businessTripApplication!=null) {
-			showSB.append("  ##isNew=== false");
-		    BusinessTripApplicationLocalServiceUtil.preValidate(businessTripApplication);
 			isNew = false;
 		}
 		businessTripApplication = businessTripApplication!=null?businessTripApplication:BusinessTripApplicationLocalServiceUtil.createBusinessTripApplication(businessTripApplicationId);
@@ -56,8 +47,6 @@
 		businessTripApplicationId = CounterLocalServiceUtil.increment(BusinessTripApplication.class.getName(),1);
 		businessTripApplication = BusinessTripApplicationLocalServiceUtil.createBusinessTripApplication(businessTripApplicationId);
 	}
-	 showSB.append("  ##get BT OBJ===");
-	 showSB.append(businessTripApplication.toString());
 	String disabled="";
 	String readonly="";
 	if(!isNew&&businessTripApplication!=null){
@@ -74,63 +63,59 @@
 	double carRentalTotalCostEur = ParamUtil.getDouble(request, "carRentalTotalCostEur",businessTripApplication.getCarRentalTotalCostEur());
 	
 	//Fetch the data from SAP
-	long staffCode = ParamUtil.getLong(renderRequest, "staffCode", 0);			
-	long userId = themeDisplay.getUser().getUserId();
-	long agentUser = ParamUtil.getLong(renderRequest, "applicantAgentPerson",0);
-	boolean isApplicantAgent = false;
-	System.out.println("agentUser="+agentUser);
-	if(isNew){ // input
-		System.out.println("*************new***************");
-		if(agentUser==0 || agentUser == userId){
-			isApplicantAgent = false;
-			staffCode=staffCode==0?themeDisplay.getUser().getFacebookId():staffCode;
-		}else{
-			isApplicantAgent = true;
+	if(isNew) {
+		long staffCode = ParamUtil.getLong(renderRequest, "staffCode", 0);			
+		staffCode=staffCode==0?themeDisplay.getUser().getFacebookId():staffCode;
+		SAPUser sapUser = SAPUserLocalServiceUtil.getSapUserByStaffCode(String.valueOf(staffCode));
+		boolean isApplicantAgent = ParamUtil.getBoolean(renderRequest, "isApplicantAgent",false);
+		if(sapUser!=null) {
+			businessTripApplication.setIsApplicantAgent(isApplicantAgent);
+			businessTripApplication.setPrintName(sapUser.getStaffName());
+			businessTripApplication.setStaffCode(Long.valueOf(sapUser.getStaffCode()));			
+			businessTripApplication.setCompanyName(sapUser.getSapCompanyName());
+			businessTripApplication.setDivision(sapUser.getDivisionName());
+			businessTripApplication.setDepartment(sapUser.getDepartmentName());			
+			businessTripApplication.setCostCenter(sapUser.getCostCener());			
+			businessTripApplication.setPersonalID(sapUser.getPersonalId());
+			businessTripApplication.setPassportNo(sapUser.getPassportNo());
+			businessTripApplication.setOfficePhone(sapUser.getContactNo());
+			businessTripApplication.setMobilePhone(sapUser.getCellPhone());
+			businessTripApplication.setEmail(sapUser.getEmail());
+			businessTripApplication.setOfficeSite(sapUser.getOfficeSite());
+			businessTripApplication.setApproverId(Long.valueOf(Validator.isNotNull(sapUser.getSupervisorFgId())?sapUser.getSupervisorFgId():"0"));
+			businessTripApplication.setApproverName(sapUser.getSupervisorFgName());
+			businessTripApplication.setEvpId(Long.valueOf(Validator.isNotNull(sapUser.getDivisionManagerId())?sapUser.getDivisionManagerId():"0"));
+			businessTripApplication.setEvpName(sapUser.getDivisionManagerName());
+		}
+	}else {
+		boolean isApplicantAgent = ParamUtil.getBoolean(renderRequest, "isApplicantAgent",true);
+		if(isApplicantAgent!=businessTripApplication.getIsApplicantAgent() && Validator.isNotNull(isClickAgent)) {		
+			long staffCode = isApplicantAgent?ParamUtil.getLong(renderRequest, "staffCode", 0):themeDisplay.getUser().getFacebookId();
 			staffCode = staffCode==0?businessTripApplication.getStaffCode():staffCode;
-		}
-	}else{ // recall or draft
-		System.out.println("*************not new***************");
-		if(agentUser == 0){
-			User agentUserTemp = UserLocalServiceUtil.fetchUserByFacebookId(themeDisplay.getCompanyId(),businessTripApplication.getStaffCode());
-			if(user !=null){
-				agentUser = agentUserTemp.getUserId();
-			}
-			isApplicantAgent = businessTripApplication.getIsApplicantAgent();
-		}else{
-			if(agentUser == userId){
-				isApplicantAgent = false;
-				staffCode=staffCode==0?themeDisplay.getUser().getFacebookId():staffCode;
-			}else{
-				isApplicantAgent = true;
-				staffCode = staffCode==0?businessTripApplication.getStaffCode():staffCode;
-			}
-		}
-	}
-	System.out.println("agentUser="+agentUser);
-	SAPUser sapUser = SAPUserLocalServiceUtil.getSapUserByStaffCode(String.valueOf(staffCode));
-	
-	if(sapUser!=null) {
-		businessTripApplication.setIsApplicantAgent(isApplicantAgent);
-		businessTripApplication.setPrintName(sapUser.getStaffName());
-		businessTripApplication.setStaffCode(Long.valueOf(sapUser.getStaffCode()));			
-		businessTripApplication.setCompanyName(sapUser.getSapCompanyName());
-		businessTripApplication.setDivision(sapUser.getDivisionName());
-		businessTripApplication.setDepartment(sapUser.getDepartmentName());			
-		businessTripApplication.setCostCenter(sapUser.getCostCener());			
-		businessTripApplication.setPersonalID(sapUser.getPersonalId());
-		businessTripApplication.setPassportNo(sapUser.getPassportNo());
-		businessTripApplication.setOfficePhone(sapUser.getContactNo());
-		businessTripApplication.setMobilePhone(sapUser.getCellPhone());
-		businessTripApplication.setEmail(sapUser.getEmail());
-		businessTripApplication.setOfficeSite(sapUser.getOfficeSite());
-		businessTripApplication.setApproverId(Long.valueOf(Validator.isNotNull(sapUser.getSupervisorFgId())?sapUser.getSupervisorFgId():"0"));
-		businessTripApplication.setApproverName(sapUser.getSupervisorFgName());
-		businessTripApplication.setEvpId(Long.valueOf(Validator.isNotNull(sapUser.getDivisionManagerId())?sapUser.getDivisionManagerId():"0"));
-		businessTripApplication.setEvpName(sapUser.getDivisionManagerName());
-	}
-	
-	
-	
+			SAPUser sapUser = SAPUserLocalServiceUtil.getSapUserByStaffCode(String.valueOf(staffCode));
+			if(sapUser!=null) {
+				businessTripApplication.setIsApplicantAgent(isApplicantAgent);
+				businessTripApplication.setPrintName(sapUser.getStaffName());
+				businessTripApplication.setStaffCode(Long.valueOf(sapUser.getStaffCode()));			
+				businessTripApplication.setCompanyName(sapUser.getSapCompanyName());
+				businessTripApplication.setDivision(sapUser.getDivisionName());
+				businessTripApplication.setDepartment(sapUser.getDepartmentName());			
+				businessTripApplication.setCostCenter(sapUser.getCostCener());			
+				businessTripApplication.setPersonalID(sapUser.getPersonalId());
+				businessTripApplication.setPassportNo(sapUser.getPassportNo());
+				businessTripApplication.setOfficePhone(sapUser.getContactNo());
+				businessTripApplication.setMobilePhone(sapUser.getCellPhone());
+				businessTripApplication.setEmail(sapUser.getEmail());
+				businessTripApplication.setOfficeSite(sapUser.getOfficeSite());
+				businessTripApplication.setApproverId(Long.valueOf(Validator.isNotNull(sapUser.getSupervisorFgId())?sapUser.getSupervisorFgId():"0"));
+				businessTripApplication.setApproverName(sapUser.getSupervisorFgName());
+				
+				businessTripApplication.setEvpId(Long.valueOf(Validator.isNotNull(sapUser.getDivisionManagerId())?sapUser.getDivisionManagerId():"0"));
+				businessTripApplication.setEvpName(sapUser.getDivisionManagerName());
+			}			
+		}		
+	}	
+
 	long approverId = ParamUtil.getLong(request, "approverId",businessTripApplication.getApproverId());
 	String approverName = ParamUtil.getString(request, "approverName",businessTripApplication.getApproverName());
 	long evpId = ParamUtil.getLong(request, "evpId",businessTripApplication.getEvpId());
@@ -144,16 +129,10 @@
 	String targetDepartmentApproverName = ParamUtil.getString(request, "targetDepartmentApproverName",businessTripApplication.getTargetDepartmentApproverName());
 	int tt=0;
 	if(isNew){
-		tt= ParamUtil.getInteger(request, "tripType",99);
+		tt= ParamUtil.getInteger(request, "tripTypeAsForm",99);
 	}else{
 		tt = ParamUtil.getInteger(request, "tripType",businessTripApplication.getTripType());
-		 if(tt==99){
-			 tt =businessTripApplication.getTripType();
-		 }
 	}
-	System.out.println("##tt=== "+tt);
-	showSB.append("  ##tt=== ");
-	showSB.append(tt);
 	boolean isPassValue = ParamUtil.getBoolean(request, "isPassValue",false);
 	String departureDate = ParamUtil.getString(request, "departureDate",businessTripApplication.getDepartureDate()!=null?sdf_dmy.format(businessTripApplication.getDepartureDate()):"");
 	String returnDate = ParamUtil.getString(request, "returnDate",businessTripApplication.getReturnDate()!=null?sdf_dmy.format(businessTripApplication.getReturnDate()):"");
@@ -210,7 +189,7 @@ width: 270px;
 	<aui:input type="hidden" name="carRentalTotalCostRmb" value='<%=carRentalTotalCostRmb%>'/>
 	<aui:input type="hidden" name="carRentalTotalCostEur" value='<%=carRentalTotalCostEur%>'/>
 	
-	<aui:input name="applicantAgentPerson" type="hidden" />
+	<aui:input type="hidden" name="isApplicantAgent"/>
 	<aui:input type="hidden" name="staffCode"/>
 	<aui:input type="hidden" name="approverId" value='<%=approverId%>'/>
 	<aui:input type="hidden" name="approverName" value='<%=approverName%>'/>
@@ -285,7 +264,7 @@ width: 270px;
 					onClick='<%= myApplicationsURL %>' />
 			</aui:button-row>
 		</div>
-	 <div class="tabTitle">
+		<div class="tabTitle">
 			<h3>
 				<liferay-ui:message
 					key="vgc-apon-business-trip-application"/>
@@ -301,33 +280,15 @@ width: 270px;
 			<div class="subtitle">
 				<liferay-ui:message
 					key="vgc-apon-business-trip-application-personal-information" />
-				<%
-				    if(isHasAppliantAgent) {
-				%>	
-				 <b>&nbsp;&nbsp;<liferay-ui:message key="vgc-aponv2-on-behalf-of"/>
-					<select name="<portlet:namespace/>applicantAgentPerson"  id="applicantAgentPerson" onchange ='<%=renderResponse.getNamespace() + "applicantAgentClick(this)"%>' <%=disabled%> >
-					<option value="<%=themeDisplay.getUser().getUserId()%>" selected>--none--</option>
-					<%
-					 for (Entry<Long, String> entry : applicantAgentMap.entrySet()) {
-					%>
-					   <option value="<%=entry.getKey()%>"
-							<%=entry.getKey().equals(agentUser)?"selected='selected'":""%>><%=entry.getValue()%></option>
-					<%
-					 }
-					
-					%>
-					</select>
-				  
-				</b>
+				<%if(isHasAppliantAgent) {
+				%>
+				<input type="checkbox" name="<portlet:namespace/>isApplicantAgent"
+					value='<%=true %>' <%=businessTripApplication.getIsApplicantAgent()?"checked='checked'":"" %>
+					onclick='<%=renderResponse.getNamespace() + "applicantAgentClick(this)"%>'/>
+				<liferay-ui:message key="vgc-apon-on-behalf-of-x" arguments="<%=agentName %>"/>
 				<%	
-				} else{
-					%>	
-						<select name="<portlet:namespace/>applicantAgentPerson"  id="applicantAgentPerson" style="display : none">
-						<option value="<%=themeDisplay.getUser().getUserId()%>" selected>--none--</option>
-						</select>
-					<%	
-				}
-					%>	
+				} 
+				%>
 			</div>
 			<ul>
 				<li class="md01"><liferay-ui:message
@@ -550,7 +511,7 @@ width: 270px;
 				<liferay-ui:message
 					key="vgc-apon-business-trip-application-cash-advance" />
 			</div>
-				<p style="padding-left:5px;padding-top: 10px;font-style:italic; color: red;">The advance payment can be edited only AFTER the business trip was fully approved.The field will then become editabe.Reimbursement currency should be consistent with cash advance you claimed.</p>
+				<p style="padding-left:5px;padding-top: 10px;font-style:italic; color: red;">The advance payment can be edited only AFTER the business trip was fully approved.The field will then become editable.Reimbursement currency should be consistent with cash advance you claimed.</p>
 			<ul>
 				<li class="md01"><liferay-ui:message
 						key="vgc-apon-business-trip-application-advance-payment" /></li>
@@ -676,7 +637,7 @@ width: 270px;
 				<liferay-ui:message
 							key="vgc.apon.audit.trail.log.approval.status.information" />
 			</div>
-			<div class="gridtb">
+			<div class="gridtb" style="width:1223px;">
 				<ul>
 					<li class="od03"><liferay-ui:message
 							key="vgc.apon.audit.trail.log.no" /></li>
@@ -741,17 +702,8 @@ width: 270px;
 <aui:form action="<%=applicantAgentURL%>" method="post" name="applicantAgentForm">
 	<aui:fieldset>
 		<aui:input name="businessTripApplicationId" type="hidden" value="<%=businessTripApplicationId %>"/>
-		<aui:input name="applicantAgentPerson" type="hidden" />
+		<aui:input name="isApplicantAgent" type="hidden" />
 		<aui:input type="hidden" name="transitionName" value='<%=transitionName%>' />	
-		
-		<aui:input type="hidden" name="tripType" value='<%=tt%>'/>
-		<aui:input type="hidden" name="departureDate" value='<%=departureDate%>'/>
-		<aui:input type="hidden" name="returnDate" value='<%=returnDate%>'/>
-		<aui:input type="hidden" name="purposeOfTheTrip" value='<%=purposeOfTheTrip%>'/>
-		<aui:input type="hidden" name="visitCountriesCities" value='<%=visitCountriesCities%>'/>
-		<aui:input type="hidden" name="advancePayment" value='<%=advancePayment%>'/>
-		<aui:input type="hidden" name="currency" value='<%=currency%>'/>
-		
 	</aui:fieldset>
 </aui:form>
 
@@ -795,7 +747,7 @@ width: 270px;
 	<aui:input type="hidden" name="carRentalTotalCostRmb" value='<%=carRentalTotalCostRmb%>'/>
 	<aui:input type="hidden" name="carRentalTotalCostEur" value='<%=carRentalTotalCostEur%>'/>
 	
-	<aui:input name="applicantAgentPerson" type="hidden" />
+	<aui:input type="hidden" name="isApplicantAgent"/>
 	<aui:input type="hidden" name="staffCode"/>
 	<aui:input type="hidden" name="approverId" value='<%=approverId%>'/>
 	<aui:input type="hidden" name="approverName" value='<%=approverName%>'/>
@@ -817,10 +769,6 @@ width: 270px;
 	<aui:input type="hidden" name="currency" value='<%=currency%>'/>
 	<aui:input type="hidden" name="tripTypeAsForm"  id="tripTypeAsForm" />
 </aui:form>
-
-<div  id="showSB"  style="display:none">
-		<%=showSB.toString() %>
-</div>
 
 
 <aui:script>
@@ -1233,19 +1181,7 @@ width: 270px;
 	
 	//When the employee is on behalf of the applicant,display the query button
 	function <portlet:namespace />applicantAgentClick(obj) {
-		document.<portlet:namespace />applicantAgentForm.<portlet:namespace />applicantAgentPerson.value = obj.value;
-		var radionum = document.getElementsByName("<portlet:namespace />tripType");
-		 for(var i=0;i<radionum.length;i++){
-			 if(radionum[i].checked){
-				 document.<portlet:namespace />applicantAgentForm.<portlet:namespace />tripType.value =document.<portlet:namespace />fm.<portlet:namespace />tripType.value= radionum[i].value;
-			 } }
-		document.<portlet:namespace />applicantAgentForm.<portlet:namespace />departureDate.value = document.<portlet:namespace />fm.<portlet:namespace />departureDate.value;
-		document.<portlet:namespace />applicantAgentForm.<portlet:namespace />returnDate.value = document.<portlet:namespace />fm.<portlet:namespace />returnDate.value;
-		document.<portlet:namespace />applicantAgentForm.<portlet:namespace />purposeOfTheTrip.value = document.<portlet:namespace />fm.<portlet:namespace />purposeOfTheTrip.value;
-		document.<portlet:namespace />applicantAgentForm.<portlet:namespace />visitCountriesCities.value = document.<portlet:namespace />fm.<portlet:namespace />visitCountriesCities.value;
-		document.<portlet:namespace />applicantAgentForm.<portlet:namespace />advancePayment.value = document.<portlet:namespace />fm.<portlet:namespace />advancePayment.value;
-		document.<portlet:namespace />applicantAgentForm.<portlet:namespace />currency.value = document.<portlet:namespace />fm.<portlet:namespace />currency.value;
-		
+		document.<portlet:namespace />applicantAgentForm.<portlet:namespace />isApplicantAgent.value = obj.checked;
 		submitForm(document.<portlet:namespace />applicantAgentForm);
 	}
 	
@@ -1262,8 +1198,13 @@ width: 270px;
 	
 	//Parse the value to the Portlet method
 	function <portlet:namespace/>passValueToPortlet() {
-		document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />applicantAgentPerson.value = document.<portlet:namespace />fm.<portlet:namespace />applicantAgentPerson.value;
-		document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />applicantAgentPerson.value = document.<portlet:namespace />fm.<portlet:namespace />applicantAgentPerson.value;
+		if(document.<portlet:namespace />fm.<portlet:namespace />isApplicantAgent!=null && document.<portlet:namespace />fm.<portlet:namespace />isApplicantAgent.checked){
+			document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />isApplicantAgent.value = 'true';
+			document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />isApplicantAgent.value = 'true';
+		}else {
+			document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />isApplicantAgent.value = 'false';
+			document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />isApplicantAgent.value = 'false';
+		}
 		var paymentCurrencyApp=document.getElementById("paymentCurrencyApp");
 		paymentCurrencyApp.disabled=false;
 		document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />staffCode.value = document.<portlet:namespace />fm.<portlet:namespace />staffCode.value;
@@ -1298,12 +1239,6 @@ width: 270px;
 		document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />targetDepartmentApproverName.value = document.<portlet:namespace />fm.<portlet:namespace />targetDepartmentApproverName.value;
 		document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />tripType.value = document.<portlet:namespace />fm.<portlet:namespace />tripType.value;
 		document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />tripType.value = document.<portlet:namespace />fm.<portlet:namespace />tripType.value;
-		 var radionum = document.getElementsByName("<portlet:namespace />tripType");
-		 for(var i=0;i<radionum.length;i++){
-			 if(radionum[i].checked){
-				 document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />tripType.value =document.<portlet:namespace />fm.<portlet:namespace />tripType.value= radionum[i].value;
-				 document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />tripType.value =document.<portlet:namespace />fm.<portlet:namespace />tripType.value= radionum[i].value;
-			 } }
 		document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />departureDate.value = document.<portlet:namespace />fm.<portlet:namespace />departureDate.value;
 		document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />departureDate.value = document.<portlet:namespace />fm.<portlet:namespace />departureDate.value;
 		document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />returnDate.value = document.<portlet:namespace />fm.<portlet:namespace />returnDate.value;
@@ -1329,13 +1264,6 @@ width: 270px;
 			w = 1200;
 			h = 400;			
 		}
-		var radionum = document.getElementsByName("<portlet:namespace />tripType");
-        var  travelTypeVal=-1;
-        for(var i=0;i<radionum.length;i++){
-                  if(radionum[i].checked){
-                           travelTypeVal = radionum[i].value
-                  } }
-        updateUrl=updateUrl+'&<portlet:namespace />travelTypeVal='+travelTypeVal;
 		Liferay.Util.selectEntity(
 				{
 					dialog: {
@@ -1511,36 +1439,64 @@ $(function(){
 	<portlet:namespace/>loopEmail();
 });
 
-function getElementsClass(classnames){
-	var classobj = new Array();
-	var classint = 0;
-	var tags = document.getElementsByTagName("li");
-	for ( var i in tags) {
-		if (tags[i].nodeType == 1) {
-			if (tags[i].getAttribute("class") == classnames){
+function getElementsClass(classnames) {
+	var classobj = new Array();// å®ä¹æ°ç»
+
+	var classint = 0;// å®ä¹æ°ç»çä¸æ 
+
+	var tags = document.getElementsByTagName("li");// è·åHTMLçæææ ç­¾
+
+	for ( var i in tags) {// å¯¹æ ç­¾è¿è¡éå
+
+		if (tags[i].nodeType == 1) {// å¤æ­èç¹ç±»å
+
+			if (tags[i].getAttribute("class") == classnames)// å¤æ­åéè¦CLASSåå­ç¸åçï¼å¹¶ç»æä¸ä¸ªæ°ç»
+
+			{
+
 				classobj[classint] = tags[i];
+
 				classint++;
-				}
+
 			}
+
 		}
-	return classobj;
+
 	}
 
-function getElementsUlClass(classnames){
-	var classobj = new Array();
-	var classint = 0;
-	var tags = document.getElementsByTagName("ul");
-	for ( var i in tags) {
-		if (tags[i].nodeType == 1){
-			if (tags[i].getAttribute("class") == classnames){
+	return classobj;// è¿åç»æçæ°ç»
+
+}
+
+function getElementsUlClass(classnames) {
+	var classobj = new Array();// å®ä¹æ°ç»
+
+	var classint = 0;// å®ä¹æ°ç»çä¸æ 
+
+	var tags = document.getElementsByTagName("ul");// è·åHTMLçæææ ç­¾
+
+	for ( var i in tags) {// å¯¹æ ç­¾è¿è¡éå
+
+		if (tags[i].nodeType == 1) {// å¤æ­èç¹ç±»å
+
+			if (tags[i].getAttribute("class") == classnames)// å¤æ­åéè¦CLASSåå­ç¸åçï¼å¹¶ç»æä¸ä¸ªæ°ç»
+
+			{
+
 				classobj[classint] = tags[i];
+
 				classint++;
-				}
+
 			}
+
 		}
-	return classobj;
+
 	}
-	
+
+	return classobj;// è¿åç»æçæ°ç»
+
+}
+
 function CheckTripType(val) {
 	var navs = getElementsUlClass("nav nav-tabs")[0].getElementsByTagName('li');
 	var paymentCurrencyApp = document.getElementById("paymentCurrencyApp");
@@ -1555,18 +1511,32 @@ function CheckTripType(val) {
 				navs[0].getElementsByTagName('a')[0].click();
 				// Liferay.Portal.Tabs.show('_businesstripapplication_WAR_vgcaponbusinesstripportlet_tabs111810399459711211111045981171151051101011151154511611410511245971121121081059997116105111110451021081051031041164510511010211111410997116105111110TabsId');
 			}
+
 			ali.style.display = "none";
 			hotelandcar.style.display = "none";
 			car.style.display = "none";
-			document.getElementById("domf").color = "#FF0000"
-			document.getElementById("intf").color = "#000000"
+
 		} else if (val == 1) {
 			paymentCurrencyApp.disabled = false;
 			ali.style.display = "block";
 			hotelandcar.style.display = "block";
 			car.style.display = "block";
-			 document.getElementById("intf").color = "#FF0000"
-			 document.getElementById("domf").color = "#000000"
+		}
+		
+		
+		var radios = document.getElementsByName("<portlet:namespace/>tripType");
+		var val;
+		for(var i=0;i<radios.length;i++){
+			 if(radios[i].checked) {
+				 if(radios[i].value ==0){
+					document.getElementById("domf").color = "#FF0000"
+					document.getElementById("intf").color = "#000000"
+				 }else if(radios[i].value ==1){
+					 document.getElementById("intf").color = "#FF0000"
+					 document.getElementById("domf").color = "#000000"
+				 }
+			
+			 }
 		}
 	}
 

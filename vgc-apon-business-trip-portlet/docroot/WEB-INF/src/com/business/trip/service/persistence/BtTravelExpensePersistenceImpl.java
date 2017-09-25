@@ -18,6 +18,7 @@ import com.business.trip.NoSuchBtTravelExpenseException;
 import com.business.trip.model.BtTravelExpense;
 import com.business.trip.model.impl.BtTravelExpenseImpl;
 import com.business.trip.model.impl.BtTravelExpenseModelImpl;
+import com.business.trip.service.persistence.BtTravelExpensePersistence;
 
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;

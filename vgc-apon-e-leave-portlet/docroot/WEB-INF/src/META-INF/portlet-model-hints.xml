@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+
+<model-hints>
+	<model name="com.e.leave.model.ELeave">
+		<field name="eLeaveId" type="long" />
+		<field name="groupId" type="long" />
+		<field name="userId" type="long" />
+		<field name="userName" type="String" />
+		<field name="createDate" type="Date" />
+		<field name="modifiedDate" type="Date" />
+		<field name="companyId" type="long" />
+		<field name="ticketNo" type="String" />
+		<field name="staffName" type="String" />
+		<field name="staffCode" type="String" />
+		<field name="company" type="String" />
+		<field name="division" type="String" />
+		<field name="department" type="String" />
+		<field name="costCenter" type="String" />
+		<field name="officePhone" type="String" />
+		<field name="mobilePhone" type="String" />
+		<field name="email" type="String" />
+		<field name="positionType" type="String" />
+		<field name="isApplicantAgent" type="boolean" />
+		<field name="isApproverAgent" type="boolean" />
+		<field name="processType" type="String" />
+		<field name="subProcessType" type="String" />
+		<field name="submittedDate" type="Date" />
+		<field name="comments" type="String" />
+		<field name="status" type="int" />
+		<field name="statusByUserId" type="long" />
+		<field name="statusByUserName" type="String" />
+		<field name="statusDate" type="Date" />
+		<field name="totalLeaveEntitlement" type="String" />
+		<field name="totalDuration" type="String" />
+		<field name="remainingLeaveDaysBefore" type="String" />
+		<field name="remainingLeaveDaysAfter" type="String" />
+	</model>
+	<model name="com.e.leave.model.ELeaveInfo">
+		<field name="eLeaveInfoId" type="long" />
+		<field name="eLeaveId" type="long" />
+		<field name="startDate" type="Date" />
+		<field name="endDate" type="Date" />
+		<field name="startTime" type="String" />
+		<field name="endTime" type="String" />
+		<field name="typeOfLeave" type="String" />
+		<field name="typeOfLeaveId" type="String" />
+		<field name="absenceDays" type="String" />
+		<field name="remark" type="String">
+			<hint name="max-length">250</hint>
+		</field>
+	</model>
+</model-hints>

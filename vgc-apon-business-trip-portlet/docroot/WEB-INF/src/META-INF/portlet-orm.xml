@@ -1,0 +1,493 @@
+<?xml version="1.0"?>
+
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_1_0.xsd">
+	<persistence-unit-metadata>
+		<xml-mapping-metadata-complete/>
+		<persistence-unit-defaults>
+			<access>PROPERTY</access>
+		</persistence-unit-defaults>
+	</persistence-unit-metadata>
+	<mapped-superclass class="com.business.trip.model.impl.BtCarRentalInfoModelImpl">
+		<attributes>
+			<id name="btCarRentalInfoId" />
+			<basic name="businessTripPkId" />
+			<basic name="ticketNo" />
+			<basic name="pickupLocation" />
+			<basic name="pickupDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="dropoffLocation" />
+			<basic name="dropoffDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="carType" />
+			<basic name="typeOfRental" />
+			<basic name="price" />
+			<basic name="currency">
+				<column name="CURRENCY_" />
+			</basic>
+			<basic name="tripType" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.business.trip.model.impl.BtCostListModelImpl">
+		<attributes>
+			<id name="btCostListId" />
+			<basic name="businessTripPkId" />
+			<basic name="ticketNo" />
+			<basic name="item" />
+			<basic name="invoiceCurrency" />
+			<basic name="paymentAmount" />
+			<basic name="paymentCurrency" />
+			<basic name="countryCity" />
+			<basic name="type">
+				<column name="TYPE_" />
+			</basic>
+			<basic name="invoiceAmount" />
+			<basic name="taxRate" />
+			<basic name="netAmount" />
+			<basic name="taxAmount" />
+			<basic name="netAmountRmb" />
+			<basic name="entertainmentDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="entertainmentPlace" />
+			<basic name="reasonesInfo" />
+			<basic name="attendeesTotal" />
+			<basic name="averageSpend" />
+			<basic name="mealCategory" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.business.trip.model.impl.BtEntertainmentDetailModelImpl">
+		<attributes>
+			<id name="btEntertainmentDetailId" />
+			<basic name="btCostListId" />
+			<basic name="businessTripPkId" />
+			<basic name="fullName" />
+			<basic name="positionTitle" />
+			<basic name="company" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.business.trip.model.impl.BtExchangeRateModelImpl">
+		<attributes>
+			<id name="btExchangeRateId" />
+			<basic name="firstCurrency" />
+			<basic name="secondCurrency" />
+			<basic name="firToSecExchangeRate" />
+			<basic name="secToFirExchangeRate" />
+			<basic name="userId" />
+			<basic name="userName" />
+			<basic name="createDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="modifiedDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="status" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+			<transient name="userUuid" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.business.trip.model.impl.BtExchangeSAPRateModelImpl">
+		<attributes>
+			<id name="btExchangeSAPRateId" />
+			<basic name="fromCurrency" />
+			<basic name="toCurrency" />
+			<basic name="currencyRate" />
+			<basic name="rateType" />
+			<basic name="sapDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="importDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.business.trip.model.impl.BtFlightTrainInfoModelImpl">
+		<attributes>
+			<id name="btFlightTrainInfoId" />
+			<basic name="businessTripPkId" />
+			<basic name="ticketNo" />
+			<basic name="type">
+				<column name="TYPE_" />
+			</basic>
+			<basic name="fromCity" />
+			<basic name="toCity" />
+			<basic name="departureDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="departureFlight" />
+			<basic name="departureTime">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="classInfo" />
+			<basic name="price" />
+			<basic name="currency">
+				<column name="CURRENCY_" />
+			</basic>
+			<basic name="tripType" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.business.trip.model.impl.BtHotelInfoModelImpl">
+		<attributes>
+			<id name="btHotelInfoId" />
+			<basic name="businessTripPkId" />
+			<basic name="ticketNo" />
+			<basic name="city" />
+			<basic name="cityType" />
+			<basic name="hotel" />
+			<basic name="checkIn">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="checkOut">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="roomCategory" />
+			<basic name="price" />
+			<basic name="currency">
+				<column name="CURRENCY_" />
+			</basic>
+			<basic name="otherReasonInfo" />
+			<basic name="isNotBookedFromTA" />
+			<basic name="isOverBudget" />
+			<basic name="othersSpecify" />
+			<basic name="tripType" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.business.trip.model.impl.BtReimbursementSAPInfoModelImpl">
+		<attributes>
+			<id name="btReimbursementSAPInfoId" />
+			<basic name="businessTripPkId" />
+			<basic name="ticketNo" />
+			<basic name="currency">
+				<column name="CURRENCY_" />
+			</basic>
+			<basic name="step" />
+			<basic name="messageType" />
+			<basic name="message" />
+			<basic name="certificateNo" />
+			<basic name="company" />
+			<basic name="year" />
+			<basic name="createDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="modifiedDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.business.trip.model.impl.BtTrainInfoModelImpl">
+		<attributes>
+			<id name="btTrainInfoId" />
+			<basic name="businessTripPkId" />
+			<basic name="ticketNo" />
+			<basic name="fromCity" />
+			<basic name="toCity" />
+			<basic name="departureDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="departureTrain" />
+			<basic name="classInfo" />
+			<basic name="price" />
+			<basic name="currency">
+				<column name="CURRENCY_" />
+			</basic>
+			<basic name="tripType" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.business.trip.model.impl.BtTravelExpenseModelImpl">
+		<attributes>
+			<id name="btTravelExpenseId" />
+			<basic name="businessTripPkId" />
+			<basic name="ticketNo" />
+			<basic name="travelDate" />
+			<basic name="departure" />
+			<basic name="arrival" />
+			<basic name="fromCity" />
+			<basic name="toCity" />
+			<basic name="isHasBreakfast" />
+			<basic name="isHasLunch" />
+			<basic name="isHasDinner" />
+			<basic name="country" />
+			<basic name="city" />
+			<basic name="rateOfDma" />
+			<basic name="currency">
+				<column name="CURRENCY_" />
+			</basic>
+			<basic name="allowance" />
+			<basic name="comments" />
+			<basic name="tripType" />
+			<basic name="allowanceRmb" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.business.trip.model.impl.BusinessTripApplicationModelImpl">
+		<attributes>
+			<id name="businessTripApplicationId" />
+			<basic name="ticketNo" />
+			<basic name="processType" />
+			<basic name="subType" />
+			<basic name="printName" />
+			<basic name="staffCode" />
+			<basic name="companyName" />
+			<basic name="division" />
+			<basic name="department" />
+			<basic name="costCenter" />
+			<basic name="personalID" />
+			<basic name="passportNo" />
+			<basic name="officePhone" />
+			<basic name="mobilePhone" />
+			<basic name="email" />
+			<basic name="officeSite" />
+			<basic name="approverId" />
+			<basic name="approverName" />
+			<basic name="evpId" />
+			<basic name="evpName" />
+			<basic name="isCrossDepartment" />
+			<basic name="targetDepartmentId" />
+			<basic name="targetDepartmentName" />
+			<basic name="targetCostCenter" />
+			<basic name="targetDepartmentApproverId" />
+			<basic name="targetDepartmentApproverName" />
+			<basic name="tripType" />
+			<basic name="departureDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="returnDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="purposeOfTheTrip" />
+			<basic name="visitCountriesCities" />
+			<basic name="advancePayment" />
+			<basic name="currency">
+				<column name="CURRENCY_" />
+			</basic>
+			<basic name="paymentMethods" />
+			<basic name="totalCostRmb" />
+			<basic name="totalCostEur" />
+			<basic name="hotelTotalCostRmb" />
+			<basic name="hotelTotalCostEur" />
+			<basic name="carRentalTotalCostRmb" />
+			<basic name="carRentalTotalCostEur" />
+			<basic name="remark" />
+			<basic name="otherEmails" />
+			<basic name="status" />
+			<basic name="sapStatus" />
+			<basic name="sapComments" />
+			<basic name="sapDocumentId" />
+			<basic name="sapCertificateNo" />
+			<basic name="sapCompany" />
+			<basic name="sapYear" />
+			<basic name="statusByUserId" />
+			<basic name="statusByUserName" />
+			<basic name="statusDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="isApplicantAgent" />
+			<basic name="isApproverAgent" />
+			<basic name="groupId" />
+			<basic name="userId" />
+			<basic name="userName" />
+			<basic name="createDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="modifiedDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="submittedDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="companyId" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+			<transient name="statusByUserUuid" />
+			<transient name="userUuid" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.business.trip.model.impl.BusinessTripReimbursementModelImpl">
+		<attributes>
+			<id name="businessTripReimbursementId" />
+			<basic name="ticketNo" />
+			<basic name="bussinessTirpTicketNo" />
+			<basic name="processType" />
+			<basic name="subType" />
+			<basic name="printName" />
+			<basic name="staffCode" />
+			<basic name="companyName" />
+			<basic name="division" />
+			<basic name="department" />
+			<basic name="costCenter" />
+			<basic name="personalID" />
+			<basic name="passportNo" />
+			<basic name="officePhone" />
+			<basic name="mobilePhone" />
+			<basic name="email" />
+			<basic name="officeSite" />
+			<basic name="approverId" />
+			<basic name="approverName" />
+			<basic name="isCrossDepartment" />
+			<basic name="targetDepartmentId" />
+			<basic name="targetDepartmentName" />
+			<basic name="targetCostCenter" />
+			<basic name="targetDepartmentApproverId" />
+			<basic name="targetDepartmentApproverName" />
+			<basic name="tripType" />
+			<basic name="departureDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="returnDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="purposeOfTheTrip" />
+			<basic name="visitCountriesCities" />
+			<basic name="advancePayment" />
+			<basic name="currency">
+				<column name="CURRENCY_" />
+			</basic>
+			<basic name="paymentMethods" />
+			<basic name="totalCostRmb" />
+			<basic name="totalCostEur" />
+			<basic name="orgTotalCostRmb" />
+			<basic name="orgTotalCostEur" />
+			<basic name="hotelTotalCostRmb" />
+			<basic name="hotelTotalCostEur" />
+			<basic name="carRentalTotalCostRmb" />
+			<basic name="carRentalTotalCostEur" />
+			<basic name="flightCurrency" />
+			<basic name="flightTotal" />
+			<basic name="flightAirFare" />
+			<basic name="flightTaxes" />
+			<basic name="flightTransactionFee" />
+			<basic name="totalTravelExpenseRmb" />
+			<basic name="totalTravelExpenseEur" />
+			<basic name="costListInlandTotalRmb" />
+			<basic name="costListForeignTotalEur" />
+			<basic name="costListForeignTotalRmb" />
+			<basic name="remark" />
+			<basic name="isPaybyRmb" />
+			<basic name="status" />
+			<basic name="sapStatus" />
+			<basic name="sapComments" />
+			<basic name="sapDocumentId" />
+			<basic name="statusByUserId" />
+			<basic name="statusByUserName" />
+			<basic name="statusDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="isApplicantAgent" />
+			<basic name="isApproverAgent" />
+			<basic name="groupId" />
+			<basic name="userId" />
+			<basic name="userName" />
+			<basic name="createDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="modifiedDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="submittedDate">
+				<temporal>TIMESTAMP</temporal>
+			</basic>
+			<basic name="companyId" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+			<transient name="statusByUserUuid" />
+			<transient name="userUuid" />
+		</attributes>
+	</mapped-superclass>
+	<mapped-superclass class="com.business.trip.model.impl.RateCityModelImpl">
+		<attributes>
+			<id name="ratecityId" />
+			<basic name="areaName" />
+			<basic name="rateOfDma" />
+			<basic name="currency">
+				<column name="CURRENCY_" />
+			</basic>
+			<basic name="parentId" />
+			<transient name="modelAttributes" />
+			<transient name="primaryKey" />
+			<transient name="primaryKeyObj" />
+		</attributes>
+	</mapped-superclass>
+	<entity class="com.business.trip.model.impl.BtCarRentalInfoImpl" name="BtCarRentalInfo">
+		<table name="vgcapon_BtCarRentalInfo" />
+		<attributes />
+	</entity>
+	<entity class="com.business.trip.model.impl.BtCostListImpl" name="BtCostList">
+		<table name="vgcapon_BtCostList" />
+		<attributes />
+	</entity>
+	<entity class="com.business.trip.model.impl.BtEntertainmentDetailImpl" name="BtEntertainmentDetail">
+		<table name="vgcapon_BtEntertainmentDetail" />
+		<attributes />
+	</entity>
+	<entity class="com.business.trip.model.impl.BtExchangeRateImpl" name="BtExchangeRate">
+		<table name="vgcapon_BtExchangeRate" />
+		<attributes />
+	</entity>
+	<entity class="com.business.trip.model.impl.BtExchangeSAPRateImpl" name="BtExchangeSAPRate">
+		<table name="vgcapon_BtExchangeSAPRate" />
+		<attributes />
+	</entity>
+	<entity class="com.business.trip.model.impl.BtFlightTrainInfoImpl" name="BtFlightTrainInfo">
+		<table name="vgcapon_BtFlightTrainInfo" />
+		<attributes />
+	</entity>
+	<entity class="com.business.trip.model.impl.BtHotelInfoImpl" name="BtHotelInfo">
+		<table name="vgcapon_BtHotelInfo" />
+		<attributes />
+	</entity>
+	<entity class="com.business.trip.model.impl.BtReimbursementSAPInfoImpl" name="BtReimbursementSAPInfo">
+		<table name="vgcapon_BtReimbursementSAPInfo" />
+		<attributes />
+	</entity>
+	<entity class="com.business.trip.model.impl.BtTrainInfoImpl" name="BtTrainInfo">
+		<table name="vgcapon_BtTrainInfo" />
+		<attributes />
+	</entity>
+	<entity class="com.business.trip.model.impl.BtTravelExpenseImpl" name="BtTravelExpense">
+		<table name="vgcapon_BtTravelExpense" />
+		<attributes />
+	</entity>
+	<entity class="com.business.trip.model.impl.BusinessTripApplicationImpl" name="BusinessTripApplication">
+		<table name="VgcApon_BtApplication" />
+		<attributes />
+	</entity>
+	<entity class="com.business.trip.model.impl.BusinessTripReimbursementImpl" name="BusinessTripReimbursement">
+		<table name="VgcApon_BtReimbursement" />
+		<attributes />
+	</entity>
+	<entity class="com.business.trip.model.impl.RateCityImpl" name="RateCity">
+		<table name="vgcapon_RateCity" />
+		<attributes />
+	</entity>
+</entity-mappings>

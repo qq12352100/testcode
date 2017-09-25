@@ -282,14 +282,6 @@ public class BusinessTripReimbursementLocalServiceUtil {
 		return getService().invokeMethod(name, parameterTypes, arguments);
 	}
 
-	public static java.util.List<java.lang.Object[]> reimbursementTravelForReport(
-		java.lang.String travelType, java.lang.String ticketNo, int status,
-		java.lang.String periodStart, java.lang.String periodEnd) {
-		return getService()
-				   .reimbursementTravelForReport(travelType, ticketNo, status,
-			periodStart, periodEnd);
-	}
-
 	public static com.business.trip.model.BusinessTripReimbursement saveOrUpdateBusinessTripReimbursement(
 		com.business.trip.model.BusinessTripReimbursement businessTripReimbursement,
 		com.liferay.portal.service.ServiceContext serviceContext)
@@ -319,19 +311,6 @@ public class BusinessTripReimbursementLocalServiceUtil {
 		return getService()
 				   .submitBusinessTripReimbursement(businessTripReimbursement,
 			serviceContext, autoNewAterAccountReject);
-	}
-
-	/**
-	* Get Total Payment Amount
-	*
-	* @param businessTripReimbursement
-	* @return
-	* @throws SystemException
-	*/
-	public static java.lang.Double[] getTotalPaymentAmount(
-		com.business.trip.model.BusinessTripReimbursement businessTripReimbursement)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		return getService().getTotalPaymentAmount(businessTripReimbursement);
 	}
 
 	public static void paymentCompletedSendEmailtoApplicant(

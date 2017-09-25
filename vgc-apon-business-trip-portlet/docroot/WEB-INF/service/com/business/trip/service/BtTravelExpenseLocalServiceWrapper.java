@@ -400,19 +400,6 @@ public class BtTravelExpenseLocalServiceWrapper
 	}
 
 	/**
-	* To corrected the history data  cost list netAmountRMB value
-	*
-	* @param businessTripReimbursementId
-	* @throws SystemException
-	*/
-	@Override
-	public void correctAmountRmbDAOfHistoryData(
-		long businessTripReimbursementId)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		_btTravelExpenseLocalService.correctAmountRmbDAOfHistoryData(businessTripReimbursementId);
-	}
-
-	/**
 	 * @deprecated As of 6.1.0, replaced by {@link #getWrappedService}
 	 */
 	public BtTravelExpenseLocalService getWrappedBtTravelExpenseLocalService() {

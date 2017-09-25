@@ -98,7 +98,6 @@
 	iteratorURL="<%=portletURL%>" var="personalIDSearchContainer">
 	<liferay-ui:search-container-results>
 		<%
-		System.out.println("select staffcode="+staffCode);
 		List<BusinessTripApplication> result=BusinessTripApplicationLocalServiceUtil.findByT_P_S_P(ticketNo, printName, staffCode, personalID,themeDisplay.getUserId(),personalIDSearchContainer.getStart(),personalIDSearchContainer.getEnd());
 		pageContext.setAttribute("results", result);
 		pageContext.setAttribute("total", BusinessTripApplicationLocalServiceUtil.findCountByT_P_S_P(ticketNo, printName, staffCode,personalID,themeDisplay.getUserId()));

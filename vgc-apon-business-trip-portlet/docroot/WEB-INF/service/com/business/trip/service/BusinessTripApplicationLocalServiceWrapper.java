@@ -300,16 +300,6 @@ public class BusinessTripApplicationLocalServiceWrapper
 			serviceContext);
 	}
 
-	/**
-	* @param businessTripApplication
-	* @return isCanReselectTripType
-	*/
-	@Override
-	public boolean preValidate(
-		com.business.trip.model.BusinessTripApplication businessTripApplication) {
-		return _businessTripApplicationLocalService.preValidate(businessTripApplication);
-	}
-
 	@Override
 	public com.business.trip.model.BusinessTripApplication submitBusinessTripApplication(
 		com.business.trip.model.BusinessTripApplication businessTripApplication,

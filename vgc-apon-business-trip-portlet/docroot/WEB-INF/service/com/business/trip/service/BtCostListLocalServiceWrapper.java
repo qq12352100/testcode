@@ -325,20 +325,6 @@ public class BtCostListLocalServiceWrapper implements BtCostListLocalService,
 	}
 
 	@Override
-	public java.lang.Double findSumInvoiceAmountByCurrency(
-		long businessTripPkId, java.lang.String paymentCurrency)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		return _btCostListLocalService.findSumInvoiceAmountByCurrency(businessTripPkId,
-			paymentCurrency);
-	}
-
-	@Override
-	public java.lang.Double findEURPayByRMBByCurrency(long businessTripPkId)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		return _btCostListLocalService.findEURPayByRMBByCurrency(businessTripPkId);
-	}
-
-	@Override
 	public java.lang.Double findSumNetAmountRmbByCurrency(
 		long businessTripPkId, java.lang.String paymentCurrency,
 		java.util.List<java.lang.String> items)
@@ -368,31 +354,6 @@ public class BtCostListLocalServiceWrapper implements BtCostListLocalService,
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _btCostListLocalService.addCalculate(oldTotal, totalCurrency,
 			amount, currency);
-	}
-
-	/**
-	* To corrected the history data  cost list netAmountRMB value
-	*
-	* @param businessTripReimbursementId
-	* @throws SystemException
-	*/
-	@Override
-	public void correctAmountRmbCostListOfHistoryData(
-		long businessTripReimbursementId)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		_btCostListLocalService.correctAmountRmbCostListOfHistoryData(businessTripReimbursementId);
-	}
-
-	/**
-	* Delete all cost list by bussiness trip pk id
-	*
-	* @param businessTripReimbursementId
-	* @throws SystemException
-	*/
-	@Override
-	public void deleteCostListByBRPKId(long businessTripReimbursementId)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		_btCostListLocalService.deleteCostListByBRPKId(businessTripReimbursementId);
 	}
 
 	/**

@@ -123,126 +123,120 @@ public class BusinessTripApplicationLocalServiceClp
 				"com.liferay.portal.service.ServiceContext"
 			};
 
-		_methodName20 = "preValidate";
+		_methodName20 = "submitBusinessTripApplication";
 
 		_methodParameterTypes20 = new String[] {
-				"com.business.trip.model.BusinessTripApplication"
-			};
-
-		_methodName21 = "submitBusinessTripApplication";
-
-		_methodParameterTypes21 = new String[] {
 				"com.business.trip.model.BusinessTripApplication",
 				"com.liferay.portal.service.ServiceContext"
 			};
 
-		_methodName22 = "sendEmailtoApprover";
+		_methodName21 = "sendEmailtoApprover";
+
+		_methodParameterTypes21 = new String[] {
+				"com.business.trip.model.BusinessTripApplication"
+			};
+
+		_methodName22 = "findEmailsOfPendingApprover";
 
 		_methodParameterTypes22 = new String[] {
 				"com.business.trip.model.BusinessTripApplication"
 			};
 
-		_methodName23 = "findEmailsOfPendingApprover";
+		_methodName23 = "updateStatus";
 
 		_methodParameterTypes23 = new String[] {
-				"com.business.trip.model.BusinessTripApplication"
-			};
-
-		_methodName24 = "updateStatus";
-
-		_methodParameterTypes24 = new String[] {
 				"long", "long", "int",
 				"com.liferay.portal.service.ServiceContext"
 			};
 
-		_methodName25 = "findByS_U";
+		_methodName24 = "findByS_U";
 
-		_methodParameterTypes25 = new String[] { "int", "long" };
+		_methodParameterTypes24 = new String[] { "int", "long" };
 
-		_methodName26 = "findByStatus";
+		_methodName25 = "findByStatus";
 
-		_methodParameterTypes26 = new String[] { "int" };
+		_methodParameterTypes25 = new String[] { "int" };
 
-		_methodName27 = "saveOrUpdateAuditTrailLog";
+		_methodName26 = "saveOrUpdateAuditTrailLog";
 
-		_methodParameterTypes27 = new String[] {
+		_methodParameterTypes26 = new String[] {
 				"long", "long", "long", "long", "java.lang.String",
 				"java.lang.String", "java.lang.String"
 			};
 
-		_methodName28 = "getOperationNo";
+		_methodName27 = "getOperationNo";
 
-		_methodParameterTypes28 = new String[] { "java.util.List" };
+		_methodParameterTypes27 = new String[] { "java.util.List" };
 
-		_methodName29 = "getOperationUserByRoleName";
+		_methodName28 = "getOperationUserByRoleName";
 
-		_methodParameterTypes29 = new String[] { "long", "java.lang.String" };
+		_methodParameterTypes28 = new String[] { "long", "java.lang.String" };
 
-		_methodName30 = "searchBusinessTripApplicationByTicketNo";
+		_methodName29 = "searchBusinessTripApplicationByTicketNo";
+
+		_methodParameterTypes29 = new String[] { "java.lang.String" };
+
+		_methodName30 = "getBusinessTripApplicationByTicketNo";
 
 		_methodParameterTypes30 = new String[] { "java.lang.String" };
 
-		_methodName31 = "getBusinessTripApplicationByTicketNo";
+		_methodName31 = "getCssContent";
 
-		_methodParameterTypes31 = new String[] { "java.lang.String" };
+		_methodParameterTypes31 = new String[] {  };
 
-		_methodName32 = "getCssContent";
+		_methodName32 = "getDDNames";
 
-		_methodParameterTypes32 = new String[] {  };
-
-		_methodName33 = "getDDNames";
-
-		_methodParameterTypes33 = new String[] {
+		_methodParameterTypes32 = new String[] {
 				"com.business.trip.model.BusinessTripApplication"
 			};
 
-		_methodName34 = "updateSAPStatusAsSAPInfo";
+		_methodName33 = "updateSAPStatusAsSAPInfo";
 
-		_methodParameterTypes34 = new String[] {
+		_methodParameterTypes33 = new String[] {
 				"java.util.List", "int",
 				"com.liferay.portal.service.ServiceContext"
 			};
 
-		_methodName35 = "updateSAPStatus";
+		_methodName34 = "updateSAPStatus";
 
-		_methodParameterTypes35 = new String[] {
+		_methodParameterTypes34 = new String[] {
 				"long", "int", "com.liferay.portal.service.ServiceContext",
 				"java.lang.String", "java.lang.String", "java.lang.String",
 				"java.lang.String", "java.lang.String"
 			};
 
-		_methodName36 = "findCountByS_U_SAP";
+		_methodName35 = "findCountByS_U_SAP";
 
-		_methodParameterTypes36 = new String[] {
+		_methodParameterTypes35 = new String[] {
 				"int", "java.lang.String", "java.lang.String", "int",
 				"java.lang.String", "java.lang.String", "java.lang.String"
 			};
 
-		_methodName37 = "findByS_U_SAP";
+		_methodName36 = "findByS_U_SAP";
 
-		_methodParameterTypes37 = new String[] {
+		_methodParameterTypes36 = new String[] {
 				"int", "java.lang.String", "java.lang.String", "int",
 				"java.lang.String", "java.lang.String", "java.lang.String",
 				"int", "int"
 			};
 
-		_methodName38 = "findByT_P_S_P";
+		_methodName37 = "findByT_P_S_P";
 
-		_methodParameterTypes38 = new String[] {
+		_methodParameterTypes37 = new String[] {
 				"java.lang.String", "java.lang.String", "java.lang.String",
 				"java.lang.String", "long", "int", "int"
 			};
 
-		_methodName39 = "findCountByT_P_S_P";
+		_methodName38 = "findCountByT_P_S_P";
 
-		_methodParameterTypes39 = new String[] {
+		_methodParameterTypes38 = new String[] {
 				"java.lang.String", "java.lang.String", "java.lang.String",
 				"java.lang.String", "long"
 			};
 
-		_methodName40 = "fetchBusinessTripApplicationByTicketNo";
+		_methodName39 = "fetchBusinessTripApplicationByTicketNo";
 
-		_methodParameterTypes40 = new String[] { "java.lang.String" };
+		_methodParameterTypes39 = new String[] { "java.lang.String" };
 	}
 
 	@Override
@@ -846,33 +840,6 @@ public class BusinessTripApplicationLocalServiceClp
 	}
 
 	@Override
-	public boolean preValidate(
-		com.business.trip.model.BusinessTripApplication businessTripApplication) {
-		Object returnObj = null;
-
-		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName20,
-					_methodParameterTypes20,
-					new Object[] {
-						ClpSerializer.translateInput(businessTripApplication)
-					});
-		}
-		catch (Throwable t) {
-			t = ClpSerializer.translateThrowable(t);
-
-			if (t instanceof RuntimeException) {
-				throw (RuntimeException)t;
-			}
-			else {
-				throw new RuntimeException(t.getClass().getName() +
-					" is not a valid exception");
-			}
-		}
-
-		return ((Boolean)returnObj).booleanValue();
-	}
-
-	@Override
 	public com.business.trip.model.BusinessTripApplication submitBusinessTripApplication(
 		com.business.trip.model.BusinessTripApplication businessTripApplication,
 		com.liferay.portal.service.ServiceContext serviceContext)
@@ -881,8 +848,8 @@ public class BusinessTripApplicationLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName21,
-					_methodParameterTypes21,
+			returnObj = _invokableLocalService.invokeMethod(_methodName20,
+					_methodParameterTypes20,
 					new Object[] {
 						ClpSerializer.translateInput(businessTripApplication),
 						
@@ -917,8 +884,8 @@ public class BusinessTripApplicationLocalServiceClp
 		com.business.trip.model.BusinessTripApplication businessTripApplication)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		try {
-			_invokableLocalService.invokeMethod(_methodName22,
-				_methodParameterTypes22,
+			_invokableLocalService.invokeMethod(_methodName21,
+				_methodParameterTypes21,
 				new Object[] {
 					ClpSerializer.translateInput(businessTripApplication)
 				});
@@ -947,8 +914,8 @@ public class BusinessTripApplicationLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName23,
-					_methodParameterTypes23,
+			returnObj = _invokableLocalService.invokeMethod(_methodName22,
+					_methodParameterTypes22,
 					new Object[] {
 						ClpSerializer.translateInput(businessTripApplication)
 					});
@@ -981,8 +948,8 @@ public class BusinessTripApplicationLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName24,
-					_methodParameterTypes24,
+			returnObj = _invokableLocalService.invokeMethod(_methodName23,
+					_methodParameterTypes23,
 					new Object[] {
 						userId,
 						
@@ -1023,8 +990,8 @@ public class BusinessTripApplicationLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName25,
-					_methodParameterTypes25, new Object[] { status, userId });
+			returnObj = _invokableLocalService.invokeMethod(_methodName24,
+					_methodParameterTypes24, new Object[] { status, userId });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1051,8 +1018,8 @@ public class BusinessTripApplicationLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName26,
-					_methodParameterTypes26, new Object[] { status });
+			returnObj = _invokableLocalService.invokeMethod(_methodName25,
+					_methodParameterTypes25, new Object[] { status });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1081,8 +1048,8 @@ public class BusinessTripApplicationLocalServiceClp
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
-			_invokableLocalService.invokeMethod(_methodName27,
-				_methodParameterTypes27,
+			_invokableLocalService.invokeMethod(_methodName26,
+				_methodParameterTypes26,
 				new Object[] {
 					companyId,
 					
@@ -1126,8 +1093,8 @@ public class BusinessTripApplicationLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName28,
-					_methodParameterTypes28,
+			returnObj = _invokableLocalService.invokeMethod(_methodName27,
+					_methodParameterTypes27,
 					new Object[] { ClpSerializer.translateInput(list) });
 		}
 		catch (Throwable t) {
@@ -1153,8 +1120,8 @@ public class BusinessTripApplicationLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName29,
-					_methodParameterTypes29,
+			returnObj = _invokableLocalService.invokeMethod(_methodName28,
+					_methodParameterTypes28,
 					new Object[] {
 						companyId,
 						
@@ -1192,8 +1159,8 @@ public class BusinessTripApplicationLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName30,
-					_methodParameterTypes30,
+			returnObj = _invokableLocalService.invokeMethod(_methodName29,
+					_methodParameterTypes29,
 					new Object[] { ClpSerializer.translateInput(TicketNo) });
 		}
 		catch (Throwable t) {
@@ -1227,8 +1194,8 @@ public class BusinessTripApplicationLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName31,
-					_methodParameterTypes31,
+			returnObj = _invokableLocalService.invokeMethod(_methodName30,
+					_methodParameterTypes30,
 					new Object[] { ClpSerializer.translateInput(TicketNo) });
 		}
 		catch (Throwable t) {
@@ -1259,8 +1226,8 @@ public class BusinessTripApplicationLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName32,
-					_methodParameterTypes32, new Object[] {  });
+			returnObj = _invokableLocalService.invokeMethod(_methodName31,
+					_methodParameterTypes31, new Object[] {  });
 		}
 		catch (Throwable t) {
 			t = ClpSerializer.translateThrowable(t);
@@ -1283,8 +1250,8 @@ public class BusinessTripApplicationLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName33,
-					_methodParameterTypes33,
+			returnObj = _invokableLocalService.invokeMethod(_methodName32,
+					_methodParameterTypes32,
 					new Object[] {
 						ClpSerializer.translateInput(businessTripApplication)
 					});
@@ -1311,8 +1278,8 @@ public class BusinessTripApplicationLocalServiceClp
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
-			_invokableLocalService.invokeMethod(_methodName34,
-				_methodParameterTypes34,
+			_invokableLocalService.invokeMethod(_methodName33,
+				_methodParameterTypes33,
 				new Object[] {
 					ClpSerializer.translateInput(params),
 					
@@ -1354,8 +1321,8 @@ public class BusinessTripApplicationLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName35,
-					_methodParameterTypes35,
+			returnObj = _invokableLocalService.invokeMethod(_methodName34,
+					_methodParameterTypes34,
 					new Object[] {
 						businessTripApplicationId,
 						
@@ -1406,8 +1373,8 @@ public class BusinessTripApplicationLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName36,
-					_methodParameterTypes36,
+			returnObj = _invokableLocalService.invokeMethod(_methodName35,
+					_methodParameterTypes35,
 					new Object[] {
 						status,
 						
@@ -1457,8 +1424,8 @@ public class BusinessTripApplicationLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName37,
-					_methodParameterTypes37,
+			returnObj = _invokableLocalService.invokeMethod(_methodName36,
+					_methodParameterTypes36,
 					new Object[] {
 						status,
 						
@@ -1511,8 +1478,8 @@ public class BusinessTripApplicationLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName38,
-					_methodParameterTypes38,
+			returnObj = _invokableLocalService.invokeMethod(_methodName37,
+					_methodParameterTypes37,
 					new Object[] {
 						ClpSerializer.translateInput(ticketNo),
 						
@@ -1556,8 +1523,8 @@ public class BusinessTripApplicationLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName39,
-					_methodParameterTypes39,
+			returnObj = _invokableLocalService.invokeMethod(_methodName38,
+					_methodParameterTypes38,
 					new Object[] {
 						ClpSerializer.translateInput(ticketNo),
 						
@@ -1596,8 +1563,8 @@ public class BusinessTripApplicationLocalServiceClp
 		Object returnObj = null;
 
 		try {
-			returnObj = _invokableLocalService.invokeMethod(_methodName40,
-					_methodParameterTypes40,
+			returnObj = _invokableLocalService.invokeMethod(_methodName39,
+					_methodParameterTypes39,
 					new Object[] { ClpSerializer.translateInput(ticketNo) });
 		}
 		catch (Throwable t) {
@@ -1698,6 +1665,4 @@ public class BusinessTripApplicationLocalServiceClp
 	private String[] _methodParameterTypes38;
 	private String _methodName39;
 	private String[] _methodParameterTypes39;
-	private String _methodName40;
-	private String[] _methodParameterTypes40;
 }

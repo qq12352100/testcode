@@ -32,7 +32,7 @@
 		<input type="hidden" name="<portlet:namespace/>firToSecExchangeRate" value="<%=btExchangeRate.getFirToSecExchangeRate()%>"/>
 		<input type="hidden" name="<portlet:namespace/>secToFirExchangeRate" value="<%=btExchangeRate.getSecToFirExchangeRate()%>"/>
 	
-		<div class="mainbody" id="mainbody_hotel">
+		<div class="mainbody">
 			<div class="newtb">
 		    	<ul>
 		    	    <li class="nd02"><liferay-ui:message key="vgc-apon-business-trip-application-hotel-city"/></li>
@@ -42,10 +42,10 @@
 		    	</ul>
 		    	<ul>
 		    		<li class="nd02">
-		    	    	<input type="text" name="<portlet:namespace/>city" id="city" value="<%=btHotelInfo.getCity()==null?"":btHotelInfo.getCity() %>" required="required" maxlength="75" readonly="readonly"/>
+		    	    	<input type="text" name="<portlet:namespace/>city" id="city" value="<%=btHotelInfo.getCity()==null?"":btHotelInfo.getCity() %>" required="required" maxlength="75"/>
 		    	    </li>
 		    	    <li class="nd02">
-		    	    	<select name="<portlet:namespace/>cityType" disabled="disabled">
+		    	    	<select name="<portlet:namespace/>cityType">
 						<%
 							String cityType =btHotelInfo.getCityType()==null?"":btHotelInfo.getCityType();					
 							for (String curCityType : PortletPropsValues.CITY_TYPE) {
@@ -59,10 +59,10 @@
 						</select>
 		    	    </li>
 		    	    <li class="nd02">
-		    	    	<input type="text" name="<portlet:namespace/>hotel" id="hotel" value="<%=btHotelInfo.getHotel()==null?"":btHotelInfo.getHotel() %>" required="required" maxlength="75"  readonly="readonly"/>
+		    	    	<input type="text" name="<portlet:namespace/>hotel" id="hotel" value="<%=btHotelInfo.getHotel()==null?"":btHotelInfo.getHotel() %>" required="required" maxlength="75"/>
 		    	    </li>
 		    	    <li class="nd02">
-		    	    	<input id="d4311" class="Wdate" type="text" name="<portlet:namespace/>checkIn" value="<%=isNew?startDate:sdf.format(btHotelInfo.getCheckIn())%>"  readonly="readonly"
+		    	    	<input id="d4311" class="Wdate" type="text" name="<portlet:namespace/>checkIn" value="<%=isNew?startDate:sdf.format(btHotelInfo.getCheckIn())%>"
 						onFocus="WdatePicker({lang:'en',dateFmt:'dd.MM.yyyy HH:mm',maxDate:'#F{$dp.$D(\'d4312\')}'})"/>					
 		    	    </li>
 		    	</ul>
@@ -76,11 +76,11 @@
 		    	</ul>
 		    	<ul>
 		    		<li class="nd02">
-		    			<input id="d4312" class="Wdate" type="text" name="<portlet:namespace/>checkOut" value="<%=isNew?endDate:sdf.format(btHotelInfo.getCheckOut())%>"  readonly="readonly"
+		    			<input id="d4312" class="Wdate" type="text" name="<portlet:namespace/>checkOut" value="<%=isNew?endDate:sdf.format(btHotelInfo.getCheckOut())%>"
 							onFocus="WdatePicker({lang:'en',dateFmt:'dd.MM.yyyy HH:mm',minDate:'#F{$dp.$D(\'d4311\')}'})"/>	
 		    	    </li>
 		    	    <li class="nd02">
-		    	    	<select name="<portlet:namespace/>roomCategory" onchange='<%=renderResponse.getNamespace()+ "selectNonStandard();"%>' disabled="disabled">
+		    	    	<select name="<portlet:namespace/>roomCategory" onchange='<%=renderResponse.getNamespace()+ "selectNonStandard();"%>'>
 							<%
 								String roomCategory =btHotelInfo.getRoomCategory()==null?"":btHotelInfo.getRoomCategory();					
 								for (String curRoomCategory : PortletPropsValues.ROOM_CATEGORY) {
@@ -94,7 +94,7 @@
 						</select>
 		    	    </li>
 		    	    <li class="nd02">
-		    	    	<input type="text" name="<portlet:namespace/>price" id="price" onblur="checkFloat(this)"  readonly="readonly" onkeyup="this.value=this.value.replace(/[^0-9.]/g,'')" value="<%= String.format("%.2f", btHotelInfo.getPrice())%>" maxlength="75" required="required"/>
+		    	    	<input type="text" name="<portlet:namespace/>price" id="price" onblur="checkFloat(this)"  onkeyup="this.value=this.value.replace(/[^0-9.]/g,'')" value="<%= String.format("%.2f", btHotelInfo.getPrice())%>" maxlength="75" required="required"/>
 		    	    </li>
 		    	    <li class="nd02">
 		    	    	<select id="curreencyID" name="<portlet:namespace/>currency" disabled="disabled">
@@ -121,16 +121,16 @@
 		    	</ul>
 		    	<ul>
 		    	    <li class="nd02">
-		    	    	<input type="checkbox" value='1' <%= btHotelInfo.getIsOverBudget() == 1 ? "checked='checked'": "" %> name="<portlet:namespace/>isOverBudget"  readonly="readonly"/>
+		    	    	<input type="checkbox" value='1' <%= btHotelInfo.getIsOverBudget() == 1 ? "checked='checked'": "" %> name="<portlet:namespace/>isOverBudget" />
 		    	    </li>
 		    	      <li class="nd02">
-		    	      	<textarea name="<portlet:namespace/>otherReasonInfo" maxlength="75"  readonly="readonly"><%=btHotelInfo.getOtherReasonInfo()==null?"":btHotelInfo.getOtherReasonInfo()%></textarea>
+		    	      	<textarea name="<portlet:namespace/>otherReasonInfo" maxlength="75" ><%=btHotelInfo.getOtherReasonInfo()==null?"":btHotelInfo.getOtherReasonInfo()%></textarea>
 		    	    </li>
 		    	    <li class="nd02">
-		    	    	<input type="checkbox" value='<%=true %>' <%= btHotelInfo.getIsNotBookedFromTA() == true ? "checked='checked'": "" %> name="<portlet:namespace/>isNotBookedFromTA"  readonly="readonly"/>
+		    	    	<input type="checkbox" value='<%=true %>' <%= btHotelInfo.getIsNotBookedFromTA() == true ? "checked='checked'": "" %> name="<portlet:namespace/>isNotBookedFromTA" />
 		    	    </li>
 		    	    <li class="nd02">
-		    	    	<textarea name="<portlet:namespace/>othersSpecify" maxlength="75"  readonly="readonly"><%=btHotelInfo.getOthersSpecify()==null?"":btHotelInfo.getOthersSpecify()%></textarea>
+		    	    	<textarea name="<portlet:namespace/>othersSpecify" maxlength="75" ><%=btHotelInfo.getOthersSpecify()==null?"":btHotelInfo.getOthersSpecify()%></textarea>
 		    	    </li>
 		    	</ul>
 		    </div>
@@ -138,7 +138,7 @@
 		
 		<div class="cetBtn">
 			<aui:button-row>
-<%-- 				<%if(!isNew){
+				<%if(!isNew){
 				%>
 				<aui:button style="margin-right:20px;" cssClass="selector-button"
 					value="vgc-apon-button-update"/>
@@ -149,7 +149,7 @@
 					value="vgc.apon.button.confirm" />
 				<%
 				}
-				%>	 --%>			
+				%>				
  			    <aui:button type="cancel"
  				   onClick='<%=renderResponse.getNamespace()+ "cancel();"%>'
 					name="vgc-apon-business-trip-application-hotel-cancel" />
@@ -260,10 +260,10 @@
     }
 
 	window.onload=function(){
-	/* 	var ttv = "<%=travelTypeVal%>";
+		var ttv = "<%=travelTypeVal%>";
 		if(ttv!=0){
 			document.getElementById("curreencyID").disabled = false;
-		} */
+		}
 		var buttons=parent.document.getElementsByTagName("button");
 		for(var i=0;i<buttons.length;i++){		
 			if(buttons[i].className!=null&&buttons[i].className.indexOf("btn close")!=-1){		
@@ -320,5 +320,4 @@
 			commonValidataOverBudget();
 		}
 		});
-	
 </aui:script> 

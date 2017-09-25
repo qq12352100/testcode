@@ -108,8 +108,6 @@ public class BusinessTripReimbursementWrapper
 		attributes.put("costListForeignTotalRmb", getCostListForeignTotalRmb());
 		attributes.put("remark", getRemark());
 		attributes.put("isPaybyRmb", getIsPaybyRmb());
-		attributes.put("evpId", getEvpId());
-		attributes.put("evpName", getEvpName());
 		attributes.put("status", getStatus());
 		attributes.put("sapStatus", getSapStatus());
 		attributes.put("sapComments", getSapComments());
@@ -462,18 +460,6 @@ public class BusinessTripReimbursementWrapper
 
 		if (isPaybyRmb != null) {
 			setIsPaybyRmb(isPaybyRmb);
-		}
-
-		Long evpId = (Long)attributes.get("evpId");
-
-		if (evpId != null) {
-			setEvpId(evpId);
-		}
-
-		String evpName = (String)attributes.get("evpName");
-
-		if (evpName != null) {
-			setEvpName(evpName);
 		}
 
 		Integer status = (Integer)attributes.get("status");
@@ -1672,46 +1658,6 @@ public class BusinessTripReimbursementWrapper
 	@Override
 	public void setIsPaybyRmb(boolean isPaybyRmb) {
 		_businessTripReimbursement.setIsPaybyRmb(isPaybyRmb);
-	}
-
-	/**
-	* Returns the evp ID of this business trip reimbursement.
-	*
-	* @return the evp ID of this business trip reimbursement
-	*/
-	@Override
-	public long getEvpId() {
-		return _businessTripReimbursement.getEvpId();
-	}
-
-	/**
-	* Sets the evp ID of this business trip reimbursement.
-	*
-	* @param evpId the evp ID of this business trip reimbursement
-	*/
-	@Override
-	public void setEvpId(long evpId) {
-		_businessTripReimbursement.setEvpId(evpId);
-	}
-
-	/**
-	* Returns the evp name of this business trip reimbursement.
-	*
-	* @return the evp name of this business trip reimbursement
-	*/
-	@Override
-	public java.lang.String getEvpName() {
-		return _businessTripReimbursement.getEvpName();
-	}
-
-	/**
-	* Sets the evp name of this business trip reimbursement.
-	*
-	* @param evpName the evp name of this business trip reimbursement
-	*/
-	@Override
-	public void setEvpName(java.lang.String evpName) {
-		_businessTripReimbursement.setEvpName(evpName);
 	}
 
 	/**

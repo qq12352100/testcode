@@ -38,7 +38,7 @@ public class BusinessTripReimbursementCacheModel implements CacheModel<BusinessT
 	Externalizable {
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(143);
+		StringBundler sb = new StringBundler(139);
 
 		sb.append("{businessTripReimbursementId=");
 		sb.append(businessTripReimbursementId);
@@ -146,10 +146,6 @@ public class BusinessTripReimbursementCacheModel implements CacheModel<BusinessT
 		sb.append(remark);
 		sb.append(", isPaybyRmb=");
 		sb.append(isPaybyRmb);
-		sb.append(", evpId=");
-		sb.append(evpId);
-		sb.append(", evpName=");
-		sb.append(evpName);
 		sb.append(", status=");
 		sb.append(status);
 		sb.append(", sapStatus=");
@@ -416,15 +412,6 @@ public class BusinessTripReimbursementCacheModel implements CacheModel<BusinessT
 		}
 
 		businessTripReimbursementImpl.setIsPaybyRmb(isPaybyRmb);
-		businessTripReimbursementImpl.setEvpId(evpId);
-
-		if (evpName == null) {
-			businessTripReimbursementImpl.setEvpName(StringPool.BLANK);
-		}
-		else {
-			businessTripReimbursementImpl.setEvpName(evpName);
-		}
-
 		businessTripReimbursementImpl.setStatus(status);
 		businessTripReimbursementImpl.setSapStatus(sapStatus);
 
@@ -554,8 +541,6 @@ public class BusinessTripReimbursementCacheModel implements CacheModel<BusinessT
 		costListForeignTotalRmb = objectInput.readDouble();
 		remark = objectInput.readUTF();
 		isPaybyRmb = objectInput.readBoolean();
-		evpId = objectInput.readLong();
-		evpName = objectInput.readUTF();
 		status = objectInput.readInt();
 		sapStatus = objectInput.readInt();
 		sapComments = objectInput.readUTF();
@@ -789,15 +774,6 @@ public class BusinessTripReimbursementCacheModel implements CacheModel<BusinessT
 		}
 
 		objectOutput.writeBoolean(isPaybyRmb);
-		objectOutput.writeLong(evpId);
-
-		if (evpName == null) {
-			objectOutput.writeUTF(StringPool.BLANK);
-		}
-		else {
-			objectOutput.writeUTF(evpName);
-		}
-
 		objectOutput.writeInt(status);
 		objectOutput.writeInt(sapStatus);
 
@@ -896,8 +872,6 @@ public class BusinessTripReimbursementCacheModel implements CacheModel<BusinessT
 	public double costListForeignTotalRmb;
 	public String remark;
 	public boolean isPaybyRmb;
-	public long evpId;
-	public String evpName;
 	public int status;
 	public int sapStatus;
 	public String sapComments;

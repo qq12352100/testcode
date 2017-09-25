@@ -373,18 +373,6 @@ public class BtTravelExpenseLocalServiceUtil {
 			isHasDinner);
 	}
 
-	/**
-	* To corrected the history data  cost list netAmountRMB value
-	*
-	* @param businessTripReimbursementId
-	* @throws SystemException
-	*/
-	public static void correctAmountRmbDAOfHistoryData(
-		long businessTripReimbursementId)
-		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().correctAmountRmbDAOfHistoryData(businessTripReimbursementId);
-	}
-
 	public static void clearService() {
 		_service = null;
 	}

@@ -63,7 +63,7 @@ SAPUser loginUser=SAPUserLocalServiceUtil.getSapUserByStaffCode(String.valueOf(s
 		<liferay-ui:search-container-column-text name="vgc-apon-business-trip-application-select-approver-company" property="sapCompanyName"/>
 		<liferay-ui:search-container-column-text name="vgc-apon-business-trip-application-select-approver-division" property="divisionName"/>
 		<liferay-ui:search-container-column-text name="vgc-apon-business-trip-application-select-approver-department" property="departmentName"/>
-		<liferay-ui:search-container-column-text name="vgc-apon-business-trip-application-select-approver-evp" property="staffName"/>
+		<liferay-ui:search-container-column-text name="Evp Name" property="staffName"/>
 		<liferay-ui:search-container-column-text name="vgc-apon-business-trip-application-select-approver-function-name" property="positionName"/>
 	</liferay-ui:search-container-row>
 	<liferay-ui:search-iterator />

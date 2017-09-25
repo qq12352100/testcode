@@ -84,8 +84,6 @@ public class BusinessTripReimbursementSoap implements Serializable {
 		soapModel.setCostListForeignTotalRmb(model.getCostListForeignTotalRmb());
 		soapModel.setRemark(model.getRemark());
 		soapModel.setIsPaybyRmb(model.getIsPaybyRmb());
-		soapModel.setEvpId(model.getEvpId());
-		soapModel.setEvpName(model.getEvpName());
 		soapModel.setStatus(model.getStatus());
 		soapModel.setSapStatus(model.getSapStatus());
 		soapModel.setSapComments(model.getSapComments());
@@ -590,22 +588,6 @@ public class BusinessTripReimbursementSoap implements Serializable {
 		_isPaybyRmb = isPaybyRmb;
 	}
 
-	public long getEvpId() {
-		return _evpId;
-	}
-
-	public void setEvpId(long evpId) {
-		_evpId = evpId;
-	}
-
-	public String getEvpName() {
-		return _evpName;
-	}
-
-	public void setEvpName(String evpName) {
-		_evpName = evpName;
-	}
-
 	public int getStatus() {
 		return _status;
 	}
@@ -795,8 +777,6 @@ public class BusinessTripReimbursementSoap implements Serializable {
 	private double _costListForeignTotalRmb;
 	private String _remark;
 	private boolean _isPaybyRmb;
-	private long _evpId;
-	private String _evpName;
 	private int _status;
 	private int _sapStatus;
 	private String _sapComments;

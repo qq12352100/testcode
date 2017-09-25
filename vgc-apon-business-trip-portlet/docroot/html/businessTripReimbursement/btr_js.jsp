@@ -1,15 +1,13 @@
 <%@include file="/html/init.jsp"%>
 <%
-String businessTripReimbursementid  = ParamUtil.getString(request,"businessTripReimbursement");
-String businessTripApplicationid  =  ParamUtil.getString(request,"businessTripApplication");
+String businessTripReimbursementid  = request.getParameter("businessTripReimbursement");
+String businessTripApplicationid  = request.getParameter("businessTripApplication");
 System.out.println("businessTripReimbursementid:"+businessTripReimbursementid);
-String supportFileType =  ParamUtil.getString(request,"supportFileType");
+String supportFileType = request.getParameter("supportFileType");
 System.out.println("supportFileType111:"+request.getParameter("supportFileType"));
-String supportFileSize =  ParamUtil.getString(request,"supportFileSize");
-String importFileType =  ParamUtil.getString(request,"importFileType");
-String importError =  ParamUtil.getString(request,"importError");
-System.out.println("importError:"+importError);
-
+String supportFileSize = request.getParameter("supportFileSize");
+String importFileType = request.getParameter("importFileType");
+String importError = request.getParameter("importError");
 //String myApplicationsPlid = request.getParameter("myApplicationsPlid");
 String prefixUrl = "/web"+themeDisplay.getScopeGroup().getFriendlyURL();	 
 String myApplicationsPageUrl = prefixUrl+PropsUtil.get("vgc.apon.my.applications.page.friendly.url");
@@ -17,57 +15,82 @@ String myApplicationsPageUrl = prefixUrl+PropsUtil.get("vgc.apon.my.applications
 	themeDisplay.getCompanyId(),myApplicationsPageUrl);
 
 if(Validator.isNotNull(businessTripReimbursementid)){
-	BusinessTripReimbursement businessTripReimbursement = BusinessTripReimbursementLocalServiceUtil.fetchBusinessTripReimbursement(Long.parseLong(businessTripReimbursementid));
+	BusinessTripReimbursement businessTripReimbursement = BusinessTripReimbursementLocalServiceUtil.getBusinessTripReimbursement(Long.parseLong(businessTripReimbursementid));
 }
 
 if(Validator.isNotNull(businessTripApplicationid)){
-	BusinessTripApplication businessTripApplication = BusinessTripApplicationLocalServiceUtil.fetchBusinessTripApplication(Long.parseLong(businessTripApplicationid));
+	BusinessTripApplication businessTripApplication = BusinessTripApplicationLocalServiceUtil.getBusinessTripApplication(Long.parseLong(businessTripApplicationid));
 }
+long sCode = themeDisplay.getUser().getFacebookId();
+List<com.cardholder.model.CardHolder> cardHolderList=CardHolderLocalServiceUtil.findBystaffcode(Long.toString(sCode),-1,-1);
+boolean isCardHolder=false;
+if(cardHolderList.size()>0){
+	isCardHolder=true;
+	
+}
+System.out.println("isCardHolder"+isCardHolder);
 %>
 <portlet:resourceURL var="downloadURL"></portlet:resourceURL>
-
 <liferay-portlet:renderURL var="openBusinessTripApplicationURL"
 	windowState="normal" plid="<%=myApplicationsPlid%>"
 	portletName="mysubmissionslist_WAR_vgcaponmysubmissionsportlet">
 	<liferay-portlet:param name="mvcPath"
 		value="/html/mysubmissionslist/details/business_trip_application_details.jsp" />
 	<liferay-portlet:param name="pkId"
-		value='<%=businessTripApplicationid%>' />
+		value='<%=businessTripApplicationid!=null?String.valueOf(businessTripApplicationid):"0"%>' />
 	<liferay-portlet:param name="tabs2" value="completed" />
 </liferay-portlet:renderURL>
-
 
 <aui:script>
 	//When submit the form, there will be a workflow to enabled
 	function <portlet:namespace />submitBusinessTripReimbursement() {
 		if(!validateFileTypeAndSize()) {
 			return false;
-		} 	
+		} 
+		var bussinessTirpTicketNo=document.getElementById('bussinessTirpTicketNo').value;
+		if(bussinessTirpTicketNo==null||bussinessTirpTicketNo==""){
+			alert("Please select bussiness trip ticket");
+			return false;
+		}
+		 var fileNames = document.getElementsByName('<portlet:namespace/>fileName');
+		var fileFlag = true;
+		for(var i=0;i<fileNames.length;i++) {
+			var obj_file = fileNames[i];
+			var fileName = obj_file.value;
+			if(fileName!=null && fileName !=""){
+				fileFlag = false;
+				break;
+			}
+		}	
+		var isCardHolder = "<%=isCardHolder%>"
+		if(isCardHolder=="true"){
+			if(fileFlag){
+				alert("Please upload your bank attachment.");
+				return false;
+			}
+			
+		}	 
 		<portlet:namespace />setFileInfo();
 		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= Constants.PUBLISH %>";
 		submitForm(document.<portlet:namespace />fm);	
 	}
-	
 	function <portlet:namespace />openBtApplicationDetail() {
 		var downloadUrl = '<%=openBusinessTripApplicationURL %>';		
-		window.location.href = downloadUrl;
+		window.location.href = downloadUrl; 
 	}
-	
 	//Save the form data and not enable the workflow
 	function <portlet:namespace />saveBusinessTripReimbursement() {
 		if(!validateFileTypeAndSize()) {
 			return false;
 		} 
 		<portlet:namespace />setFileInfo();
-		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%=(businessTripReimbursementid==""? Constants.ADD : Constants.UPDATE) %>";
+		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= (Validator.isNotNull(businessTripReimbursementid)) ? Constants.ADD : Constants.UPDATE %>";
 		submitForm(document.<portlet:namespace />fm);
 	}
-	
 	function <portlet:namespace />importItinerary(){
 		var fileInput = document.getElementById("pdfImport");
 		fileInput.click();
 	}
-	
 	//validate the field is not null
 	function validateNotNull(inputId, tdIndex) {
 		var portletNamespace = '<portlet:namespace/>';
@@ -194,59 +217,7 @@ if(Validator.isNotNull(businessTripApplicationid)){
 		  fileDiv.removeChild(obj);   
 	}
 	
-	//Validate the file type and size is right
-	function validateFileTypeAndSize() {
-		var fileNames = document.getElementsByName('<portlet:namespace/>fileName');
-		var supportFileType = '<%=supportFileType%>';
-		var supportFileSize = '<%=supportFileSize%>';
-		var flag = true;
-		//get the browser type
-		var  browserCfg = {};  
-        var ua = window.navigator.userAgent;  
-        if (ua.indexOf("MSIE")>=1){  
-            browserCfg.ie = true;  
-        }else if(ua.indexOf("Firefox")>=1){  
-            browserCfg.firefox = true;  
-        }else if(ua.indexOf("Chrome")>=1){  
-            browserCfg.chrome = true;  
-        }  
-		for(var i=0;i<fileNames.length;i++) {
-			var obj_file = fileNames[i];
-			var fileName = obj_file.value;
-			if(fileName!=null && fileName !=""){
-				var validateFileName;
-				var index = fileName.lastIndexOf("\\");
-				if(index>0){
-					validateFileName = fileName.substring(index+1, fileName.lastIndexOf("."));
-				}else{
-				    validateFileName = fileName.substring(0, fileName.lastIndexOf("."));
-				}
-				
-				if(!illegalChar(validateFileName)){
-					return false;
-				}
-				var fileType = (fileName.substring(fileName.lastIndexOf(".")+1,fileName.length)).toLowerCase();
-				if(supportFileType.indexOf(fileType, 0)==-1) {
-					alert('Only support the '+supportFileType+' attachments!');
-					flag = false;
-					break;
-				}
-				var filesize = 0;
-				if(browserCfg.firefox || browserCfg.chrome ){  
-                    filesize = obj_file.files[0].size;  
-                }else if(browserCfg.ie){  
-                	//ie
-                }
-				if(filesize>1024*1024*supportFileSize) {
-					alert('The Max attachments size is '+supportFileSize +'Mb!');
-					flag = false;
-					break;
-				}
-			}
-		}
-		return flag;
-	}
-	
+
 	//format validation	
 	function illegalChar(validateFileName){
 			 var flag=true;
@@ -311,7 +282,6 @@ if(Validator.isNotNull(businessTripApplicationid)){
 						document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />attendeesTotal.value = event.attendeesTotal;
 						document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />mealCategory.value = event.mealCategory;
 						document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />isEntertainment.value ='true';
-						
 						document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />netAmount.value = event.netAmount;
 						document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />taxAmount.value = event.taxAmount;
 						document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />taxRate.value = event.taxRate;
@@ -403,22 +373,7 @@ if(Validator.isNotNull(businessTripApplicationid)){
 			);
 	}
 	
-	function importPdf(){
-		var importFileType = '<%=importFileType%>';
-		var importFile = document.<portlet:namespace />importFm.<portlet:namespace />pdfImport;
-		var fileName = importFile.value;
-		if(fileName!=null && fileName !=""){
-			var fileType = (fileName.substring(fileName.lastIndexOf(".")+1,fileName.length)).toLowerCase();
-			if(importFileType.indexOf(fileType, 0)==-1) {
-				alert('Only support the '+importFileType+' attachments!');
-				return false;
-			}
-		}else {
-			alert('Please choose one file at least!');
-			return false;
-		}			
-		submitForm(document.<portlet:namespace/>importFm);
-	}
+
 	
 	window.onload=function(){
 		var tohere=document.getElementById("tohere").value;
@@ -426,7 +381,7 @@ if(Validator.isNotNull(businessTripApplicationid)){
 			 location.hash="#toherediv";
 		}
 		var importError="<%=importError%>";
-		if(importError!=null&&importError!=""){
+		if(importError!="null"&&importError!=""){
 			if("true"==importError){
 				alert("import flight PDF Success!");
 			}else if("No"==importError){
@@ -436,62 +391,9 @@ if(Validator.isNotNull(businessTripApplicationid)){
 			}	
 		}
 	}
-	
-	function changeGetRMB(obj){
-		console.log(obj.checked);
-		document.<portlet:namespace />applicantAgentForm.<portlet:namespace />tempIsGetRMB.value =obj.checked;
-		document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />tempIsGetRMB.value = obj.checked;
-		document.<portlet:namespace />importFm.<portlet:namespace />tempIsGetRMB.value = obj.checked;
-		document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />tempIsGetRMB.value = obj.checked;
-	}
-
-	function changeApplicantAgent(obj){
-		console.log(obj.checked);
-		//document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />isApplicantAgent.value = document.<portlet:namespace />fm.<portlet:namespace />isApplicantAgent.checked;
-		document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />isApplicantAgent.value = obj.checked;
-		document.<portlet:namespace />importFm.<portlet:namespace />isApplicantAgent.value = obj.checked;
-		document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />isApplicantAgent.value = obj.checked;
-		document.<portlet:namespace />searchBussinessTirpTicketNo.<portlet:namespace />isApplicantAgent.value = obj.checked;
-	}
 </aui:script>
 
 <aui:script use="liferay-search-container">
-var selectApproverLink = A.one('#selectApprover');
-if (selectApproverLink) {
-          selectApproverLink.on(
-                   'click',
-                   function(event) {
-                             Liferay.Util.selectEntity(
-                                      {
-                                                dialog: {
-                                                          constrain: true,
-                                                          modal: true
-                                                },
-                                                id: '<portlet:namespace />selectApprover',
-                                                title: '<liferay-ui:message key="vgc-apon-business-trip-application-select-approver-title" />',
-                                                uri:'<portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="mvcPath" value="/html/businessTripReimbursement/select_approver.jsp" /></portlet:renderURL>'
-                                      },
-                                      function(event) {
-                                    	 
-                                                document.getElementById("approverId").value=event.approverId;
-                                                document.getElementById("approverName").value=event.approverName;
-                                                
-                                        		document.<portlet:namespace />applicantAgentForm.<portlet:namespace />tempApproverId.value = event.approverId;
-                                        		document.<portlet:namespace />applicantAgentForm.<portlet:namespace />tempApproverName.value = event.approverName;
-                                        		document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />tempApproverId.value = event.approverId;
-                                        		document.<portlet:namespace />addDetailInfoFm.<portlet:namespace />tempApproverName.value = event.approverName;
-                                        		document.<portlet:namespace />importFm.<portlet:namespace />tempApproverId.value = event.approverId;
-                                        		document.<portlet:namespace />importFm.<portlet:namespace />tempApproverName.value = event.approverName;
-                                        		document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />tempApproverId.value = event.approverId;
-                                        		document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />tempApproverName.value = event.approverName;
-                                        		/* document.<portlet:namespace />searchBussinessTirpTicketNo.<portlet:namespace />tempApproverId.value = event.approverId;
-                                        		document.<portlet:namespace />searchBussinessTirpTicketNo.<portlet:namespace />tempApproverName.value = event.approverName; */
-                                      }
-                             );
-                   }
-          );
-}
-
 var searchBussinessTirpTicketNoLink = A.one('#<portlet:namespace />searchBussinessTirpTicketNo');
 if (searchBussinessTirpTicketNoLink) {
 	searchBussinessTirpTicketNoLink.on(
@@ -580,8 +482,5 @@ function CheckTripType(val) {
 			car.style.display = "block";
 		}
 	}
-
 }
 </aui:script>
-
-

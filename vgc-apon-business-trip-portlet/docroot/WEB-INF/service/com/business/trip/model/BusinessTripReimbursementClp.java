@@ -133,8 +133,6 @@ public class BusinessTripReimbursementClp extends BaseModelImpl<BusinessTripReim
 		attributes.put("costListForeignTotalRmb", getCostListForeignTotalRmb());
 		attributes.put("remark", getRemark());
 		attributes.put("isPaybyRmb", getIsPaybyRmb());
-		attributes.put("evpId", getEvpId());
-		attributes.put("evpName", getEvpName());
 		attributes.put("status", getStatus());
 		attributes.put("sapStatus", getSapStatus());
 		attributes.put("sapComments", getSapComments());
@@ -487,18 +485,6 @@ public class BusinessTripReimbursementClp extends BaseModelImpl<BusinessTripReim
 
 		if (isPaybyRmb != null) {
 			setIsPaybyRmb(isPaybyRmb);
-		}
-
-		Long evpId = (Long)attributes.get("evpId");
-
-		if (evpId != null) {
-			setEvpId(evpId);
-		}
-
-		String evpName = (String)attributes.get("evpName");
-
-		if (evpName != null) {
-			setEvpName(evpName);
 		}
 
 		Integer status = (Integer)attributes.get("status");
@@ -1884,52 +1870,6 @@ public class BusinessTripReimbursementClp extends BaseModelImpl<BusinessTripReim
 	}
 
 	@Override
-	public long getEvpId() {
-		return _evpId;
-	}
-
-	@Override
-	public void setEvpId(long evpId) {
-		_evpId = evpId;
-
-		if (_businessTripReimbursementRemoteModel != null) {
-			try {
-				Class<?> clazz = _businessTripReimbursementRemoteModel.getClass();
-
-				Method method = clazz.getMethod("setEvpId", long.class);
-
-				method.invoke(_businessTripReimbursementRemoteModel, evpId);
-			}
-			catch (Exception e) {
-				throw new UnsupportedOperationException(e);
-			}
-		}
-	}
-
-	@Override
-	public String getEvpName() {
-		return _evpName;
-	}
-
-	@Override
-	public void setEvpName(String evpName) {
-		_evpName = evpName;
-
-		if (_businessTripReimbursementRemoteModel != null) {
-			try {
-				Class<?> clazz = _businessTripReimbursementRemoteModel.getClass();
-
-				Method method = clazz.getMethod("setEvpName", String.class);
-
-				method.invoke(_businessTripReimbursementRemoteModel, evpName);
-			}
-			catch (Exception e) {
-				throw new UnsupportedOperationException(e);
-			}
-		}
-	}
-
-	@Override
 	public int getStatus() {
 		return _status;
 	}
@@ -2550,8 +2490,6 @@ public class BusinessTripReimbursementClp extends BaseModelImpl<BusinessTripReim
 		clone.setCostListForeignTotalRmb(getCostListForeignTotalRmb());
 		clone.setRemark(getRemark());
 		clone.setIsPaybyRmb(getIsPaybyRmb());
-		clone.setEvpId(getEvpId());
-		clone.setEvpName(getEvpName());
 		clone.setStatus(getStatus());
 		clone.setSapStatus(getSapStatus());
 		clone.setSapComments(getSapComments());
@@ -2619,7 +2557,7 @@ public class BusinessTripReimbursementClp extends BaseModelImpl<BusinessTripReim
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(143);
+		StringBundler sb = new StringBundler(139);
 
 		sb.append("{businessTripReimbursementId=");
 		sb.append(getBusinessTripReimbursementId());
@@ -2727,10 +2665,6 @@ public class BusinessTripReimbursementClp extends BaseModelImpl<BusinessTripReim
 		sb.append(getRemark());
 		sb.append(", isPaybyRmb=");
 		sb.append(getIsPaybyRmb());
-		sb.append(", evpId=");
-		sb.append(getEvpId());
-		sb.append(", evpName=");
-		sb.append(getEvpName());
 		sb.append(", status=");
 		sb.append(getStatus());
 		sb.append(", sapStatus=");
@@ -2770,7 +2704,7 @@ public class BusinessTripReimbursementClp extends BaseModelImpl<BusinessTripReim
 
 	@Override
 	public String toXmlString() {
-		StringBundler sb = new StringBundler(217);
+		StringBundler sb = new StringBundler(211);
 
 		sb.append("<model><model-name>");
 		sb.append("com.business.trip.model.BusinessTripReimbursement");
@@ -2989,14 +2923,6 @@ public class BusinessTripReimbursementClp extends BaseModelImpl<BusinessTripReim
 		sb.append(getIsPaybyRmb());
 		sb.append("]]></column-value></column>");
 		sb.append(
-			"<column><column-name>evpId</column-name><column-value><![CDATA[");
-		sb.append(getEvpId());
-		sb.append("]]></column-value></column>");
-		sb.append(
-			"<column><column-name>evpName</column-name><column-value><![CDATA[");
-		sb.append(getEvpName());
-		sb.append("]]></column-value></column>");
-		sb.append(
 			"<column><column-name>status</column-name><column-value><![CDATA[");
 		sb.append(getStatus());
 		sb.append("]]></column-value></column>");
@@ -3119,8 +3045,6 @@ public class BusinessTripReimbursementClp extends BaseModelImpl<BusinessTripReim
 	private double _costListForeignTotalRmb;
 	private String _remark;
 	private boolean _isPaybyRmb;
-	private long _evpId;
-	private String _evpName;
 	private int _status;
 	private int _sapStatus;
 	private String _sapComments;

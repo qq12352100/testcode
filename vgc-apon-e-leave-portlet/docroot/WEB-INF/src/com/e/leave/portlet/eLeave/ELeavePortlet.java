@@ -5,7 +5,6 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -148,11 +147,6 @@ public class ELeavePortlet extends MVCPortlet{
 		sb.append("?p_p_id=").append(redirectPortletId).append("&_").append(redirectPortletId).append("_tabs2=");
 		if(cmd.equals(Constants.PUBLISH)){
 			String transitionName = ParamUtil.getString(uploadPortletRequest, "transitionName");
-			/**
-			 * when supervisor reject the ticket, then change the e-leave content, the transitionName will be lost.  So here to check again.
-			 */
-			transitionName = WorkflowInstanceLinkLocalServiceUtil.fetchWorkflowInstanceLink(themeDisplay.getCompanyId(),eLeave.getGroupId(), ELeave.class.getName(), eLeave.getELeaveId())==null?transitionName:"resubmit";
-			System.out.println("********AddELeave**************transitionName***********="+transitionName);
 			if("resubmit".equals(transitionName)) {
 				long companyId = serviceContext.getCompanyId();
 				WorkflowInstanceLink w = WorkflowInstanceLinkLocalServiceUtil.fetchWorkflowInstanceLink(companyId, eLeave.getGroupId(), ELeave.class.getName(), eLeaveId);
@@ -302,7 +296,7 @@ public class ELeavePortlet extends MVCPortlet{
 			String typeOfLeave = ParamUtil.getString(resourceRequest, "typeOfLeave");
 			String typeOfLeaveTxt=LanguageUtil.get(LocaleUtil.getDefault(), typeOfLeave);
 			String typeOfLeaveId=ELConstants.getTypeOfLeaveCode(typeOfLeaveTxt);
-			String startDates = ParamUtil.getString(resourceRequest, "startDates"); 
+			String startDates = ParamUtil.getString(resourceRequest, "startDates");
 			String endDates = ParamUtil.getString(resourceRequest, "endDates");
 			String startTimes = ParamUtil.getString(resourceRequest, "startTimes");
 			String endTimes = ParamUtil.getString(resourceRequest, "endTimes");
@@ -404,15 +398,8 @@ public class ELeavePortlet extends MVCPortlet{
 							System.out.println("absenceDays1= "+absenceDays1);
 							System.out.println("absenceDays2= "+absenceDays2);
 							System.out.println("totalEntitlement= "+totalEntitlement);
-						//JAVA-672
 							leaveDaysBefor=totalEntitlement-tduration-absenceDays1-absenceDays2;
-							BigDecimal bd2 = new BigDecimal(leaveDaysBefor);
-							leaveDaysBefor = bd2.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
-							
 							leaveDaysAfter=leaveDaysBefor-totalDuration;
-							bd2 = new BigDecimal(leaveDaysAfter);
-							leaveDaysAfter = bd2.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
-							
 							isLeaveDaysAfter=leaveDaysAfter<0d?true:false;
 							if("0900".equals(typeOfLeaveId)){
 								double absenceDays3= 0;
@@ -434,26 +421,18 @@ public class ELeavePortlet extends MVCPortlet{
 					throw new RuntimeException();
 				} catch (ParseException e) {
 					e.printStackTrace();
-					throw new RuntimeException();    
+					throw new RuntimeException();
 				}
 				if("0140".equals(typeOfLeaveId)||"0300".equals(typeOfLeaveId)||"0301".equals(typeOfLeaveId)||"0400".equals(typeOfLeaveId)||"0124".equals(typeOfLeaveId)){
 					if(startDates.split(",").length==1&&startTimes.split(",").length==1&&endDates.split(",").length==1&&endTimes.split(",").length==1){
 						SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 						String startDateStr=startDates.split(",")[0]+" "+startTimes.split(",")[0];
-						System.out.println("0300 startDateStr="+startDateStr);
 						String endDateStr=endDates.split(",")[0]+" "+endTimes.split(",")[0];	
-						System.out.println("0300 endDateStr="+endDateStr);
 						try {
 							Date startDate=sdf.parse(startDateStr);
-							System.out.println("0300 startDate="+startDate);
 							Date endDate=sdf.parse(endDateStr);
-							System.out.println("0300 endDate="+endDate);
 							long m =endDate.getTime()-startDate.getTime();
-							System.out.println("0300 m="+m);
 							duration=Double.valueOf((m/86400000))+1d;
-							System.out.println("0300 duration="+duration);
-							durationList=new ArrayList<String>();
-							durationList.add(String.valueOf(duration));
 						} catch (ParseException e) {
 							e.printStackTrace();
 							throw new RuntimeException();
@@ -473,7 +452,7 @@ public class ELeavePortlet extends MVCPortlet{
 			}
 			jsonObj.put("isLeaveInfoExist",isLeaveInfoExist);
 			jsonObj.put("totalLeaveEntitlement",totalLeaveEntitlement);	
-			jsonObj.put("isCheck",true);
+			jsonObj.put("isCheck",isCheck);
 			jsonObj.put("isUnpaidLeave",isUnpaidLeave);
 			jsonObj.put("isLeaveDaysAfter",isLeaveDaysAfter);
 			jsonObj.put("msg",msg);

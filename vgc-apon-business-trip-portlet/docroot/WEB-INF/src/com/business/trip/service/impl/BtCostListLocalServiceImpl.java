@@ -14,6 +14,7 @@
 
 package com.business.trip.service.impl;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.business.trip.model.BtCostList;
@@ -196,5 +197,35 @@ public class BtCostListLocalServiceImpl extends BtCostListLocalServiceBaseImpl {
 			}
 		}
 		return newTotal;
+	}
+	
+	/**
+	 * To corrected the history data  cost list netAmountRMB value
+	 * @param businessTripReimbursementId
+	 * @throws SystemException 
+	 */
+	public void  correctAmountRmbCostListOfHistoryData(long businessTripReimbursementId) throws SystemException{
+		List<BtCostList> costList =	btCostListPersistence.findByBusinessTripPkId(businessTripReimbursementId);
+		if(costList != null){
+			BigDecimal bd2 = null;
+			for(BtCostList cost : costList){
+				if(cost.getNetAmount()==0.0){
+					bd2 = new BigDecimal(cost.getPaymentAmount()-cost.getTaxAmount());
+					cost.setNetAmount( bd2.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+				}else if("RMB".equals(cost.getPaymentCurrency())&&cost.getTaxAmount()==0.0){
+					bd2 = new BigDecimal(cost.getPaymentAmount()-cost.getNetAmount());
+					cost.setTaxAmount( bd2.setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+				}
+				if("RMB".equals(cost.getPaymentCurrency())){
+					cost.setNetAmountRmb(cost.getPaymentAmount());
+				}else{
+					if(cost.getNetAmountRmb() == 0 || cost.getNetAmountRmb()== cost.getPaymentAmount()){
+						cost.setNetAmountRmb(BtExchangeRateLocalServiceUtil.changeEURToRMB(cost.getPaymentAmount()));
+					}
+				}
+				this.updateBtCostList(cost);
+			}
+		}
+		
 	}
 }

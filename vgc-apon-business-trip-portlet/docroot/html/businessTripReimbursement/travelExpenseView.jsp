@@ -2,12 +2,16 @@
 String tripTypeString="0";
 double travelExpenseTotalRmb = 0.0;
 double travelExpenseTotalEur = 0.0;
+double travelExpenseTotalEurToRmb =0.0;
 if(businessTripReimbursement!=null){
 	tripTypeString=String.valueOf(businessTripReimbursement.getTripType());
+	//correct allowance amount for history data and wrong data
+	BtTravelExpenseLocalServiceUtil.correctAmountRmbDAOfHistoryData(businessTripReimbursement.getBusinessTripReimbursementId());
 	
 	travelExpenseTotalRmb = BtTravelExpenseLocalServiceUtil.findSumByCurrency(businessTripReimbursement.getBusinessTripReimbursementId(), "RMB");
 	travelExpenseTotalEur = BtTravelExpenseLocalServiceUtil.findSumByCurrency(businessTripReimbursement.getBusinessTripReimbursementId(), "EUR");
-	
+	travelExpenseTotalEurToRmb = BtTravelExpenseLocalServiceUtil.findSumInRMBByCurrency(businessTripReimbursement.getBusinessTripReimbursementId(),"EUR");
+	System.out.println("travelExpenseTotalEurToRmb****"+travelExpenseTotalEurToRmb);
 	if(businessTripReimbursement.getTotalTravelExpenseRmb()!=travelExpenseTotalRmb||
 			businessTripReimbursement.getTotalTravelExpenseEur()!=travelExpenseTotalEur){
 		businessTripReimbursement.setTotalTravelExpenseRmb(travelExpenseTotalRmb);
@@ -63,8 +67,8 @@ com.business.trip.model.BtTravelExpense btTravelExpense_=BtTravelExpenseLocalSer
 		<liferay-ui:search-container-column-text name="vgc-apon-business-trip-reimbursement-travel-expense-dally" >
 		<%=String.format("%.2f",btTravelExpense.getAllowance())%>
 		</liferay-ui:search-container-column-text>
-		<liferay-ui:search-container-column-text name="vgc-apon-business-trip-reimbursement-travel-expense-dally-rmb" >
-		<%=String.format("%.2f",btTravelExpense.getAllowanceRmb())%>
+		<liferay-ui:search-container-column-text name="vgc-apon-business-trip-reimbursement-travel-expense-dally-rmb" cssClass="special" >
+			<%=String.format("%.2f",btTravelExpense.getAllowanceRmb())%>
 		</liferay-ui:search-container-column-text>
 		<liferay-ui:search-container-column-text name="vgc-apon-business-trip-reimbursement-travel-expense-comments" property="comments" />
 		<liferay-ui:search-container-column-text name="vgc-apon-delete">
@@ -93,14 +97,21 @@ com.business.trip.model.BtTravelExpense btTravelExpense_=BtTravelExpenseLocalSer
 		<liferay-ui:message key="vgc-apon-business-trip-reimbursement-travel-expense-total-eur"></liferay-ui:message>
 		<%=String.format("%.2f",travelExpenseTotalEur)%>
 		<liferay-ui:message key="vgc-apon-business-trip-application-hotel-eur"></liferay-ui:message>
+		<div id="<portlet:namespace/>totalRMBAmountOfEURTravelExpense" style='display:inline'>&nbsp;
+			<%=String.format("%.2f",travelExpenseTotalEurToRmb)%>
+			<liferay-ui:message key="vgc-apon-business-trip-application-hotel-rmb" />
+		</div>
 	</h5>
 </div>
 <div style="display:none;">
 	<h5>
-		<liferay-ui:message key="vgc-apon-business-trip-reimbursement-travel-expense-total"></liferay-ui:message>
-		<%=String.format("%.2f",businessTripReimbursement.getTotalTravelExpenseRmb())%>
+		<liferay-ui:message
+			key="vgc-apon-business-trip-reimbursement-travel-expense-total"></liferay-ui:message>
+		<%=String.format("%.2f",
+					businessTripReimbursement.getTotalTravelExpenseRmb())%>
 		<liferay-ui:message key="vgc-apon-business-trip-application-hotel-rmb"></liferay-ui:message>
-		<%=String.format("%.2f",businessTripReimbursement.getTotalTravelExpenseEur())%>
+		<%=String.format("%.2f",
+					businessTripReimbursement.getTotalTravelExpenseEur())%>
 		<liferay-ui:message key="vgc-apon-business-trip-application-hotel-eur"></liferay-ui:message>
 	</h5>
 </div>

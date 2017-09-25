@@ -230,7 +230,7 @@ public class BusinessTripApplicationPortlet extends MVCPortlet {
 
 		// Get the URL to redirect
 		String url = themeDisplay.getURLPortal();
-		url =  url.indexOf("8080") != -1 ? "" : url
+		url = url.indexOf("9080") != -1 || url.indexOf("8080") != -1 ? "" : url
 				.substring(url.lastIndexOf('/'));
 		StringBuffer sb = new StringBuffer(url);
 		String friendlyUrl = PropsUtil

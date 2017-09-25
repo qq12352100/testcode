@@ -115,7 +115,7 @@
 			businessTripReimbursement.setFlightTaxes(flightTaxes);
 			businessTripReimbursement.setFlightTransactionFee(flightTransactionFee);
 		}
-		
+	
 		String url = themeDisplay.getURLPortal();
 		url = url.indexOf("9080") != -1 || url.indexOf("8080") != -1 ? "" : url.substring(url.lastIndexOf('/'));
 		
@@ -162,7 +162,13 @@
 	boolean tempIsAppliantAgent = ParamUtil.getBoolean(request, "isApplicantAgent",false);
 	String tempApproverId = ParamUtil.getString(request, "tempApproverId","");
 	String tempApproverName = ParamUtil.getString(request, "tempApproverName","");
-	boolean tempIsGetRMB = ParamUtil.getBoolean(request, "tempIsGetRMB",false);
+	String tempIsGetRMBStr = ParamUtil.getString(request, "tempIsGetRMB");
+	Boolean tempIsGetRMB = null;
+	if(tempIsGetRMBStr==null || "".equals(tempIsGetRMBStr)){
+		tempIsGetRMB = businessTripReimbursement.getIsPaybyRmb();
+	}else{
+		tempIsGetRMB = Boolean.valueOf(tempIsGetRMBStr);
+	}
 %>
 
 <portlet:actionURL var="addBusinessTripReimbursementURL" windowState="normal">
@@ -238,7 +244,7 @@
 	<input type="hidden" name="<portlet:namespace/>tempApproverName"
 		value='<%="".equals(tempApproverName)?businessTripReimbursement.getApproverName():tempApproverName%>' />
 	<input type="hidden" name="<portlet:namespace/>tempIsGetRMB"
-		value='<%=businessTripReimbursement.getIsPaybyRmb()||tempIsGetRMB?"true":"false" %>' />
+		value='<%=tempIsGetRMB %>' />
 		
 </aui:form>
 
@@ -292,7 +298,7 @@
 	<input type="hidden" name="<portlet:namespace/>tempApproverName"
 		value='<%="".equals(tempApproverName)?businessTripReimbursement.getApproverName():tempApproverName%>' />
 	<input type="hidden" name="<portlet:namespace/>tempIsGetRMB"
-		value='<%=businessTripReimbursement.getIsPaybyRmb()||tempIsGetRMB?"true":"false"%>' />	
+		value='<%=tempIsGetRMB%>' />	
 </aui:form>
 
 <%-- <portlet:resourceURL var="downloadURL"></portlet:resourceURL> --%>
@@ -586,13 +592,13 @@
 					value="<%=businessTripReimbursement.getVisitCountriesCities()%>"
 					readonly="readonly"></li>
 				<%
-				   if(businessTripReimbursement.getTripType()==1 && "RMB".equals(businessTripReimbursement.getCurrency())){
+				   if(businessTripReimbursement.getTripType()==1 && ("RMB".equals(businessTripReimbursement.getCurrency())||businessTripReimbursement.getAdvancePayment()==0)){
 				%>	
 					<li class="md01"><liferay-ui:message key="vgc-apon-business-trip-application-is-payed-byRMB" /></li>
 					<li class="md022"><input type="checkbox" id="isPaybyRmb" name="<portlet:namespace/>isPaybyRmb" value='<%=true%>' onclick="changeGetRMB(this);"
-						<%=businessTripReimbursement.getIsPaybyRmb()||tempIsGetRMB?"checked='checked'":""%>
+						<%--  <%=tempIsGetRMB?"checked='checked'":""%> --%>  checked='checked'
 					 />
-					 
+					 <li style="padding-left:42px;font-style:italic;color: red;width:400px;margin-left: 660px;margin-top: -20px;">Note:VGIC can not reimburse EUR,VGIC employees must NOT change this option or the application will be rejected.<p></p></li>
 					 </li>
 				 <%
 				   }
@@ -634,6 +640,7 @@
 				<%@ include file="/html/businessTripReimbursement/costListView.jsp"%>
 			</liferay-ui:section>
 		</liferay-ui:tabs>
+		<p style="padding-left:10px;font-style:italic; color: red;"><liferay-ui:message key="vgc-apon-business-trip-reimbursement-hotel-remark"/></p>
 		<%
 		String advanceStyle="";
 		if(businessTripApplication!=null){
@@ -692,12 +699,12 @@
 			</ul>
 		</div>
 		<!-- **************************************************************Upload the attachments start...******************************************************************************************* -->
-		<div class="attachmentList" style="width: 1114px;">
-			<div class="subtitle" style="width: 1114px;">Attachment list</div>
-			<div class="gridtb" style="width: 1114px;">
+		<div class="attachmentList">
+			<div class="subtitle">Attachment list</div>
+			<div class="gridtb">
 				<ul>
 					<li class="od01">Attachment Name</li>
-					<li class="od02">File Name</li>
+					<li class="od02">File Name<font color="red">* (Attachment is mandatory)</font></li>
 					<li class="od01">Upload Date</li>
 					<li class="od01 lcol">Action</li>
 				</ul>
@@ -744,46 +751,8 @@
 				<p style="padding-left:10px;padding-top: 30px;font-style:italic; color: red;"><liferay-ui:message key="vgc.apon.business.trip.attachmentList.notes" /></p>
 			</div>
 		</div>
-		<!-- ***************************wt***********************************Upload the attachments end...******************************************************************************************* -->
-		<div class="approvalStatusInfo"
-			style='display: <%=auditTrailLogs.size()>0?"block":"none"%>'>
-			<div class="subtitle">
-				<liferay-ui:message
-							key="vgc.apon.audit.trail.log.approval.status.information" />
-			</div>
-			<div class="gridtb" style="width:1223px;">
-				<ul>
-					<li class="od03"><liferay-ui:message
-							key="vgc.apon.audit.trail.log.no" /></li>
-					<li class="od04"><liferay-ui:message
-							key="vgc.apon.audit.trail.log.approver.applicant.role" /></li>
-					<li class="od04"><liferay-ui:message
-							key="vgc.apon.audit.trail.log.approver.applicant" /></li>
-					<li class="od04"><liferay-ui:message
-							key="vgc.apon.audit.trail.log.action.status" /></li>
-					<li class="od04"><liferay-ui:message
-							key="vgc.apon.audit.trail.log.time" /></li>
-					<li class="od04 lcol"><liferay-ui:message
-							key="vgc.apon.audit.trail.log.comment" /></li>
-				</ul>
-				<%
-					for(int i=0;i<auditTrailLogs.size();i++) {
-									AuditTrailLog auLog = auditTrailLogs.get(i);
-				%>
-				<ul class="std">
-					<li class="od03"><%=i+1%></li>
-					<li class="od04"><%=auLog.getOperationRole()%></li>
-					<li class="od04"><%=auLog.getOperationUser()%></li>
-					<li class="od04"><%=auLog.getOperationStatus()%></li>
-					<li class="od04"><%=auLog.getOperationTime()==null?"":sdf.format(auLog.getOperationTime())%></li>
-					<li class="od04 lcol"><%=auLog.getOperationComment()%></li>
-				</ul>
-				<%
-					}
-				%>
-			</div>
-		</div>
-		<!-- **************************************************************Upload the attachments end...******************************************************************************************* -->	
+		<!-- **************************************************************Upload the attachments end...******************************************************************************************* -->
+
 		<div class="comment">
 			<p>
 				<liferay-ui:message key="vgc-apon-business-trip-application-remark" />
@@ -824,7 +793,7 @@
 	<input type="hidden" name="<portlet:namespace/>tempApproverName"
 		value='<%="".equals(tempApproverName)?businessTripReimbursement.getApproverName():tempApproverName%>' />
 	<input type="hidden" name="<portlet:namespace/>tempIsGetRMB"
-		value='<%=businessTripReimbursement.getIsPaybyRmb()||tempIsGetRMB?"true":"false"%>' />
+		value='<%=tempIsGetRMB%>' />
 	</aui:fieldset>
 </aui:form>
 
@@ -976,7 +945,7 @@
 	<input type="hidden" name="<portlet:namespace/>tempApproverName"
 		value='<%="".equals(tempApproverName)?businessTripReimbursement.getApproverName():tempApproverName%>' />
 	<input type="hidden" name="<portlet:namespace/>tempIsGetRMB"
-		value='<%=businessTripReimbursement.getIsPaybyRmb()||tempIsGetRMB?"true":"false"%>' />	
+		value='<%=tempIsGetRMB%>' />	
 </aui:form>
 <liferay-util:include page="/html/businessTripReimbursement/view_js.jsp"  servletContext="<%= this.getServletContext() %>">
 	<liferay-util:param name="businessTripReimbursement" value="<%=String.valueOf(businessTripReimbursementId) %>"/>
@@ -984,6 +953,7 @@
 	<liferay-util:param name="supportFileSize" value="<%=supportFileSize %>"/>
 	<liferay-util:param name="importFileType" value="<%=importFileType %>"/>
 	<liferay-util:param name="importError" value="<%=importError %>"/>
+	<liferay-util:param name="tempIsGetRMB" value="<%=String.valueOf(tempIsGetRMB) %>"/>
 	<liferay-util:param name="myApplicationsPlid" value="<%=String.valueOf(myApplicationsPlid) %>"/>
 	<liferay-util:param name="businessTripApplication" value="<%=Validator.isNotNull(businessTripApplication)?String.valueOf(businessTripApplication.getBusinessTripApplicationId()):StringPool.BLANK %>"/>
 </liferay-util:include>

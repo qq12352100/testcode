@@ -29,8 +29,8 @@ String selectedRateUrl = "/html/businessTripReimbursement/travelExpenseRateOfDma
 	}
 	
 	boolean isHasBreakfast=false;
-	String from="";
-	String to="";
+	String from="-";
+	String to="-";
 	if(!isNew){
 		from=btTravelExpense.getFromCity();
 		to=btTravelExpense.getToCity();

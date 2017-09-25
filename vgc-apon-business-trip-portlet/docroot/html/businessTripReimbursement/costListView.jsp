@@ -10,6 +10,8 @@ boolean updateBTRFlag = false;
 if(businessTripReimbursement!=null){
 	tripTypeCostList=String.valueOf(businessTripReimbursement.getTripType());
 	ticketNo=businessTripReimbursement.getBussinessTirpTicketNo();
+	//correct the history data and wrong data
+	BtCostListLocalServiceUtil.correctAmountRmbCostListOfHistoryData(businessTripReimbursementId);
 	
 	String RMB = "RMB";
 	String EUR = "EUR";
@@ -81,7 +83,7 @@ if(businessTripReimbursement!=null){
 				<%=String.format("%.2f",btCostList.getPaymentAmount())%>
 			</liferay-ui:search-container-column-text>	
 			<liferay-ui:search-container-column-text name="vgc-apon-business-trip-reimbursement-cost-list-rmb-amount"
-				property="netAmountRmb" >			
+				property="netAmountRmb" cssClass="special" >			
 				<%=String.format("%.2f",btCostList.getNetAmountRmb())%>
 			</liferay-ui:search-container-column-text>	
 			<liferay-ui:search-container-column-text name="vgc-apon-delete">
@@ -97,11 +99,11 @@ if(businessTripReimbursement!=null){
 		 onClick='<%= renderResponse.getNamespace() + "openAddPageCost();" %>'/>
     </aui:button-row>	    
     <!-- this is for total information -->
-    <div class="pos">
+    <div class="pos" >
        <ul>
          <li><h5><liferay-ui:message key="vgc-apon-business-trip-reimbursement-cost-list-inland-total-rmb"/><%=String.format("%.2f",businessTripReimbursement.getCostListInlandTotalRmb())%><liferay-ui:message key="vgc-apon-business-trip-application-hotel-rmb"/></h5></li>
          <li><h5><liferay-ui:message key="vgc-apon-business-trip-reimbursement-cost-list-foreign-total"/><%=String.format("%.2f",businessTripReimbursement.getCostListForeignTotalEur())%><liferay-ui:message key="vgc-apon-business-trip-application-hotel-eur"/>&nbsp;<%=String.format("%.2f",businessTripReimbursement.getCostListForeignTotalRmb())%><liferay-ui:message key="vgc-apon-business-trip-application-hotel-rmb"/></h5></li>
-      	 <li><h5><liferay-ui:message key="vgc-apon-business-trip-reimbursement-cost-list-total-inrmb"/><%=String.format("%.2f",businessTripReimbursement.getCostListInlandTotalRmb()+businessTripReimbursement.getCostListForeignTotalRmb())%><liferay-ui:message key="vgc-apon-business-trip-application-hotel-rmb"/></h5>
+      	 <li id="<portlet:namespace/>totalRMBAmountOfCost"><h5><liferay-ui:message key="vgc-apon-business-trip-reimbursement-cost-list-total-inrmb"/><%=String.format("%.2f",businessTripReimbursement.getCostListInlandTotalRmb()+businessTripReimbursement.getCostListForeignTotalRmb())%><liferay-ui:message key="vgc-apon-business-trip-application-hotel-rmb"/></h5></li>
        </ul>   
     </div>
   
@@ -128,7 +130,7 @@ if(businessTripReimbursement!=null){
 					constrain: true,
 					modal: true,
 					width:1200,
-					height:550
+					height:450
 				},
 				id: '<portlet:namespace />AddBusinessTripReimbursement',
 				title: '<liferay-ui:message  key="vgc-apon-add"/>',

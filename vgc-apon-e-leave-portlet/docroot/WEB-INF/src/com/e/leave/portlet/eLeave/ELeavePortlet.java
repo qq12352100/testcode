@@ -294,6 +294,7 @@ public class ELeavePortlet extends MVCPortlet{
 			String eLeaveId = ParamUtil.getString(resourceRequest, "eLeaveId");	
 			String staffCode = ParamUtil.getString(resourceRequest, "staffCode");	
 			String typeOfLeave = ParamUtil.getString(resourceRequest, "typeOfLeave");
+			System.out.println("typeOfLeave:"+typeOfLeave);
 			String typeOfLeaveTxt=LanguageUtil.get(LocaleUtil.getDefault(), typeOfLeave);
 			String typeOfLeaveId=ELConstants.getTypeOfLeaveCode(typeOfLeaveTxt);
 			String startDates = ParamUtil.getString(resourceRequest, "startDates");
@@ -318,16 +319,17 @@ public class ELeavePortlet extends MVCPortlet{
 			if(!"9001".equals(typeOfLeaveId)&&!"9002".equals(typeOfLeaveId)&&!"9003".equals(typeOfLeaveId)&&!"9004".equals(typeOfLeaveId)){
 				try {
 					isLeaveInfoExist=ELeaveInfoLocalServiceUtil.isLeaveInfoExist(Long.valueOf(eLeaveId), typeOfLeave);
+					System.out.println("isLeaveInfoExist:"+isLeaveInfoExist);
 					if(!isLeaveInfoExist){
 						List<AbsenceQuotaData> absenceQuotaDatas=AbsenceQuotaDataLocalServiceUtil.getAbsenceQuotaDataByStaffCode(staffCode);
-						log.info("absenceQuotaDatas.size()= "+absenceQuotaDatas);
+						System.out.println("absenceQuotaDatas.size()= "+absenceQuotaDatas);
 						if(absenceQuotaDatas!=null&&absenceQuotaDatas.size()>0){
 							for(AbsenceQuotaData absenceQuotaData:absenceQuotaDatas){
 								if(absenceQuotaData.getAbsenceQuotaTypeText()!=null&&!absenceQuotaData.getAbsenceQuotaTypeText().equals("")){
-									log.info(" typeOfLeaveId = "+typeOfLeaveId);
-									log.info("absenceQuotaData.TotalEntitlement= "+absenceQuotaData.getTotalEntitlement());
-									log.info("absenceQuotaData.Deduction"+absenceQuotaData.getDeduction());
-									log.info("AbsenceQuotaTypeText= "+absenceQuotaData.getAbsenceQuotaTypeText());
+									System.out.println(" typeOfLeaveId = "+typeOfLeaveId);
+									System.out.println("absenceQuotaData.TotalEntitlement= "+absenceQuotaData.getTotalEntitlement());
+									System.out.println("absenceQuotaData.Deduction"+absenceQuotaData.getDeduction());
+									System.out.println("AbsenceQuotaTypeText= "+absenceQuotaData.getAbsenceQuotaTypeText());
 									if(this.getQuotaTypeCompare(typeOfLeaveId,absenceQuotaData.getAbsenceQuotaTypeText())){
 										if(absenceQuotaData.getTotalEntitlement()!=null&&
 												!absenceQuotaData.getTotalEntitlement().equals("")){
@@ -343,17 +345,17 @@ public class ELeavePortlet extends MVCPortlet{
 											if(absenceQuotaData.getTotalEntitlement()!=null&&
 													!absenceQuotaData.getTotalEntitlement().equals("")){
 												annualLeaveTotalLeave=Double.valueOf(absenceQuotaData.getTotalEntitlement());
-												log.info("annualLeaveTotalLeave "+annualLeaveTotalLeave);
+												System.out.println("annualLeaveTotalLeave "+annualLeaveTotalLeave);
 											}
 											if(absenceQuotaData.getDeduction()!=null&&
 													!absenceQuotaData.getDeduction().equals("")){
 												annualLeaveDuration=Double.valueOf(absenceQuotaData.getDeduction());
-												log.info("annualLeaveDuration "+annualLeaveDuration);
+												System.out.println("annualLeaveDuration "+annualLeaveDuration);
 											}
 											break;
 										}
 									}
-									log.info(" end of 'for iterator' ");
+									System.out.println(" end of 'for iterator' ");
 								}
 							}
 						}
@@ -374,25 +376,27 @@ public class ELeavePortlet extends MVCPortlet{
 						}
 						Map<String,Object> map=AbsenceQuotaDataLocalServiceUtil.checkLeaveData(paramList);
 						if(map.containsKey("status")){
-							log.info("status= "+map.get("status"));
+							System.out.println("status= "+map.get("status"));
 							String status=String.valueOf(map.get("status"));
 							if("Success".equals(status)){
 								isCheck=true;
 								msg="";
 								duration=Double.valueOf(String.valueOf(map.get("duration")));
+								System.out.println("duration= "+durationList.toString());
 							}else if("Error".equals(status)){
 								isCheck=false;
 								msg=String.valueOf(map.get("msg"));
 							}
 							durationList=(List<String>)map.get("durationList");
-							log.info("durationList= "+durationList);
+							System.out.println("durationList= "+durationList);
+							System.out.println("durationList= "+durationList.toString());
 						}
 						if(isCheck){
 							double totalEntitlement=totalLeaveEntitlement;
 							double totalDuration=duration;
 							double absenceDays1=ELeaveLocalServiceUtil.getSubmittedOrApprovedAbsenceDays(staffCode, typeOfLeaveId);
 							double absenceDays2=ELeaveLocalServiceUtil.getCompletedOfCurrentDayAbsenceDays(staffCode, typeOfLeaveId);
-							log.info("================================Check eleave data=====================");
+							System.out.println("================================Check eleave data=====================");
 							System.out.println("================================Check eleave data=====================");
 							System.out.println("tduration= "+tduration);
 							System.out.println("absenceDays1= "+absenceDays1);
@@ -512,6 +516,10 @@ public class ELeavePortlet extends MVCPortlet{
 			}
 		}else if("0124".equals(typeOfLeaveId)){
 			if(absenceQuotaTypeText.toLowerCase().equals("service year award leave")){
+				isEquals=true;
+			}
+		}else if("0130".equals(typeOfLeaveId)){
+			if(absenceQuotaTypeText.toLowerCase().equals("overtime shift leave")){
 				isEquals=true;
 			}
 		}

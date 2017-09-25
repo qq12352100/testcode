@@ -88,6 +88,23 @@
 			travel-expense-allowance-portlet
 		</css-class-wrapper>
 	</portlet>
+	<portlet>
+		<portlet-name>travelReport</portlet-name>
+		<icon>/icon.png</icon>
+		<instanceable>false</instanceable>
+		<header-portlet-javascript>/js/jQuery/jquery-1.7.1.min.js</header-portlet-javascript>
+		<header-portlet-javascript>/js/jQuery/util.js</header-portlet-javascript>
+		<header-portlet-javascript>/js/jQuery/dhtmlxcommon.js</header-portlet-javascript>
+		<header-portlet-javascript>/js/My97DatePicker/WdatePicker.js</header-portlet-javascript>
+		<header-portlet-javascript>/js/timePicker.js</header-portlet-javascript>
+		<header-portlet-javascript>/js/manage.js</header-portlet-javascript>
+		<footer-portlet-css>/css/timePicker.css</footer-portlet-css>
+		<footer-portlet-css>/css/manage.css</footer-portlet-css>
+		<footer-portlet-css>/css/reimburse.css</footer-portlet-css>
+		<footer-portlet-css>/css/reimburse-new.css</footer-portlet-css>
+		<footer-portlet-javascript>/js/reimburse.js</footer-portlet-javascript>
+		<css-class-wrapper>vgcapon-portlet</css-class-wrapper>
+	</portlet>
 	<role-mapper>
 		<role-name>administrator</role-name>
 		<role-link>Administrator</role-link>

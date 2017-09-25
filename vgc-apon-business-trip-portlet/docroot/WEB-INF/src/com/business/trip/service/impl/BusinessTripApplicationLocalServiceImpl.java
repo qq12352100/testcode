@@ -297,7 +297,6 @@ public class BusinessTripApplicationLocalServiceImpl
 				.append("</div>");
 		
 		if(null!=toAddresses){
-			System.out.println(toAddresses[0]);
 			for(String tempAdd : toAddresses){
 				System.out.println("In sendEmailtoApprover toAddress: "+tempAdd);
 			}
@@ -824,8 +823,8 @@ public class BusinessTripApplicationLocalServiceImpl
 					"%" + printName + "%"));
 		}			
 		if (Validator.isNotNull(staffCode)) {
-			query.add(PropertyFactoryUtil.forName("staffCode").eq(
-					Long.parseLong(staffCode) ));
+			query.add(PropertyFactoryUtil.forName("staffCode").like(
+					"%" + staffCode + "%"));
 		}			
 		if (Validator.isNotNull(personalID)) {
 			query.add(PropertyFactoryUtil.forName("personalID").like(
@@ -859,8 +858,8 @@ public class BusinessTripApplicationLocalServiceImpl
 					"%" + printName + "%"));
 		}			
 		if (Validator.isNotNull(staffCode)) {
-			query.add(PropertyFactoryUtil.forName("staffCode").eq(
-					Long.parseLong(staffCode)));
+			query.add(PropertyFactoryUtil.forName("staffCode").like(
+					"%" + staffCode + "%"));
 		}			
 		if (Validator.isNotNull(personalID)) {
 			query.add(PropertyFactoryUtil.forName("personalID").like(

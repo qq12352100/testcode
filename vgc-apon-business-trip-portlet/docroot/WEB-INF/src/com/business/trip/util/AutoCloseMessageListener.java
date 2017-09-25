@@ -1,11 +1,8 @@
 package com.business.trip.util;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.business.trip.model.BusinessTripApplication;
 import com.business.trip.service.BusinessTripApplicationLocalServiceUtil;
@@ -18,12 +15,10 @@ import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.messaging.MessageListenerException;
 import com.liferay.portal.kernel.util.PropsUtil;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowTask;
 import com.liferay.portal.kernel.workflow.WorkflowTaskManagerUtil;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.WorkflowInstanceLink;
-import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.service.WorkflowInstanceLinkLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
@@ -76,13 +71,9 @@ public class AutoCloseMessageListener implements MessageListener {
 						businessTripApplicationId);		
 		for(WorkflowTask wt:workflowTasks) {
 			if(w!=null && w.getWorkflowInstanceId()==wt.getWorkflowInstanceId()) {
-				Map<String, Serializable>	workflowContext = new HashMap<String, Serializable>();
-				ServiceContext serviceContext =  new ServiceContext();
-				serviceContext.setAttribute("vgcapon_btApplication_isNeedCashAdvance", "No");//vgcapon_btApplication_isNeedCashAdvance
-				workflowContext.put(WorkflowConstants.CONTEXT_SERVICE_CONTEXT, serviceContext);
 				WorkflowTaskManagerUtil.completeWorkflowTask(
 						companyId, UserLocalServiceUtil.getDefaultUserId(companyId),
-						wt.getWorkflowTaskId(), "approve", "", workflowContext);
+						wt.getWorkflowTaskId(), "approve", "", null);
 				BusinessTripApplicationLocalServiceUtil.saveOrUpdateAuditTrailLog(businessTripApplication.getCompanyId(),
 						businessTripApplication.getGroupId(), businessTripApplication.getBusinessTripApplicationId(), 
 						businessTripApplication.getUserId(), businessTripApplication.getUserName(), ActionConstants.COMPLETE, "Auto Completed");
@@ -104,7 +95,7 @@ public class AutoCloseMessageListener implements MessageListener {
 		mailbody.append("<div class='emailTmp'>")
 				.append("<p>Dear Applicant, </p>")
 				.append("<p>Based on travel expense advance policy, you can only apply cash advance 3 days in advance for RMB or 7 days in advance for EUR.</p>")
-				.append("<p>As it's due date now, cash advance application won't be supported. Please view the detail information in <a href='")
+				.append("<p>As it’s due date now, cash advance application won’t be supported. Please view the detail information in <a href='")
 				.append(PropsUtil.get("vgc.apon.system.href.url")).append("'>APON System</a>.</p>")
 				.append("<p>PLEASE DO NOT REPLY to this email, as it is system generated.</p>")
 				.append("</div>");		

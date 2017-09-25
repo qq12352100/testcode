@@ -62,10 +62,7 @@ public class BtExchangeRateLocalServiceImpl
 		double amountRMB =amountEUR;
 		BtExchangeRate btExchangeRate = BtExchangeRateLocalServiceUtil.fetchByF_S_S("RMB", "EUR", BusinessTripConstants.VALID_STATUS);
 		if( btExchangeRate!=null){
-			System.out.println("changeEURToRMB btExchangeRate="+btExchangeRate.getSecToFirExchangeRate());
-			System.out.println("changeEURToRMB amountEUR="+amountEUR);
 			amountRMB= amountEUR*btExchangeRate.getSecToFirExchangeRate();
-			System.out.println("changeEURToRMB amountRMB="+amountRMB);
 		}
 		BigDecimal bd2 = new BigDecimal(amountRMB);
 		amountRMB = bd2.setScale(2,

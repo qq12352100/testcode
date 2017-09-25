@@ -286,8 +286,6 @@
 			<hint name="max-length">512</hint>
 		</field>
 		<field name="isPaybyRmb" type="boolean" />
-		<field name="evpId" type="long" />
-		<field name="evpName" type="String" />
 		<field name="status" type="int" />
 		<field name="sapStatus" type="int" />
 		<field name="sapComments" type="String">

@@ -68,17 +68,6 @@ function <portlet:namespace/>deleteBtFlightInfo(pkId){
 		'click',
 		function(event) {
 			<portlet:namespace/>passValueToPortlet();
-			 var radionum = document.getElementsByName("<portlet:namespace />tripType");
-			 var  travelTypeVal=-1;
-			 for(var i=0;i<radionum.length;i++){
-				 if(radionum[i].checked){
-					 travelTypeVal = radionum[i].value
-				 } }
-			if(travelTypeVal==-1){
-				alert('Please select Travel Reservation');
-				return false;
-			}
-			
 			Liferay.Util.selectEntity(
 				{
 					dialog: {

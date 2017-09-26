@@ -314,6 +314,8 @@
 		<property name="costListForeignTotalRmb" type="com.liferay.portal.dao.orm.hibernate.DoubleType" />
 		<property name="remark" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="isPaybyRmb" type="com.liferay.portal.dao.orm.hibernate.BooleanType" />
+		<property name="evpId" type="com.liferay.portal.dao.orm.hibernate.LongType" />
+		<property name="evpName" type="com.liferay.portal.dao.orm.hibernate.StringType" />
 		<property name="status" type="com.liferay.portal.dao.orm.hibernate.IntegerType" />
 		<property name="sapStatus" type="com.liferay.portal.dao.orm.hibernate.IntegerType" />
 		<property name="sapComments" type="com.liferay.portal.dao.orm.hibernate.StringType" />

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +23,6 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.vgc.apon.model.SAPUser;
-import com.vgc.apon.service.PendingToSAPLocalServiceUtil;
 import com.vgc.apon.service.SAPUserLocalServiceUtil;
 
 /**
@@ -130,12 +128,12 @@ public class TravelExpenseAllowancePortlet extends MVCPortlet {
 								.getEmployeeGroupId().equals("6"))) {
 					lgart = "2009";
 					lgart_test="Gross Amount";
-				} else if (sapUser != null
+				}/* else if (sapUser != null
 						&& (sapUser.getEmployeeGroupId().equals("7") || sapUser
 								.getEmployeeGroupId().equals("8"))) {
 					lgart = "N/A";
 					lgart_test= "N/A";
-				} else {
+				}*/ else {  // sapUser.getEmployeeGroupId().equals("7") || sapUser.getEmployeeGroupId().equals("8"))
 					lgart = "N/A";
 					lgart_test= "N/A";
 				}

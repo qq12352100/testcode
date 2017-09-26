@@ -393,6 +393,8 @@
 			<basic name="costListForeignTotalRmb" />
 			<basic name="remark" />
 			<basic name="isPaybyRmb" />
+			<basic name="evpId" />
+			<basic name="evpName" />
 			<basic name="status" />
 			<basic name="sapStatus" />
 			<basic name="sapComments" />

@@ -83,6 +83,8 @@ com.business.trip.model.BtTravelExpense btTravelExpense_=BtTravelExpenseLocalSer
 		<% if(btTravelExpense_!=null){ %>
 			<aui:button value="vgc-apon-business-trip-reimbursement-travel-expense-updateMore"
 		onClick='<%= renderResponse.getNamespace() + "openUpdatePageTravelExpense();" %>' />
+					<aui:button value="vgc-apon-business-trip-reimbursement-travel-expense-deleteAll"
+		onClick='<%= renderResponse.getNamespace() + "deleteAllBtTravelExpense();" %>' />
 		<%} %>
 </aui:button-row>
 <div>
@@ -122,6 +124,13 @@ com.business.trip.model.BtTravelExpense btTravelExpense_=BtTravelExpenseLocalSer
 		if(confirm('Are you sure to delete it?')) {
 			document.<portlet:namespace/>deleteDetailInfoForm.<portlet:namespace/>pkId.value=pkId;
 			document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />tabs2.value = 'travelExpense';
+			submitForm(document.<portlet:namespace/>deleteDetailInfoForm);
+		}
+	}
+	
+	function <portlet:namespace/>deleteAllBtTravelExpense(){
+		if(confirm('Are you sure to delete all?')) {
+			document.<portlet:namespace />deleteDetailInfoForm.<portlet:namespace />tabs2.value = 'deleteAllTravelExpense';
 			submitForm(document.<portlet:namespace/>deleteDetailInfoForm);
 		}
 	}

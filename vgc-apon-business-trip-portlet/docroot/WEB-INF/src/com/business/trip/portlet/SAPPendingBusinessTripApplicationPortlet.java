@@ -91,7 +91,7 @@ public class SAPPendingBusinessTripApplicationPortlet extends MVCPortlet {
 					
 					Map<String, Object>  rtn_params=PendingToSAPLocalServiceUtil.pendingToSAPBusinessTripApplication(sap_map);
 					System.out.println("############SAPPendingBusinessTripApplicationPortlet  status:  ##### "+(rtn_params!=null?rtn_params.get("status"):"null") );
-					if(null!=rtn_params.get("status")&&rtn_params.get("status").equals("S")){
+					if(rtn_params != null && null!=rtn_params.get("status")&&rtn_params.get("status").equals("S")){
 						//成功
 						List<Map<String, Object>>  params=new ArrayList<Map<String,Object>>();
 						Map<String,Object> map=new HashMap<String, Object>();
@@ -104,7 +104,7 @@ public class SAPPendingBusinessTripApplicationPortlet extends MVCPortlet {
 						params.add(map);
 						int sapStatus=1;
 						BusinessTripApplicationLocalServiceUtil.updateSAPStatusAsSAPInfo(params, sapStatus, serviceContext);
-					}else if(null!=rtn_params.get("status")&&rtn_params.get("status").equals("E")){
+					}else if(rtn_params != null && null!=rtn_params.get("status")&&rtn_params.get("status").equals("E")){
 						//失败
 						List<Map<String, Object>>  params=new ArrayList<Map<String,Object>>();
 						Map<String,Object> map=new HashMap<String, Object>();

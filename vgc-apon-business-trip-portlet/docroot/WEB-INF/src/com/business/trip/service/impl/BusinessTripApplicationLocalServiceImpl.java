@@ -14,26 +14,19 @@
 
 package com.business.trip.service.impl;
 
-import java.io.Serializable;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.audit.trail.model.AuditTrailLog;
 import com.audit.trail.service.AuditTrailLogLocalServiceUtil;
-import com.business.trip.model.BtExchangeRate;
+import com.business.trip.model.BtCarRentalInfo;
+import com.business.trip.model.BtHotelInfo;
 import com.business.trip.model.BusinessTripApplication;
 import com.business.trip.model.BusinessTripReimbursement;
-import com.business.trip.service.BtExchangeRateLocalServiceUtil;
+import com.business.trip.service.BtCarRentalInfoLocalServiceUtil;
+import com.business.trip.service.BtHotelInfoLocalServiceUtil;
 import com.business.trip.service.BusinessTripApplicationLocalServiceUtil;
 import com.business.trip.service.base.BusinessTripApplicationLocalServiceBaseImpl;
 import com.business.trip.util.ActionConstants;
+import com.business.trip.util.BTApplicationUtil;
 import com.business.trip.util.BusinessTripApplicationLogEnum;
-import com.business.trip.util.BusinessTripConstants;
 import com.delegation.model.ApplicantDelegation;
 import com.delegation.service.ApplicantDelegationLocalServiceUtil;
 import com.delegation.service.ApproverDelegationLocalServiceUtil;
@@ -74,6 +67,15 @@ import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetLinkLocalServiceUtil;
 import com.vgc.apon.model.SAPUser;
 import com.vgc.apon.service.SAPUserLocalServiceUtil;
+
+import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The implementation of the business trip application local service.
@@ -117,6 +119,87 @@ public class BusinessTripApplicationLocalServiceImpl
 		return businessTripApplication;
 	}
 
+	
+	/**
+	 * 
+	 * @param businessTripApplication
+	 * @return isCanReselectTripType
+	 */
+	public boolean preValidate(BusinessTripApplication businessTripApplication){
+		double totalCostEur = businessTripApplication.getTotalCostEur();
+		double totalCostRmb = businessTripApplication.getTotalCostRmb();
+		double hotelTotalCostEur = businessTripApplication.getHotelTotalCostEur();
+		double hotelTotalCostRmb =businessTripApplication.getHotelTotalCostRmb();
+		double carRentalTotalCostEur =businessTripApplication.getCarRentalTotalCostEur();
+		double carRentalTotalCostRmb =businessTripApplication.getCarRentalTotalCostRmb();
+		double oldetr = 0d;
+		double oldrte = 0d;
+		
+		boolean isCanReselectTripType = true;
+		
+		if((hotelTotalCostEur!=0 )
+				&&((hotelTotalCostRmb/hotelTotalCostEur)>0) ){
+			 oldetr = hotelTotalCostRmb /hotelTotalCostEur; //ex :7.2794
+			 oldrte = hotelTotalCostEur/hotelTotalCostRmb;//ex: 0.1373
+		}else if ((hotelTotalCostEur ==0 )
+						&&(carRentalTotalCostEur!=0)
+							&&((carRentalTotalCostRmb/carRentalTotalCostEur)>0)){
+			 oldetr = carRentalTotalCostRmb /carRentalTotalCostEur;
+			 oldrte = carRentalTotalCostEur/carRentalTotalCostRmb;
+		}
+		
+		try {
+			List<BtHotelInfo> btHotelInfoList= BtHotelInfoLocalServiceUtil.findByB_T(businessTripApplication.getBusinessTripApplicationId(), "Application", 0, 999);
+			List<BtCarRentalInfo> btCarRentallnfoList=BtCarRentalInfoLocalServiceUtil.findByB_T(businessTripApplication.getBusinessTripApplicationId(), "Application", 0, 999);
+			double hotelTotalCostEurTmp = 0d;
+			double hotelTotalCostRmbTmp =0d;
+			double carRentalTotalCostEurTmp =0d;
+			double carRentalTotalCostRmbTmp =0d;
+			
+			if(null !=btHotelInfoList &&btHotelInfoList.size() >0){
+				for(BtHotelInfo btHotelInfo:btHotelInfoList){
+					hotelTotalCostRmbTmp = BTApplicationUtil.addCalculate(
+							hotelTotalCostRmbTmp, "RMB", btHotelInfo.getPrice(), btHotelInfo.getCurrency(),oldetr,oldrte);
+					hotelTotalCostEurTmp = BTApplicationUtil.addCalculate(
+							hotelTotalCostEurTmp, "EUR", btHotelInfo.getPrice(), btHotelInfo.getCurrency(),oldetr,oldrte);
+					if(btHotelInfo.getCurrency().equals("EUR")){
+						isCanReselectTripType =false;
+					}
+				}
+			}
+			
+			if(null !=btCarRentallnfoList &&btCarRentallnfoList.size() >0){
+				for(BtCarRentalInfo btCarRentalInfo:btCarRentallnfoList){
+					carRentalTotalCostRmbTmp = BTApplicationUtil.addCalculate(
+							carRentalTotalCostRmbTmp, "RMB", btCarRentalInfo.getPrice(), btCarRentalInfo.getCurrency(),oldetr,oldrte);
+					carRentalTotalCostEurTmp = BTApplicationUtil.addCalculate(
+							carRentalTotalCostEurTmp, "EUR", btCarRentalInfo.getPrice(), btCarRentalInfo.getCurrency(),oldetr,oldrte);
+					if(btCarRentalInfo.getCurrency().equals("EUR")){
+						isCanReselectTripType =false;
+					}
+				}
+			}
+			
+			if((Math.abs(totalCostEur -hotelTotalCostEurTmp-carRentalTotalCostEurTmp) >=3d)){
+				 businessTripApplication.setTotalCostEur(hotelTotalCostEurTmp+carRentalTotalCostEurTmp);
+				 businessTripApplication.setTotalCostRmb(hotelTotalCostRmbTmp+carRentalTotalCostRmbTmp);
+				 businessTripApplication.setHotelTotalCostEur(hotelTotalCostEurTmp);
+				 businessTripApplication.setHotelTotalCostRmb(hotelTotalCostRmbTmp);
+				 businessTripApplication.setCarRentalTotalCostEur(carRentalTotalCostEurTmp);
+				 businessTripApplication.setCarRentalTotalCostRmb(carRentalTotalCostRmbTmp);
+System.out.println("validateCost====totalCostEur="+totalCostEur+"; totalCostRmb="+totalCostRmb
+		+"; hotelTotalCostEur="+hotelTotalCostEur+"; hotelTotalCostRmb="+hotelTotalCostRmb+"; carRentalTotalCostEur="
+		+carRentalTotalCostEur+"; carRentalTotalCostRmb="+carRentalTotalCostRmb);				 
+System.out.println("validateCost====totalCostEur="+businessTripApplication.getTotalCostEur()+"; totalCostRmb="+businessTripApplication.getTotalCostRmb()
+		+"; hotelTotalCostEur="+businessTripApplication.getHotelTotalCostEur()+"; hotelTotalCostRmb="+businessTripApplication.getHotelTotalCostRmb()
+		+"; carRentalTotalCostEur="+businessTripApplication.getCarRentalTotalCostEur()+"; carRentalTotalCostRmb="+businessTripApplication.getCarRentalTotalCostRmb());				 
+				 BusinessTripApplicationLocalServiceUtil.updateBusinessTripApplication(businessTripApplication);
+			}
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		return isCanReselectTripType;
+	}
 	// Submit the BusinessTripApplication to start the workflow
 	public BusinessTripApplication submitBusinessTripApplication(
 			BusinessTripApplication businessTripApplication, ServiceContext serviceContext)
@@ -153,7 +236,7 @@ public class BusinessTripApplicationLocalServiceImpl
 		String isNeedEVPApprove = businessTripApplication.getTripType()==1 || btFlightTrainInfoLocalService.isNeedEVPApprove(businessTripApplicationId, PropsUtil.get("vgc.apon.business.trip.application.type"))||
 				btHotelInfoLocalService.isNeedEVPApprove(businessTripApplicationId, PropsUtil.get("vgc.apon.business.trip.application.type"))?"Yes":"No";
 		
-		BtExchangeRate btExchangeRate = BtExchangeRateLocalServiceUtil.fetchByF_S_S("RMB", "EUR", BusinessTripConstants.VALID_STATUS);
+		//BtExchangeRate btExchangeRate = BtExchangeRateLocalServiceUtil.fetchByF_S_S("RMB", "EUR", BusinessTripConstants.VALID_STATUS);
 
 		serviceContext.setAttribute("vgcapon_btApplication_isNormalSubmit", isNormalSubmit);
 		serviceContext.setAttribute("vgcapon_btApplication_isCrossDepartment", isCrossDepartment);
@@ -161,10 +244,10 @@ public class BusinessTripApplicationLocalServiceImpl
 		serviceContext.setAttribute("vgcapon_btApplication_isNeedCashAdvance", isNeedCashAdvance);
 		serviceContext.setAttribute("vgcapon_btApplication_isOverCashAdvance", isOverCashAdvance);
 		
-		long staffCode = businessTripApplication.getStaffCode();		
+		//long staffCode = businessTripApplication.getStaffCode();		
 		long assigneSupervisorUserId = UserLocalServiceUtil.fetchUserByFacebookId(companyId, businessTripApplication.getApproverId()).getUserId();
 		Role supervisorRole = ApproverDelegationLocalServiceUtil.findAgentRoleByP_U(ApproverDelegationLocalServiceUtil.getProcessOfBusinessTripApplication(), assigneSupervisorUserId);
-		SAPUser sapUser = SAPUserLocalServiceUtil.getSapUserByStaffCode(String.valueOf(staffCode));
+		//SAPUser sapUser = SAPUserLocalServiceUtil.getSapUserByStaffCode(String.valueOf(staffCode));
 		User departmentLeadUser = UserLocalServiceUtil.fetchUserByFacebookId(PortalUtil.getDefaultCompanyId(), Long.valueOf(businessTripApplication.getTargetDepartmentApproverId()));
 		long departmentLeadUserId = departmentLeadUser!=null?departmentLeadUser.getUserId():0;
 		Role departmentLeadRole = ApproverDelegationLocalServiceUtil.findAgentRoleByP_U(ApproverDelegationLocalServiceUtil.getProcessOfBusinessTripApplication(), departmentLeadUserId);
@@ -331,7 +414,7 @@ public class BusinessTripApplicationLocalServiceImpl
 			User user = UserLocalServiceUtil.fetchUserByFacebookId(PortalUtil.getDefaultCompanyId(), staffCode);
 			toAddresses = ApproverDelegationLocalServiceUtil.findEmailsByP_U(ApproverDelegationLocalServiceUtil.getProcessOfBusinessTripApplication(), user);			
 		}else if(BusinessTripApplicationLogEnum.EVP.getRole().equals(pendRole)) {
-			SAPUser sapUser = SAPUserLocalServiceUtil.getSapUserByStaffCode(String.valueOf(businessTripApplication.getStaffCode()));
+		//	SAPUser sapUser = SAPUserLocalServiceUtil.getSapUserByStaffCode(String.valueOf(businessTripApplication.getStaffCode()));
 			//Long.valueOf(sapUser.getDivisionManagerId())
 			long vepId=businessTripApplication.getEvpId();
 			User user = UserLocalServiceUtil.fetchUserByFacebookId(PortalUtil.getDefaultCompanyId(),vepId);
@@ -383,16 +466,16 @@ public class BusinessTripApplicationLocalServiceImpl
 			String operationComment) throws SystemException, PortalException {
 		Date now = new Date();
 		BusinessTripApplication businessTripApplication = BusinessTripApplicationLocalServiceUtil.fetchBusinessTripApplication(businessTripApplicationId);
-		long staffCode = businessTripApplication.getStaffCode();
-		SAPUser sAPUser =SAPUserLocalServiceUtil.getSapUserByStaffCode(String.valueOf(staffCode));	
+	//	long staffCode = businessTripApplication.getStaffCode();
+		//SAPUser sAPUser =SAPUserLocalServiceUtil.getSapUserByStaffCode(String.valueOf(staffCode));	
 		List<AuditTrailLog> list = AuditTrailLogLocalServiceUtil.findAuditTrailByWF_O_O(businessTripApplicationId,
 						BusinessTripApplication.class.getName());		
 		int operationNo = this.getOperationNo(list);		
-		String currentOperationRole = BusinessTripApplicationLogEnum.APPLICANT.getRole();
+		//String currentOperationRole = BusinessTripApplicationLogEnum.APPLICANT.getRole();
 		String submitComment = "";
 		if(businessTripApplication.getIsApplicantAgent()) {
-			ApplicantDelegation applicantDelegation = ApplicantDelegationLocalServiceUtil.fetchByP_S(ApproverDelegationLocalServiceUtil.getProcessOfBusinessTripApplication(), String.valueOf(UserLocalServiceUtil.fetchUserById(businessTripApplication.getUserId()).getFacebookId()));
-			submitComment = "On behalf of "+ApplicantDelegationLocalServiceUtil.getAgentName(applicantDelegation);
+			User user = UserLocalServiceUtil.fetchUserByFacebookId(companyId, businessTripApplication.getStaffCode());
+			submitComment = "On behalf of "+(user!=null?user.getFirstName()+" "+user.getLastName():"");
 		}
 		if (ActionConstants.SUBMIT.equals(action)) {
 			AuditTrailLogLocalServiceUtil.saveAuditTrailLog(
@@ -409,31 +492,31 @@ public class BusinessTripApplicationLocalServiceImpl
 					businessTripApplicationId, BusinessTripApplication.class.getName(),
 					operationNo, BusinessTripApplicationLogEnum.APPLICANT.getRole(),userId,
 					operationUser, ActionConstants.STATUS_RECALL, now,operationComment);		
-			currentOperationRole = this.getOperationRole(list);
+		//	currentOperationRole = this.getOperationRole(list);
 		} else if (ActionConstants.APPROVE.equals(action)) {				
 			AuditTrailLogLocalServiceUtil.saveAuditTrailLog(companyId, groupId,
 					businessTripApplicationId, BusinessTripApplication.class.getName(),
 					operationNo, this.getOperationRole(list),userId,
 					operationUser, ActionConstants.STATUS_APPROVED, now,operationComment);		
-			currentOperationRole = this.getOperationRole(list);
+			//currentOperationRole = this.getOperationRole(list);
 		} else if (ActionConstants.REJECT.equals(action)) {
 			AuditTrailLogLocalServiceUtil.saveAuditTrailLog(companyId, groupId,
 					businessTripApplicationId, BusinessTripApplication.class.getName(),
 					operationNo, this.getOperationRole(list),userId,
 					operationUser, ActionConstants.STATUS_REJECTED, now,operationComment);		
-			currentOperationRole = this.getOperationRole(list);
+			//currentOperationRole = this.getOperationRole(list);
 		}else if (ActionConstants.CANCEL.equals(action)) {
 			AuditTrailLogLocalServiceUtil.saveAuditTrailLog(companyId, groupId,
 					businessTripApplicationId, BusinessTripApplication.class.getName(),
 					operationNo, this.getOperationRole(list),userId,
 					operationUser, ActionConstants.STATUS_REFUSE, now,operationComment);		
-			currentOperationRole = BusinessTripApplicationLogEnum.ACCOUNTING.getRole();
+			//currentOperationRole = BusinessTripApplicationLogEnum.ACCOUNTING.getRole();
 		}else if (ActionConstants.SUBMIT_TO_CASH_ADVANCE.equals(action)){
 			AuditTrailLogLocalServiceUtil.saveAuditTrailLog(
 					companyId, groupId, businessTripApplicationId,BusinessTripApplication.class.getName(),
 					operationNo, BusinessTripApplicationLogEnum.APPLICANT.getRole(),userId,
 					operationUser,ActionConstants.STATUS_SUBMITTED, now, submitComment);	
-			currentOperationRole = BusinessTripApplicationLogEnum.EVP.getRole();
+		//	currentOperationRole = BusinessTripApplicationLogEnum.EVP.getRole();
 		}
 		this.savePendingAuditTrailLog(list, businessTripApplication, companyId, groupId,businessTripApplication.getStatus(),action);
 	}
@@ -511,7 +594,7 @@ public class BusinessTripApplicationLocalServiceImpl
 		String isNeedEVPApprove = businessTripApplication.getTripType()==1 || btFlightTrainInfoLocalService.isNeedEVPApprove(businessTripApplication.getBusinessTripApplicationId(), PropsUtil.get("vgc.apon.business.trip.application.type"))||
 				btHotelInfoLocalService.isNeedEVPApprove(businessTripApplication.getBusinessTripApplicationId(), PropsUtil.get("vgc.apon.business.trip.application.type"))?"Yes":"No";
 		String isNeedCashAdvance = businessTripApplication.getAdvancePayment()!=0?"Yes":"No";
-		BtExchangeRate btExchangeRate = BtExchangeRateLocalServiceUtil.fetchByF_S_S("RMB", "EUR", BusinessTripConstants.VALID_STATUS);
+	//	BtExchangeRate btExchangeRate = BtExchangeRateLocalServiceUtil.fetchByF_S_S("RMB", "EUR", BusinessTripConstants.VALID_STATUS);
 		String isOverCashAdvance = (businessTripApplication.getCurrency().equals("EUR") && businessTripApplication.getAdvancePayment()>10000)
 				|| (businessTripApplication.getCurrency().equals("RMB") && businessTripApplication.getAdvancePayment()>80000)?"Yes":"No";
 		if(status<=104) {			
@@ -700,49 +783,54 @@ public class BusinessTripApplicationLocalServiceImpl
 		return businessTripApplication;
 	}
 
-	public long findCountByS_U_SAP(int status, String ticketNo,
-			String printName, int sapStatus,String startDate, String endDate,String sapDocumentId)
-			throws SystemException, ParseException {
-		//
-		SimpleDateFormat sdf_dmy = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-
-		DynamicQuery query = DynamicQueryFactoryUtil
-				.forClass(BusinessTripApplication.class);
-
-		if (Validator.isNotNull(printName)) {
-			query.add(RestrictionsFactoryUtil.ilike("printName", "%"
-					+ printName + "%"));
-		}
-		if (Validator.isNotNull(sapDocumentId)) {
-			query.add(RestrictionsFactoryUtil.ilike("sapDocumentId", "%"
-					+ sapDocumentId + "%"));
-		}
-		if (Validator.isNotNull(ticketNo)) {
-			query.add(RestrictionsFactoryUtil.ilike("ticketNo", "%" + ticketNo
-					+ "%"));
-		}
-		if (Validator.isNotNull(startDate) && (Validator.isNotNull(endDate))) {
-			query.add(RestrictionsFactoryUtil.ge("submittedDate",
-					sdf_dmy.parse(startDate+" 00:00:00")));
-			query.add(RestrictionsFactoryUtil.le("submittedDate",
-					sdf_dmy.parse(endDate+" 23:59:59")));
-		}
-		query.add(RestrictionsFactoryUtil.eq("status", status));
+	private Criterion getSapStatusCriterion(int sapStatus){
+		Criterion criterion = null;
 		if (sapStatus ==1) {
-			Criterion criterion = null;
 			criterion = RestrictionsFactoryUtil.eq("sapStatus", 1);
-			query.add(criterion);
 		}else if(sapStatus ==2) {
-			Criterion criterion = null;
 			criterion = RestrictionsFactoryUtil.eq("sapStatus", 2);
-			query.add(criterion);
 		}else {
-			Criterion criterion = null;
 			criterion = RestrictionsFactoryUtil.eq("sapStatus", 0);
 			criterion = RestrictionsFactoryUtil.or(criterion,
 					RestrictionsFactoryUtil.eq("sapStatus", -1));
-			query.add(criterion);
 		}
+		return criterion;
+	}
+	
+     private DynamicQuery getQueryValidateCommonField(String ticketNo,String printName,String startDate,
+				String endDate, String sapDocumentId) throws ParseException{
+    	 
+    		SimpleDateFormat sdf_dmy = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    		DynamicQuery query = DynamicQueryFactoryUtil.forClass(BusinessTripApplication.class);
+
+    		if (Validator.isNotNull(printName)) {
+    			query.add(RestrictionsFactoryUtil.ilike("printName", "%"
+    					+ printName + "%"));
+    		}
+    		if (Validator.isNotNull(sapDocumentId)) {
+    			query.add(RestrictionsFactoryUtil.ilike("sapDocumentId", "%"
+    					+ sapDocumentId + "%"));
+    		}
+    		if (Validator.isNotNull(ticketNo)) {
+    			query.add(RestrictionsFactoryUtil.ilike("ticketNo", "%" + ticketNo
+    					+ "%"));
+    		}
+    		if (Validator.isNotNull(startDate) && (Validator.isNotNull(endDate))) {
+    			query.add(RestrictionsFactoryUtil.ge("submittedDate",
+    					sdf_dmy.parse(startDate+" 00:00:00")));
+    			query.add(RestrictionsFactoryUtil.le("submittedDate",
+    					sdf_dmy.parse(endDate+" 23:59:59")));
+    		}
+			
+			return query;
+     }
+	public long findCountByS_U_SAP(int status, String ticketNo,
+			String printName, int sapStatus,String startDate, String endDate,String sapDocumentId)
+			throws SystemException, ParseException {
+
+		DynamicQuery query = getQueryValidateCommonField(ticketNo, printName, startDate, endDate, sapDocumentId);
+		query.add(RestrictionsFactoryUtil.eq("status", status));
+		query.add(getSapStatusCriterion(sapStatus));
 		query.add(RestrictionsFactoryUtil.gt("advancePayment", 0d));
 		return dynamicQueryCount(query);
 	}
@@ -752,44 +840,9 @@ public class BusinessTripApplicationLocalServiceImpl
 			String endDate,String sapDocumentId, int start, int end) throws SystemException,
 			ParseException {
 		//
-		SimpleDateFormat sdf_dmy = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-		DynamicQuery query = DynamicQueryFactoryUtil
-				.forClass(BusinessTripApplication.class);
-
-		if (Validator.isNotNull(printName)) {
-			query.add(RestrictionsFactoryUtil.ilike("printName", "%"
-					+ printName + "%"));
-		}
-		if (Validator.isNotNull(sapDocumentId)) {
-			query.add(RestrictionsFactoryUtil.ilike("sapDocumentId", "%"
-					+ sapDocumentId + "%"));
-		}
-		if (Validator.isNotNull(ticketNo)) {
-			query.add(RestrictionsFactoryUtil.ilike("ticketNo", "%" + ticketNo
-					+ "%"));
-		}
-		if (Validator.isNotNull(startDate) && (Validator.isNotNull(endDate))) {
-			query.add(RestrictionsFactoryUtil.ge("submittedDate",
-					sdf_dmy.parse(startDate+" 00:00:00")));
-			query.add(RestrictionsFactoryUtil.le("submittedDate",
-					sdf_dmy.parse(endDate+" 23:59:59")));
-		}
+		DynamicQuery query = getQueryValidateCommonField(ticketNo, printName, startDate, endDate, sapDocumentId);
 		query.add(RestrictionsFactoryUtil.eq("status", status));
-		if (sapStatus ==1) {
-			Criterion criterion = null;
-			criterion = RestrictionsFactoryUtil.eq("sapStatus", 1);
-			query.add(criterion);
-		}else if(sapStatus ==2) {
-			Criterion criterion = null;
-			criterion = RestrictionsFactoryUtil.eq("sapStatus", 2);
-			query.add(criterion);
-		}else {
-			Criterion criterion = null;
-			criterion = RestrictionsFactoryUtil.eq("sapStatus", 0);
-			criterion = RestrictionsFactoryUtil.or(criterion,
-					RestrictionsFactoryUtil.eq("sapStatus", -1));
-			query.add(criterion);
-		}
+		query.add(getSapStatusCriterion(sapStatus));
 		query.add(RestrictionsFactoryUtil.gt("advancePayment", 0d));
 		if (sapStatus < 1) {
 			query.addOrder(OrderFactoryUtil.asc("sapStatus"));
@@ -801,18 +854,28 @@ public class BusinessTripApplicationLocalServiceImpl
 		return dynamicQuery(query);
 	}
 	
-	public List<BusinessTripApplication> findByT_P_S_P(String ticketNo,String printName,String staffCode,String personalID,long userId,int start,int end) throws SystemException {
-		DynamicQuery query = DynamicQueryFactoryUtil
-				.forClass(BusinessTripApplication.class);
+	private DynamicQuery getQueryForFindByT_P_S_P(String ticketNo,
+			String printName, String staffCode, String personalID, long userId) throws SystemException {
+		DynamicQuery query = DynamicQueryFactoryUtil.forClass(BusinessTripApplication.class);
 		User user = UserLocalServiceUtil.fetchUserById(userId);
-		ApplicantDelegation applicantDelegation = ApplicantDelegationLocalServiceUtil.fetchByP_S(ApproverDelegationLocalServiceUtil.getProcessOfBusinessTripReimbursement(), String.valueOf(user.getFacebookId()));
-		Date now = new Date();
-		boolean isHasAppliantAgent = applicantDelegation!=null && now.after(applicantDelegation.getEffectiveStartDate()) && now.before(applicantDelegation.getEffectiveEndDate())?true:false;
+		/**
+		 * May be have many person by one applicant Agent
+		 */
+		List<ApplicantDelegation> applicantDelegationList = ApplicantDelegationLocalServiceUtil.findVaildByP_S_L(ApproverDelegationLocalServiceUtil.getProcessOfBusinessTripReimbursement(), String.valueOf(user.getFacebookId()));
+		long[] userStaffcode = new long[(applicantDelegationList!=null?applicantDelegationList.size():0)+1];
+		userStaffcode[0] = user.getFacebookId();
+		if(applicantDelegationList!=null &&applicantDelegationList.size()>0){
+			int i =1;
+			for(ApplicantDelegation ad : applicantDelegationList){
+				user = UserLocalServiceUtil.fetchUserById(ad.getUserId());
+				userStaffcode[i] = (user !=null?user.getFacebookId():0);
+				i++;
+			}
+		}
 		Junction junction = RestrictionsFactoryUtil.disjunction();
-		junction.add(PropertyFactoryUtil.forName("userId").eq(userId));
-		if(isHasAppliantAgent) {
-			junction.add(PropertyFactoryUtil.forName("userId").eq(applicantDelegation.getUserId()));		
-		}		
+		
+		junction.add(PropertyFactoryUtil.forName("staffCode").in(userStaffcode));		
+		
 		query.add(junction);
 		if (Validator.isNotNull(ticketNo)) {
 			query.add(PropertyFactoryUtil.forName("ticketNo").like(
@@ -831,45 +894,25 @@ public class BusinessTripApplicationLocalServiceImpl
 					"%" + personalID + "%"));
 		}			
 		query.add(PropertyFactoryUtil.forName("status").eq(0));
+		return query;
+	}
+	
+	public List<BusinessTripApplication> findByT_P_S_P(String ticketNo,String printName,String staffCode,String personalID,long userId,int start,int end) throws SystemException {
+		DynamicQuery query = getQueryForFindByT_P_S_P(ticketNo, printName, staffCode, personalID, userId);
 		query.setLimit(start, end);
 		query.addOrder(OrderFactoryUtil.desc("businessTripApplicationId"));
 		return dynamicQuery(query);
 	}
 
 	public int findCountByT_P_S_P(String ticketNo,String printName,String staffCode,String personalID,long userId) throws SystemException {
-		DynamicQuery query = DynamicQueryFactoryUtil
-				.forClass(BusinessTripApplication.class);		
-		User user = UserLocalServiceUtil.fetchUserById(userId);
-		ApplicantDelegation applicantDelegation = ApplicantDelegationLocalServiceUtil.fetchByP_S(ApproverDelegationLocalServiceUtil.getProcessOfBusinessTripReimbursement(), String.valueOf(user.getFacebookId()));
-		Date now = new Date();
-		boolean isHasAppliantAgent = applicantDelegation!=null && now.after(applicantDelegation.getEffectiveStartDate()) && now.before(applicantDelegation.getEffectiveEndDate())?true:false;
-		Junction junction = RestrictionsFactoryUtil.disjunction();
-		junction.add(PropertyFactoryUtil.forName("userId").eq(userId));
-		if(isHasAppliantAgent) {
-			junction.add(PropertyFactoryUtil.forName("userId").eq(applicantDelegation.getUserId()));		
-		}		
-		query.add(junction);
-		if (Validator.isNotNull(ticketNo)) {
-			query.add(PropertyFactoryUtil.forName("ticketNo").like(
-					"%" + ticketNo + "%"));
-		}			
-		if (Validator.isNotNull(printName)) {
-			query.add(PropertyFactoryUtil.forName("printName").like(
-					"%" + printName + "%"));
-		}			
-		if (Validator.isNotNull(staffCode)) {
-			query.add(PropertyFactoryUtil.forName("staffCode").like(
-					"%" + staffCode + "%"));
-		}			
-		if (Validator.isNotNull(personalID)) {
-			query.add(PropertyFactoryUtil.forName("personalID").like(
-					"%" + personalID + "%"));
-		}			
-		query.add(PropertyFactoryUtil.forName("status").eq(0));		
+		DynamicQuery query =getQueryForFindByT_P_S_P(ticketNo, printName, staffCode, personalID, userId);
 		return (int) dynamicQueryCount(query);
 	}
 	
 	public BusinessTripApplication fetchBusinessTripApplicationByTicketNo(String ticketNo) throws SystemException{
 		return businessTripApplicationPersistence.fetchByTicketNo(ticketNo);
 	}
+
+
+
 }

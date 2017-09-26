@@ -44,7 +44,7 @@
 		    	    <li class="nd02"><liferay-ui:message key="vgc-apon-business-trip-reimbursement-cost-list-gross-amount"/></li>
 		    	    <%-- <li class="nd02 hideli"><liferay-ui:message key="vgc-apon-business-trip-reimbursement-cost-list-tax-rate"/></li> --%>
 		    	    <li class="nd02 hideli"><liferay-ui:message key="vgc-apon-business-trip-reimbursement-cost-list-net-amount"/></li>
-		    	    <li class="nd02 hideli"><liferay-ui:message key="vgc-apon-business-trip-reimbursement-cost-list-tax-amount"/></li>
+		    	    <li class="nd02 hideli" title="Notes: If VAT special invoice, please input Tax Amount, if VAT general invoice, please input '0' as VAT Tax Amount. Gross Amount equals Net Amount plus Tax Amount."><liferay-ui:message key="vgc-apon-business-trip-reimbursement-cost-list-tax-amount"/></li>
 		    	    
 		    	</ul>
 		    	<ul id="infoul">
@@ -85,7 +85,7 @@
 		    	        <input type="text" name="<portlet:namespace/>netAmount" id="netAmount" value="<%=isNew?"":btCostList.getNetAmount() %>"  onblur="checkFloat(this)"  onkeyup="this.value=this.value.replace(/[^0-9.]/g,'')" required="required" maxlength="75"/>
 		    	    </li>
 		    	      <li class="nd02 hideli">
-		    	        <input type="text" name="<portlet:namespace/>taxAmount" id="taxAmount"  value="<%=isNew?"":btCostList.getTaxAmount() %>"  onblur="checkFloat(this)"  onkeyup="this.value=this.value.replace(/[^0-9.]/g,'')" required="required" maxlength="75"/>
+		    	        <input type="text" name="<portlet:namespace/>taxAmount" id="taxAmount"  value="<%=isNew?"":btCostList.getTaxAmount() %>"  onblur="checkFloat(this)"  onkeyup="this.value=this.value.replace(/[^0-9.]/g,'')" required="required" maxlength="75" title="Notes: If VAT special invoice, please input Tax Amount, if VAT general invoice, please input '0' as VAT Tax Amount. Gross Amount equals Net Amount plus Tax Amount."/>
 		    	    </li>
 		    	</ul>
 		    </div>

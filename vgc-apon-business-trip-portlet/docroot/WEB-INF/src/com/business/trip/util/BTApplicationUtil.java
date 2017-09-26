@@ -40,6 +40,27 @@ public class BTApplicationUtil {
 		return newTotal;
 	}
 	
+	
+	public static double addCalculate(double oldTotal,String totalCurrency,double amount,String currency,double etr, double bte ) throws SystemException {
+		if(etr==0 &&bte==0){
+			return addCalculate(oldTotal, totalCurrency, amount, currency);
+		}else{
+			double newTotal = oldTotal;
+			if(currency.equals(totalCurrency)) {
+				newTotal = oldTotal + amount;
+			}else {
+				if(currency.equalsIgnoreCase("EUR")) {
+					newTotal = oldTotal + amount*etr;
+				}else {
+					newTotal = oldTotal + amount*bte;			
+				}
+			}
+			return newTotal;
+		}
+	}
+	
+	
+	
 	//For Calculate
 	public static double deleteCalculate(double oldTotal,String totalCurrency,double amount,String currency) throws SystemException {
 		double newTotal = oldTotal;
@@ -61,7 +82,8 @@ public class BTApplicationUtil {
 	public static void passRenderParameter(ActionRequest actionRequest,
 			ActionResponse actionResponse) {
 		SimpleDateFormat sdf_dmy = new SimpleDateFormat("dd.MM.yyyy");
-		String isApplicantAgent = ParamUtil.getString(actionRequest, "isApplicantAgent");
+		long applicantAgentUserId = ParamUtil.getLong(actionRequest, "applicantAgentPerson");
+		System.out.println("passRenderParameter applicantAgentUserId="+applicantAgentUserId);
 		String staffCode = ParamUtil.getString(actionRequest, "staffCode");
 		long approverId = ParamUtil.getLong(actionRequest, "approverId");
 		String approverName = ParamUtil.getString(actionRequest, "approverName");
@@ -83,7 +105,7 @@ public class BTApplicationUtil {
 		double advancePayment = ParamUtil.getDouble(actionRequest, "advancePayment");
 		String currency = ParamUtil.getString(actionRequest, "currency");
 
-		actionResponse.setRenderParameter("isApplicantAgent", isApplicantAgent);
+		actionResponse.setRenderParameter("applicantAgentPerson", String.valueOf(applicantAgentUserId));
 		actionResponse.setRenderParameter("staffCode", staffCode);
 		actionResponse.setRenderParameter("approverId", String.valueOf(approverId));
 		actionResponse.setRenderParameter("approverName", approverName);
